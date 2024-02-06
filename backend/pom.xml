@@ -15,6 +15,9 @@
     <description>backend</description>
     <properties>
         <java.version>21</java.version>
+        <sonar.organization>sviattorg</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+
     </properties>
     <dependencies>
         <dependency>
