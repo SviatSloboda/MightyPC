@@ -8,9 +8,10 @@ public record PcCase(
         @Id
         String id,
         String name,
-        float price
+        float price,
+        float rating
 ) {
-    public PcCase(String name, float price){
-        this(UUID.randomUUID().toString(), name, price);
+    public PcCase(String name, float price, float rating){
+        this(UUID.randomUUID().toString(), name, price, rating);
     }
 }

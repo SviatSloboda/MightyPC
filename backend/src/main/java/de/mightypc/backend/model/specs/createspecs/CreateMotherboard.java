@@ -9,6 +9,7 @@ public record CreateMotherboard(
         int price,
         int energyConsumption,
         GPU[] graphicCardCompatibility,
-        CPU[] processorCompatibility
+        CPU[] processorCompatibility,
+        float rating
 ) {
 }

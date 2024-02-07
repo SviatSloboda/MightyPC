@@ -5,7 +5,15 @@ import de.mightypc.backend.model.specs.createspecs.CreatePowerSupply;
 import de.mightypc.backend.service.hardware.PowerSupplyService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,14 +28,14 @@ public class PowerSupplyController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PowerSupply>> getAllPowerSupplys() {
-        List<PowerSupply> powerSupplys = powerSupplyService.getAll();
+    public ResponseEntity<List<PowerSupply>> getAllPowerSupplies() {
+        List<PowerSupply> powerSupplies = powerSupplyService.getAll();
 
-        if (powerSupplys.isEmpty()) {
+        if (powerSupplies.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
-        return new ResponseEntity<>(powerSupplys, HttpStatus.OK);
+        return new ResponseEntity<>(powerSupplies, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -43,7 +51,8 @@ public class PowerSupplyController {
                 createPowerSupply.name(),
                 createPowerSupply.description(),
                 createPowerSupply.power(),
-                createPowerSupply.price());
+                createPowerSupply.price(),
+                createPowerSupply.rating());
 
         if (powerSupplyService.save(powerSupply)) {
             return new ResponseEntity<>(HttpStatus.CREATED);

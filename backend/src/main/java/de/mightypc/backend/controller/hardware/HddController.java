@@ -5,7 +5,15 @@ import de.mightypc.backend.model.specs.createspecs.CreateHdd;
 import de.mightypc.backend.service.hardware.HddService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.UUID;
@@ -15,7 +23,7 @@ import java.util.UUID;
 public class HddController {
     private final HddService hddService;
 
-    public HddController(HddService hddService){
+    public HddController(HddService hddService) {
         this.hddService = hddService;
     }
 
@@ -44,7 +52,8 @@ public class HddController {
                 createHdd.description(),
                 createHdd.capacity(),
                 createHdd.energyConsumption(),
-                createHdd.price());
+                createHdd.price(),
+                createHdd.rating());
 
         if (hddService.save(hdd)) {
             return new ResponseEntity<>(HttpStatus.CREATED);

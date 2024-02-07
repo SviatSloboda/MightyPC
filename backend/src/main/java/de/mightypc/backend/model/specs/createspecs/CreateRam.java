@@ -6,6 +6,7 @@ public record CreateRam(
         String type,
         int energyConsumption,
         int memorySize,
-        float price
+        float price,
+        float rating
 ) {
 }

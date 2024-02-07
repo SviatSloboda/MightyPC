@@ -12,9 +12,9 @@ public record CPU(
         float price,
         int performance,
         int energyConsumption,
-        double rating
+        float rating
 ) {
-    public CPU(String name, String description, float price, int performance, int energyConsumption, double rating) {
+    public CPU(String name, String description, float price, int performance, int energyConsumption, float rating) {
         this(UUID.randomUUID().toString(), name, description, price, performance, energyConsumption, rating);
     }
 }

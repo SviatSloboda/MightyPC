@@ -1,12 +1,19 @@
 package de.mightypc.backend.controller.hardware;
 
 import de.mightypc.backend.model.specs.GPU;
-import de.mightypc.backend.model.specs.createspecs.CreateCpu;
 import de.mightypc.backend.model.specs.createspecs.CreateGpu;
 import de.mightypc.backend.service.hardware.GpuService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,7 +23,7 @@ import java.util.UUID;
 public class GpuController {
     private final GpuService gpuService;
 
-    public GpuController(GpuService gpuService){
+    public GpuController(GpuService gpuService) {
         this.gpuService = gpuService;
     }
 
@@ -56,8 +63,8 @@ public class GpuController {
     }
 
     @PostMapping("/all")
-    public ResponseEntity<Void> saveAll(@RequestBody CreateGpu[] gpuArr){
-        for(CreateGpu createGpu: gpuArr){
+    public ResponseEntity<Void> saveAll(@RequestBody CreateGpu[] gpuArr) {
+        for (CreateGpu createGpu : gpuArr) {
             GPU gpu = new GPU(UUID.randomUUID().toString(),
                     createGpu.name(),
                     createGpu.description(),

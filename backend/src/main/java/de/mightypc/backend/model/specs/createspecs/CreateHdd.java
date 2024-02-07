@@ -5,6 +5,7 @@ public record CreateHdd(
         String description,
         int capacity,
         int energyConsumption,
-        float price
+        float price,
+        float rating
 ) {
 }

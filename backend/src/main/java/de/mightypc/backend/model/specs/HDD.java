@@ -11,9 +11,10 @@ public record HDD(
         String description,
         int capacity,
         int energyConsumption,
-        float price
+        float price,
+        float rating
 ) {
-    public HDD(String name, String description, int capacity, int energyConsumption, float price) {
-        this(UUID.randomUUID().toString(), name, description, capacity, energyConsumption, price);
+    public HDD(String name, String description, int capacity, int energyConsumption, float price, float rating) {
+        this(UUID.randomUUID().toString(), name, description, capacity, energyConsumption, price, rating);
     }
 }

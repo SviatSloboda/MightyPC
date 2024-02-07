@@ -10,9 +10,10 @@ public record PowerSupply(
         String name,
         String description,
         int power,
-        float price
+        float price,
+        float rating
 ) {
-    public PowerSupply(String name, String description, int power, float price){
-        this(UUID.randomUUID().toString(), name, description, power, price);
+    public PowerSupply(String name, String description, int power, float price, float rating){
+        this(UUID.randomUUID().toString(), name, description, power, price, rating);
     }
 }

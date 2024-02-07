@@ -6,7 +6,7 @@ public record CreateCpu (
     float price,
     int performance,
     int energyConsumption,
-    double rating
+    float rating
 ){
 
 }

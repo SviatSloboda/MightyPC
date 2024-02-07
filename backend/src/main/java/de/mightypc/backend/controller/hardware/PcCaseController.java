@@ -2,11 +2,19 @@ package de.mightypc.backend.controller.hardware;
 
 import de.mightypc.backend.model.specs.PcCase;
 import de.mightypc.backend.model.specs.createspecs.CreatePcCase;
-import de.mightypc.backend.repository.hardware.PcCaseRepository;
+
 import de.mightypc.backend.service.hardware.PcCaseService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,7 +24,7 @@ import java.util.UUID;
 public class PcCaseController {
     private final PcCaseService pcCaseService;
 
-    public PcCaseController(PcCaseService pcCaseService){
+    public PcCaseController(PcCaseService pcCaseService) {
         this.pcCaseService = pcCaseService;
     }
 
@@ -42,7 +50,8 @@ public class PcCaseController {
     public ResponseEntity<Void> save(@RequestBody CreatePcCase createPcCase) {
         PcCase pcCase = new PcCase(UUID.randomUUID().toString(),
                 createPcCase.name(),
-                createPcCase.price());
+                createPcCase.price(),
+                createPcCase.rating());
 
         if (pcCaseService.save(pcCase)) {
             return new ResponseEntity<>(HttpStatus.CREATED);

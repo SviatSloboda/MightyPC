@@ -5,7 +5,15 @@ import de.mightypc.backend.model.specs.createspecs.CreateRam;
 import de.mightypc.backend.service.hardware.RamService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.UUID;
@@ -45,7 +53,8 @@ public class RamController {
                 createRAM.type(),
                 createRAM.energyConsumption(),
                 createRAM.memorySize(),
-                createRAM.price());
+                createRAM.price(),
+                createRAM.rating());
 
         if (ramService.save(ram)) {
             return new ResponseEntity<>(HttpStatus.CREATED);

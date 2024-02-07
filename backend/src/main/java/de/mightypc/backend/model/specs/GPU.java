@@ -12,9 +12,9 @@ public record GPU(
         float price,
         int performance,
         int energyConsumption,
-        double rating
+        float rating
 ) {
-    public GPU(String name, String description, float price, int performance, int energyConsumption, double rating) {
+    public GPU(String name, String description, float price, int performance, int energyConsumption, float rating) {
         this(UUID.randomUUID().toString(), name, description, price, performance, energyConsumption, rating);
     }
 }

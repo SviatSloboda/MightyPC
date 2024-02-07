@@ -12,9 +12,10 @@ public record RAM(
         String type,
         int energyConsumption,
         int memorySize,
-        float price
+        float price,
+        float rating
 ) {
-    public RAM(String name, String description, String type, int energyConsumption, int memorySize, float price){
-        this(UUID.randomUUID().toString(), name, description, type, energyConsumption, memorySize, price);
+    public RAM(String name, String description, String type, int energyConsumption, int memorySize, float price, float rating){
+        this(UUID.randomUUID().toString(), name, description, type, energyConsumption, memorySize, price, rating);
     }
 }

@@ -4,6 +4,7 @@ public record CreateSsd(
         String name,
         String description,
         int energyConsumption,
-        float price
+        float price,
+        float rating
 ) {
 }

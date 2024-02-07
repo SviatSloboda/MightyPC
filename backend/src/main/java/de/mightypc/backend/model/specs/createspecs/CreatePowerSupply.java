@@ -4,6 +4,7 @@ public record CreatePowerSupply(
         String name,
         String description,
         int power,
-        float price
+        float price,
+        float rating
 ) {
 }

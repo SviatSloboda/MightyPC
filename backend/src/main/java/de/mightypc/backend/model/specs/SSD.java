@@ -10,9 +10,10 @@ public record SSD(
         String name,
         String description,
         int energyConsumption,
-        float price
+        float price,
+        float rating
 ) {
-    public SSD(String name, String description, int energyConsumption, float price){
-        this(UUID.randomUUID().toString(), name, description, energyConsumption, price);
+    public SSD(String name, String description, int energyConsumption, float price, float rating){
+        this(UUID.randomUUID().toString(), name, description, energyConsumption, price, rating);
     }
 }

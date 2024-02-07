@@ -14,19 +14,20 @@ public record Motherboard(
         float price,
         int energyConsumption,
         GPU[] graphicCardCompatibility,
-        CPU[] processorCompatibility
+        CPU[] processorCompatibility,
+        float rating
 ) {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Motherboard that = (Motherboard) o;
-        return price == that.price && energyConsumption == that.energyConsumption && Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Arrays.equals(graphicCardCompatibility, that.graphicCardCompatibility) && Arrays.equals(processorCompatibility, that.processorCompatibility);
+        return price == that.price && energyConsumption == that.energyConsumption && Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Arrays.equals(graphicCardCompatibility, that.graphicCardCompatibility) && Arrays.equals(processorCompatibility, that.processorCompatibility) && Objects.equals(rating, that.rating);
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(id, name, description, price, energyConsumption);
+        int result = Objects.hash(id, name, description, price, energyConsumption, rating);
         result = 31 * result + Arrays.hashCode(graphicCardCompatibility);
         result = 31 * result + Arrays.hashCode(processorCompatibility);
         return result;
@@ -42,10 +43,11 @@ public record Motherboard(
                ", energyConsumption=" + energyConsumption +
                ", graphicCardCompatibility=" + Arrays.toString(graphicCardCompatibility) +
                ", processorCompatibility=" + Arrays.toString(processorCompatibility) +
+               ", rating=" + rating +
                '}';
     }
 
-    public Motherboard(String name, String description, float price, int energyConsumption, GPU[] graphicCardCompatibility, CPU[] processorCompatibility){
-        this(UUID.randomUUID().toString(), name, description, price, energyConsumption, graphicCardCompatibility, processorCompatibility);
+    public Motherboard(String name, String description, float price, int energyConsumption, GPU[] graphicCardCompatibility, CPU[] processorCompatibility, float rating){
+        this(UUID.randomUUID().toString(), name, description, price, energyConsumption, graphicCardCompatibility, processorCompatibility, rating);
     }
 }
