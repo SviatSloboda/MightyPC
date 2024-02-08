@@ -1,10 +1,12 @@
 package de.mightypc.backend.model.specs.createspecs;
 
+import java.math.BigDecimal;
+
 public record CreatePowerSupply(
         String name,
         String description,
         int power,
-        float price,
+        BigDecimal price,
         float rating
 ) {
 }

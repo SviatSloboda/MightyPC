@@ -1,10 +1,10 @@
 package de.mightypc.backend.service.hardware;
 
+import de.mightypc.backend.exception.HardwareNotFoundException;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 public abstract class BaseService<T, ID, R extends MongoRepository<T, ID>> {
     protected R repository;
@@ -15,13 +15,17 @@ public abstract class BaseService<T, ID, R extends MongoRepository<T, ID>> {
 
     @Transactional(readOnly = true)
     public List<T> getAll() {
-        return repository.findAll();
+        List<T> entities = repository.findAll();
+
+        if(entities.isEmpty()) throw new HardwareNotFoundException("No entities were retrieved");
+
+        return entities;
     }
 
     @Transactional(readOnly = true)
     public T getById(ID id) {
         return repository.findById(id).orElseThrow(
-                () -> new NoSuchElementException(getNotFoundMessage(id)));
+                () -> new HardwareNotFoundException((getNotFoundMessage(id))));
     }
 
     @Transactional
@@ -31,20 +35,24 @@ public abstract class BaseService<T, ID, R extends MongoRepository<T, ID>> {
 
     @Transactional
     public T update(T entity) {
-        if (!repository.existsById(getId(entity))) {
-            throw new NoSuchElementException(getNotFoundMessage(getId(entity)));
+        ID entityId = getId(entity);
+
+        if (!repository.existsById(entityId)) {
+            throw new HardwareNotFoundException((getNotFoundMessage(entityId)));
         }
 
         return repository.save(entity);
     }
 
     @Transactional
-    public void delete(ID id) {
+    public boolean delete(ID id) {
         if (!repository.existsById(id)) {
-            throw new NoSuchElementException(getNotFoundMessage(id));
+            throw new HardwareNotFoundException((getNotFoundMessage(id)));
         }
 
         repository.deleteById(id);
+
+        return !repository.existsById(id);
     }
 
     private String getNotFoundMessage(ID id) {

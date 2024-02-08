@@ -1,10 +1,12 @@
 package de.mightypc.backend.model.specs.createspecs;
 
+import java.math.BigDecimal;
+
 public record CreateSsd(
         String name,
         String description,
         int energyConsumption,
-        float price,
+        BigDecimal price,
         float rating
 ) {
 }

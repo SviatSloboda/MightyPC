@@ -1,83 +1,35 @@
 package de.mightypc.backend.controller.hardware;
 
+import de.mightypc.backend.model.specs.HardwareSpec;
 import de.mightypc.backend.model.specs.RAM;
 import de.mightypc.backend.model.specs.createspecs.CreateRam;
 import de.mightypc.backend.service.hardware.RamService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("hardware/ram")
-public class RamController {
-    private final RamService ramService;
-
-    public RamController(RamService ramService){
-        this.ramService = ramService;
-    }
-
-    @GetMapping
-    public ResponseEntity<List<RAM>> getAllRAMs() {
-        List<RAM> rams = ramService.getAll();
-
-        if (rams.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-
-        return new ResponseEntity<>(rams, HttpStatus.OK);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<RAM> getById(@PathVariable String id) {
-        return ramService.getById(id)
-                .map(ram -> new ResponseEntity<>(ram, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+public class RamController extends BaseController<RAM, String, RamService> {
+    protected RamController(RamService service) {
+        super(service);
     }
 
     @PostMapping
-    public ResponseEntity<Void> save(@RequestBody CreateRam createRAM) {
-        RAM ram = new RAM(UUID.randomUUID().toString(),
-                createRAM.name(),
-                createRAM.description(),
-                createRAM.type(),
-                createRAM.energyConsumption(),
-                createRAM.memorySize(),
-                createRAM.price(),
-                createRAM.rating());
+    @ResponseStatus(HttpStatus.CREATED)
+    public RAM save(CreateRam createRam) {
+        HardwareSpec hardwareSpec = new HardwareSpec(
+                UUID.randomUUID().toString(),
+                createRam.name(),
+                createRam.description(),
+                createRam.price(),
+                createRam.rating()
+        );
 
-        if (ramService.save(ram)) {
-            return new ResponseEntity<>(HttpStatus.CREATED);
-        }
-
-        return new ResponseEntity<>(HttpStatus.CONFLICT);
-    }
-
-    @PutMapping
-    public ResponseEntity<Void> update(@RequestBody RAM ram) {
-        if (ramService.update(ram)) {
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
-        if (ramService.deleteById(id)) {
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return service.save(new RAM(hardwareSpec, createRam.type(), createRam.energyConsumption(), createRam.memorySize()));
     }
 }

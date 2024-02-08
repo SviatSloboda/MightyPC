@@ -1,11 +1,13 @@
 package de.mightypc.backend.model.specs.createspecs;
 
-public record CreateCpu (
-    String name,
-    String description,
-    float price,
-    int performance,
-    int energyConsumption,
-    float rating
-){
+import java.math.BigDecimal;
+
+public record CreateCpu(
+        String name,
+        String description,
+        BigDecimal price,
+        int performance,
+        int energyConsumption,
+        float rating
+) {
 }
