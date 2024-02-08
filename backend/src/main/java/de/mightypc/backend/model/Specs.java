@@ -2,6 +2,8 @@ package de.mightypc.backend.model;
 
 import de.mightypc.backend.model.specs.*;
 
+import java.math.BigDecimal;
+
 public record Specs(
         CPU cpu,
         GPU gpu,
@@ -10,7 +12,7 @@ public record Specs(
         SSD ssd,
         HDD hdd,
         PowerSupply powerSupply,
-        int totalPrice,
+        BigDecimal totalPrice,
         int totalPerformance
 ) {
 }

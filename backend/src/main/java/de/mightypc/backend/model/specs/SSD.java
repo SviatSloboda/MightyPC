@@ -1,19 +1,7 @@
 package de.mightypc.backend.model.specs;
 
-import org.springframework.data.annotation.Id;
-
-import java.util.UUID;
-
 public record SSD(
-        @Id
-        String id,
-        String name,
-        String description,
-        int energyConsumption,
-        float price,
-        float rating
+        HardwareSpec hardwareSpec,
+        int energyConsumption
 ) {
-    public SSD(String name, String description, int energyConsumption, float price, float rating){
-        this(UUID.randomUUID().toString(), name, description, energyConsumption, price, rating);
-    }
 }

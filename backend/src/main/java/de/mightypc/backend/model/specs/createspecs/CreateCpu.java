@@ -8,5 +8,4 @@ public record CreateCpu (
     int energyConsumption,
     float rating
 ){
-
 }
