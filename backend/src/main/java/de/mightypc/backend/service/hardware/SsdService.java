@@ -9,9 +9,10 @@ import java.util.Optional;
 
 @Service
 public class SsdService extends BaseService<SSD, String, SsdRepository> {
-    protected SsdService(SsdRepository ssdRepository){
+    protected SsdService(SsdRepository ssdRepository) {
         super(ssdRepository);
     }
+
     @Override
     protected String getId(SSD entity) {
         return entity.hardwareSpec().id();

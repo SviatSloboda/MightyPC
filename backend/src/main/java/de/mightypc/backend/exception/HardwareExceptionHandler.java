@@ -10,7 +10,7 @@ import java.time.ZonedDateTime;
 @ControllerAdvice
 public class HardwareExceptionHandler {
     @ExceptionHandler(value = {HardwareNotFoundException.class})
-    public ResponseEntity<Object> handleHardwareNotFoundException(HardwareNotFoundException hardwareNotFoundException){
+    public ResponseEntity<Object> handleHardwareNotFoundException(HardwareNotFoundException hardwareNotFoundException) {
         ErrorResponse hardwareException = new ErrorResponse(
                 hardwareNotFoundException.getMessage(),
                 hardwareNotFoundException.getCause(),

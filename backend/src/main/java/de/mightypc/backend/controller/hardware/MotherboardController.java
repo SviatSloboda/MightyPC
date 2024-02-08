@@ -14,14 +14,14 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("hardware/motherboard")
-public class MotherboardController extends BaseController<Motherboard, String, MotherboardService>{
+public class MotherboardController extends BaseController<Motherboard, String, MotherboardService> {
     protected MotherboardController(MotherboardService service) {
         super(service);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Motherboard save(CreateMotherboard createMotherboard){
+    public Motherboard save(CreateMotherboard createMotherboard) {
         HardwareSpec hardwareSpec = new HardwareSpec(
                 UUID.randomUUID().toString(),
                 createMotherboard.name(),
@@ -35,6 +35,6 @@ public class MotherboardController extends BaseController<Motherboard, String, M
                 createMotherboard.energyConsumption(),
                 createMotherboard.graphicCardCompatibility(),
                 createMotherboard.processorCompatibility()
-                ));
+        ));
     }
 }

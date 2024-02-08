@@ -21,7 +21,7 @@ public class SsdController extends BaseController<SSD, String, SsdService> {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public SSD save(CreateSsd createSsd){
+    public SSD save(CreateSsd createSsd) {
         HardwareSpec hardwareSpec = new HardwareSpec(
                 UUID.randomUUID().toString(),
                 createSsd.name(),

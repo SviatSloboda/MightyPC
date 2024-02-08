@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class HddService extends BaseService<HDD, String, HddRepository> {
-    protected HddService(HddRepository hddRepository){
+    protected HddService(HddRepository hddRepository) {
         super(hddRepository);
     }
 

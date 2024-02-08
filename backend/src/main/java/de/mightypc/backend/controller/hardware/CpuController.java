@@ -21,7 +21,7 @@ public class CpuController extends BaseController<CPU, String, CpuService> {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CPU saveCpu(CreateCpu createCpu){
+    public CPU saveCpu(CreateCpu createCpu) {
         HardwareSpec hardwareSpec = new HardwareSpec(
                 UUID.randomUUID().toString(),
                 createCpu.name(),

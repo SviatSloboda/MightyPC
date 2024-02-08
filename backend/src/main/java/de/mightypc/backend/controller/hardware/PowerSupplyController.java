@@ -14,14 +14,14 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("hardware/power-supply")
-public class PowerSupplyController extends BaseController<PowerSupply, String, PowerSupplyService>{
+public class PowerSupplyController extends BaseController<PowerSupply, String, PowerSupplyService> {
     protected PowerSupplyController(PowerSupplyService service) {
         super(service);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public PowerSupply save(CreatePowerSupply createPowerSupply){
+    public PowerSupply save(CreatePowerSupply createPowerSupply) {
         HardwareSpec hardwareSpec = new HardwareSpec(
                 UUID.randomUUID().toString(),
                 createPowerSupply.name(),

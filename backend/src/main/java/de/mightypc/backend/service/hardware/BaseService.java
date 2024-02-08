@@ -17,7 +17,7 @@ public abstract class BaseService<T, ID, R extends MongoRepository<T, ID>> {
     public List<T> getAll() {
         List<T> entities = repository.findAll();
 
-        if(entities.isEmpty()) throw new HardwareNotFoundException("No entities were retrieved");
+        if (entities.isEmpty()) throw new HardwareNotFoundException("No entities were retrieved");
 
         return entities;
     }

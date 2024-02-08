@@ -5,8 +5,8 @@ import de.mightypc.backend.repository.hardware.PowerSupplyRepository;
 import org.springframework.stereotype.Service;
 
 @Service
-public class PowerSupplyService extends BaseService<PowerSupply, String, PowerSupplyRepository>{
-    protected PowerSupplyService(PowerSupplyRepository powerSupplyRepository){
+public class PowerSupplyService extends BaseService<PowerSupply, String, PowerSupplyRepository> {
+    protected PowerSupplyService(PowerSupplyRepository powerSupplyRepository) {
         super(powerSupplyRepository);
     }
 

@@ -10,9 +10,10 @@ import java.util.Optional;
 
 @Service
 public class RamService extends BaseService<RAM, String, RamRepository> {
-    protected RamService(RamRepository ramRepository){
+    protected RamService(RamRepository ramRepository) {
         super(ramRepository);
     }
+
     @Override
     protected String getId(RAM entity) {
         return entity.hardwareSpec().id();

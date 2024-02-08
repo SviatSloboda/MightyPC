@@ -21,7 +21,7 @@ public class HddController extends BaseController<HDD, String, HddService> {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public HDD save(CreateHdd createHdd){
+    public HDD save(CreateHdd createHdd) {
         HardwareSpec hardwareSpec = new HardwareSpec(
                 UUID.randomUUID().toString(),
                 createHdd.name(),
