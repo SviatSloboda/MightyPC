@@ -14,14 +14,15 @@ public record Motherboard(
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Motherboard that = (Motherboard) o;
-        return energyConsumption == that.energyConsumption && Objects.equals(hardwareSpec, that.hardwareSpec) && Arrays.equals(graphicCardCompatibility, that.graphicCardCompatibility) && Arrays.equals(processorCompatibility, that.processorCompatibility);
+        return energyConsumption == that.energyConsumption && Objects.equals(hardwareSpec, that.hardwareSpec) && Arrays.deepEquals(graphicCardCompatibility, that.graphicCardCompatibility) && Arrays.deepEquals(processorCompatibility, that.processorCompatibility);
     }
 
     @Override
     public int hashCode() {
         int result = Objects.hash(hardwareSpec, energyConsumption);
-        result = 31 * result + Arrays.hashCode(graphicCardCompatibility);
-        result = 31 * result + Arrays.hashCode(processorCompatibility);
+        result = 31 * result + Arrays.deepHashCode(graphicCardCompatibility);
+        result = 31 * result + Arrays.deepHashCode(processorCompatibility);
         return result;
     }
+
 }
