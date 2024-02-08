@@ -4,9 +4,6 @@ import de.mightypc.backend.model.specs.SSD;
 import de.mightypc.backend.repository.hardware.SsdRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-
 @Service
 public class SsdService extends BaseService<SSD, String, SsdRepository> {
     protected SsdService(SsdRepository ssdRepository) {
