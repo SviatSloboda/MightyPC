@@ -14,7 +14,10 @@ public record Motherboard(
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Motherboard that = (Motherboard) o;
-        return energyConsumption == that.energyConsumption && Objects.equals(hardwareSpec, that.hardwareSpec) && Arrays.deepEquals(graphicCardCompatibility, that.graphicCardCompatibility) && Arrays.deepEquals(processorCompatibility, that.processorCompatibility);
+        return energyConsumption == that.energyConsumption &&
+               Objects.equals(hardwareSpec, that.hardwareSpec) &&
+               Arrays.deepEquals(graphicCardCompatibility, that.graphicCardCompatibility) &&
+               Arrays.deepEquals(processorCompatibility, that.processorCompatibility);
     }
 
     @Override
@@ -25,4 +28,13 @@ public record Motherboard(
         return result;
     }
 
+    @Override
+    public String toString() {
+        return "Motherboard{" +
+               "hardwareSpec=" + hardwareSpec +
+               ", energyConsumption=" + energyConsumption +
+               ", graphicCardCompatibility=" + Arrays.toString(graphicCardCompatibility) +
+               ", processorCompatibility=" + Arrays.toString(processorCompatibility) +
+               '}';
+    }
 }
