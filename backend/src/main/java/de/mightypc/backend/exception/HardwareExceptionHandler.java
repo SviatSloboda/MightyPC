@@ -19,15 +19,4 @@ public class HardwareExceptionHandler {
 
         return new ResponseEntity<>(hardwareException, HttpStatus.NOT_FOUND);
     }
-
-    @ExceptionHandler(value = {HardwareNoContentException.class})
-    public ResponseEntity<Object> handleHardwareNoContentException(HardwareNoContentException hardwareNoContentException){
-        ErrorResponse hardwareException = new ErrorResponse(
-                hardwareNoContentException.getMessage(),
-                hardwareNoContentException.getCause(),
-                HttpStatus.NO_CONTENT,
-                ZonedDateTime.now());
-
-        return new ResponseEntity<>(hardwareException, HttpStatus.NO_CONTENT);
-    }
 }
