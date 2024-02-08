@@ -1,62 +1,66 @@
 package de.mightypc.backend.service.hardware;
 
+import de.mightypc.backend.exception.HardwareNotFoundException;
 import de.mightypc.backend.model.specs.PowerSupply;
+import de.mightypc.backend.model.specs.HardwareSpec;
 import de.mightypc.backend.repository.hardware.PowerSupplyRepository;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class PowerSupplyServiceTest {
     private final PowerSupplyRepository powerSupplyRepository = mock(PowerSupplyRepository.class);
     private final PowerSupplyService powerSupplyService = new PowerSupplyService(powerSupplyRepository);
 
+    private static PowerSupply getPowerSupply() {
+        return new PowerSupply(new HardwareSpec(
+                "1",
+                "test",
+                "test",
+                new BigDecimal("1"),
+                1.01f),
+                1
+        );
+    }
+
     @Test
-    void getAll_ReturnsAllPowerSupplies() {
+    void getAll_ReturnsAllPowerSupplys() {
         // Arrange
-        List<PowerSupply> expected = new ArrayList<>(List.of(new PowerSupply("1", "test", "test", 1, 1.01f, 1.01f)));
+        List<PowerSupply> expected = new ArrayList<>(List.of(getPowerSupply()));
         when(powerSupplyRepository.findAll()).thenReturn(expected);
 
         // Act
         List<PowerSupply> actual = powerSupplyService.getAll();
 
         // Assert
-        assertEquals(expected, actual, "getAll should return all PowerSupplies");
+        assertEquals(expected, actual, "getAll should return all PowerSupplys");
         verify(powerSupplyRepository).findAll();
     }
 
     @Test
-    void getAll_ReturnsEmptyListWhenNoPowerSupplies() {
+    void getAll_ReturnsEmptyListWhenNoPowerSupplys() {
         // Arrange
         List<PowerSupply> expected = new ArrayList<>();
         when(powerSupplyRepository.findAll()).thenReturn(expected);
 
-        // Act
-        List<PowerSupply> actual = powerSupplyService.getAll();
-
-        // Assert
-        assertEquals(expected, actual, "getAll should return an empty list when no PowerSupplies exist");
-        verify(powerSupplyRepository).findAll();
+        // Act & Assert
+        assertThrows(HardwareNotFoundException.class, powerSupplyService::getAll);
     }
 
     @Test
     void getById_ReturnsPowerSupplyWhenExists() {
         //Arrange
-        Optional<PowerSupply> expected = Optional.of(new PowerSupply("1", "test", "test", 1, 1.01f, 1.01f));
-        when(powerSupplyRepository.findById("1")).thenReturn(expected);
+        PowerSupply expected = getPowerSupply();
+        when(powerSupplyRepository.findById("1")).thenReturn(Optional.of(expected));
 
         //Act
-        Optional<PowerSupply> actual = powerSupplyService.getById("1");
+        PowerSupply actual = powerSupplyService.getById("1");
 
         //Assert
         assertEquals(expected, actual, "getById should return the PowerSupply when it exists");
@@ -64,80 +68,60 @@ class PowerSupplyServiceTest {
     }
 
     @Test
-    void getById_ReturnsEmptyWhenPowerSupplyDoesNotExist() {
+    void getById_ThrowsExceptionWhenPowerSupplyDoesNotExist() {
         //Arrange
-        Optional<PowerSupply> expected = Optional.empty();
-        when(powerSupplyRepository.findById("1")).thenReturn(expected);
+        when(powerSupplyRepository.findById("1")).thenReturn(Optional.empty());
 
-        //Act
-        Optional<PowerSupply> actual = powerSupplyService.getById("1");
-
-        //Assert
-        assertEquals(expected, actual, "getById should return empty when the PowerSupply does not exist");
+        //Act & Assert
+        assertThrows(HardwareNotFoundException.class, () -> powerSupplyService.getById("1"),
+                "getById should throw HardwareNotFoundException when the PowerSupply does not exist");
         verify(powerSupplyRepository).findById("1");
     }
 
     @Test
-    void save_ReturnsTrueWhenPowerSupplyIsPersisted() {
+    void save_ReturnsSavedPowerSupply() {
         // Arrange
-        PowerSupply powerSupplyToSave = new PowerSupply("1", "test", "test", 1, 1.01f, 1.01f);
-        when(powerSupplyRepository.existsById("1")).thenReturn(true);
+        PowerSupply expected = getPowerSupply();
+        when(powerSupplyRepository.save(expected)).thenReturn(expected);
 
         // Act
-        boolean result = powerSupplyService.save(powerSupplyToSave);
+        PowerSupply actual = powerSupplyService.save(expected);
 
         // Assert
-        assertTrue(result, "save should return true when the PowerSupply is persisted");
-        verify(powerSupplyRepository).save(powerSupplyToSave);
+        assertEquals(expected, actual, "save should return the saved PowerSupply");
+        verify(powerSupplyRepository).save(expected);
+    }
+
+    @Test
+    void update_ReturnsUpdatedPowerSupplyWhenPowerSupplyExists() {
+        // Arrange
+        PowerSupply expected = getPowerSupply();
+        when(powerSupplyRepository.existsById("1")).thenReturn(true);
+        when(powerSupplyRepository.save(expected)).thenReturn(expected);
+
+        // Act
+        PowerSupply actual = powerSupplyService.update(expected);
+
+        // Assert
+        assertEquals(expected, actual, "update should return the updated PowerSupply");
+        verify(powerSupplyRepository).save(expected);
         verify(powerSupplyRepository).existsById("1");
     }
 
     @Test
-    void save_ReturnsFalseWhenPowerSupplyIsNotPersisted() {
+    void update_ThrowsExceptionWhenPowerSupplyDoesNotExist() {
         // Arrange
-        PowerSupply powerSupplyToSave = new PowerSupply("1", "test", "test", 1, 1.01f, 1.01f);
+        PowerSupply expected = getPowerSupply();
         when(powerSupplyRepository.existsById("1")).thenReturn(false);
 
-        // Act
-        boolean result = powerSupplyService.save(powerSupplyToSave);
-
-        // Assert
-        assertFalse(result, "save should return false when the PowerSupply is not persisted");
-        verify(powerSupplyRepository).save(powerSupplyToSave);
+        // Act & Assert
+        assertThrows(HardwareNotFoundException.class, () -> powerSupplyService.update(expected),
+                "update should throw HardwareNotFoundException when the PowerSupply does not exist");
         verify(powerSupplyRepository).existsById("1");
     }
 
     @Test
-    void update_ReturnsTrueWhenPowerSupplyExists() {
-        // Arrange
-        PowerSupply powerSupplyToUpdate = new PowerSupply("1", "test", "test", 1, 1.01f, 1.01f);
-        when(powerSupplyRepository.existsById("1")).thenReturn(true);
-
-        // Act
-        boolean result = powerSupplyService.update(powerSupplyToUpdate);
-
-        // Assert
-        assertTrue(result, "update should return true when the PowerSupply exists and is updated");
-        verify(powerSupplyRepository).save(powerSupplyToUpdate);
-        verify(powerSupplyRepository).existsById("1");
-    }
-
-    @Test
-    void update_ReturnsFalseWhenPowerSupplyDoesNotExist() {
-        // Arrange
-        PowerSupply powerSupplyToUpdate = new PowerSupply("1", "test", "test", 1, 1.01f, 1.01f);
-        when(powerSupplyRepository.existsById("1")).thenReturn(false);
-
-        // Act
-        boolean result = powerSupplyService.update(powerSupplyToUpdate);
-
-        // Assert
-        assertFalse(result, "update should return false when the PowerSupply does not exist");
-        verify(powerSupplyRepository).existsById("1");
-    }
-
-    @Test
-    void deleteById_ReturnsTrueWhenPowerSupplyIsDeleted() {
+    void deleteById_DeletesPowerSupplyWhenExists() {
         // Arrange
         String id = "1";
         when(powerSupplyRepository.existsById(id)).thenReturn(true).thenReturn(false);
@@ -148,20 +132,17 @@ class PowerSupplyServiceTest {
         // Assert
         assertTrue(result, "deleteById should return true when the PowerSupply exists and is deleted");
         verify(powerSupplyRepository).deleteById(id);
+        verify(powerSupplyRepository, times(2)).existsById(id);
     }
 
     @Test
-    void deleteById_ReturnsFalseWhenPowerSupplyDoesNotExist() {
+    void deleteById_ThrowsHardwareNotFoundExceptionWhenPowerSupplyDoesNotExist() {
         // Arrange
         String id = "1";
         when(powerSupplyRepository.existsById(id)).thenReturn(false);
 
-        // Act
-        boolean result = powerSupplyService.deleteById(id);
-
-        // Assert
-        assertFalse(result, "deleteById should return false when the PowerSupply does not exist");
+        // Act & Assert
+        assertThrows(HardwareNotFoundException.class, () -> powerSupplyService.deleteById(id), "Expected HardwareNotFoundException when PowerSupply does not exist");
         verify(powerSupplyRepository).existsById(id);
-        verifyNoMoreInteractions(powerSupplyRepository);
     }
 }

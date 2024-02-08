@@ -1,30 +1,38 @@
 package de.mightypc.backend.service.hardware;
 
+import de.mightypc.backend.exception.HardwareNotFoundException;
 import de.mightypc.backend.model.specs.SSD;
+import de.mightypc.backend.model.specs.HardwareSpec;
 import de.mightypc.backend.repository.hardware.SsdRepository;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class SsdServiceTest {
     private final SsdRepository ssdRepository = mock(SsdRepository.class);
     private final SsdService ssdService = new SsdService(ssdRepository);
 
+    private static SSD getSsd() {
+        return new SSD(new HardwareSpec(
+                "1",
+                "test",
+                "test",
+                new BigDecimal("1"),
+                1.01f),
+                9500
+        );
+    }
+
     @Test
     void getAll_ReturnsAllSsds() {
         // Arrange
-        List<SSD> expected = new ArrayList<>(List.of(new SSD("1", "test", "test", 1, 1.01f, 1.01f)));
+        List<SSD> expected = new ArrayList<>(List.of(getSsd()));
         when(ssdRepository.findAll()).thenReturn(expected);
 
         // Act
@@ -41,22 +49,18 @@ class SsdServiceTest {
         List<SSD> expected = new ArrayList<>();
         when(ssdRepository.findAll()).thenReturn(expected);
 
-        // Act
-        List<SSD> actual = ssdService.getAll();
-
-        // Assert
-        assertEquals(expected, actual, "getAll should return an empty list when no SSDs exist");
-        verify(ssdRepository).findAll();
+        // Act & Assert
+        assertThrows(HardwareNotFoundException.class, ssdService::getAll);
     }
 
     @Test
     void getById_ReturnsSsdWhenExists() {
         //Arrange
-        Optional<SSD> expected = Optional.of(new SSD("1", "test", "test", 1, 1.01f, 1.01f));
-        when(ssdRepository.findById("1")).thenReturn(expected);
+        SSD expected = getSsd();
+        when(ssdRepository.findById("1")).thenReturn(Optional.of(expected));
 
         //Act
-        Optional<SSD> actual = ssdService.getById("1");
+        SSD actual = ssdService.getById("1");
 
         //Assert
         assertEquals(expected, actual, "getById should return the SSD when it exists");
@@ -64,80 +68,60 @@ class SsdServiceTest {
     }
 
     @Test
-    void getById_ReturnsEmptyWhenSsdDoesNotExist() {
+    void getById_ThrowsExceptionWhenSsdDoesNotExist() {
         //Arrange
-        Optional<SSD> expected = Optional.empty();
-        when(ssdRepository.findById("1")).thenReturn(expected);
+        when(ssdRepository.findById("1")).thenReturn(Optional.empty());
 
-        //Act
-        Optional<SSD> actual = ssdService.getById("1");
-
-        //Assert
-        assertEquals(expected, actual, "getById should return empty when the SSD does not exist");
+        //Act & Assert
+        assertThrows(HardwareNotFoundException.class, () -> ssdService.getById("1"),
+                "getById should throw HardwareNotFoundException when the SSD does not exist");
         verify(ssdRepository).findById("1");
     }
 
     @Test
-    void save_ReturnsTrueWhenSsdIsPersisted() {
+    void save_ReturnsSavedSsd() {
         // Arrange
-        SSD ssdToSave = new SSD("1", "test", "test", 1, 1.01f, 1.01f);
-        when(ssdRepository.existsById("1")).thenReturn(true);
+        SSD expected = getSsd();
+        when(ssdRepository.save(expected)).thenReturn(expected);
 
         // Act
-        boolean result = ssdService.save(ssdToSave);
+        SSD actual = ssdService.save(expected);
 
         // Assert
-        assertTrue(result, "save should return true when the SSD is persisted");
-        verify(ssdRepository).save(ssdToSave);
+        assertEquals(expected, actual, "save should return the saved SSD");
+        verify(ssdRepository).save(expected);
+    }
+
+    @Test
+    void update_ReturnsUpdatedSsdWhenSsdExists() {
+        // Arrange
+        SSD expected = getSsd();
+        when(ssdRepository.existsById("1")).thenReturn(true);
+        when(ssdRepository.save(expected)).thenReturn(expected);
+
+        // Act
+        SSD actual = ssdService.update(expected);
+
+        // Assert
+        assertEquals(expected, actual, "update should return the updated SSD");
+        verify(ssdRepository).save(expected);
         verify(ssdRepository).existsById("1");
     }
 
     @Test
-    void save_ReturnsFalseWhenSsdIsNotPersisted() {
+    void update_ThrowsExceptionWhenSsdDoesNotExist() {
         // Arrange
-        SSD ssdToSave = new SSD("1", "test", "test", 1, 1.01f, 1.01f);
+        SSD expected = getSsd();
         when(ssdRepository.existsById("1")).thenReturn(false);
 
-        // Act
-        boolean result = ssdService.save(ssdToSave);
-
-        // Assert
-        assertFalse(result, "save should return false when the SSD is not persisted");
-        verify(ssdRepository).save(ssdToSave);
+        // Act & Assert
+        assertThrows(HardwareNotFoundException.class, () -> ssdService.update(expected),
+                "update should throw HardwareNotFoundException when the SSD does not exist");
         verify(ssdRepository).existsById("1");
     }
 
     @Test
-    void update_ReturnsTrueWhenSsdExists() {
-        // Arrange
-        SSD ssdToUpdate = new SSD("1", "test", "test", 1, 1.01f, 1.01f);
-        when(ssdRepository.existsById("1")).thenReturn(true);
-
-        // Act
-        boolean result = ssdService.update(ssdToUpdate);
-
-        // Assert
-        assertTrue(result, "update should return true when the SSD exists and is updated");
-        verify(ssdRepository).save(ssdToUpdate);
-        verify(ssdRepository).existsById("1");
-    }
-
-    @Test
-    void update_ReturnsFalseWhenSsdDoesNotExist() {
-        // Arrange
-        SSD ssdToUpdate = new SSD("1", "test", "test", 1, 1.01f, 1.01f);
-        when(ssdRepository.existsById("1")).thenReturn(false);
-
-        // Act
-        boolean result = ssdService.update(ssdToUpdate);
-
-        // Assert
-        assertFalse(result, "update should return false when the SSD does not exist");
-        verify(ssdRepository).existsById("1");
-    }
-
-    @Test
-    void deleteById_ReturnsTrueWhenSsdIsDeleted() {
+    void deleteById_DeletesSsdWhenExists() {
         // Arrange
         String id = "1";
         when(ssdRepository.existsById(id)).thenReturn(true).thenReturn(false);
@@ -148,20 +132,17 @@ class SsdServiceTest {
         // Assert
         assertTrue(result, "deleteById should return true when the SSD exists and is deleted");
         verify(ssdRepository).deleteById(id);
+        verify(ssdRepository, times(2)).existsById(id);
     }
 
     @Test
-    void deleteById_ReturnsFalseWhenSsdDoesNotExist() {
+    void deleteById_ThrowsHardwareNotFoundExceptionWhenSsdDoesNotExist() {
         // Arrange
         String id = "1";
         when(ssdRepository.existsById(id)).thenReturn(false);
 
-        // Act
-        boolean result = ssdService.deleteById(id);
-
-        // Assert
-        assertFalse(result, "deleteById should return false when the SSD does not exist");
+        // Act & Assert
+        assertThrows(HardwareNotFoundException.class, () -> ssdService.deleteById(id), "Expected HardwareNotFoundException when SSD does not exist");
         verify(ssdRepository).existsById(id);
-        verifyNoMoreInteractions(ssdRepository);
     }
 }

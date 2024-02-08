@@ -24,7 +24,7 @@ public abstract class BaseController<T, ID, S extends BaseService<T, ID, ?>> {
 
     @DeleteMapping("/{id}")
     public boolean deleteById(@PathVariable ID id) {
-        return service.delete(id);
+        return service.deleteById(id);
     }
 
     @PutMapping

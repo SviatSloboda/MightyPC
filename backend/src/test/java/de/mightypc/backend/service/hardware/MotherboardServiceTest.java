@@ -1,32 +1,42 @@
 package de.mightypc.backend.service.hardware;
 
+import de.mightypc.backend.exception.HardwareNotFoundException;
 import de.mightypc.backend.model.specs.CPU;
 import de.mightypc.backend.model.specs.GPU;
 import de.mightypc.backend.model.specs.Motherboard;
+import de.mightypc.backend.model.specs.HardwareSpec;
 import de.mightypc.backend.repository.hardware.MotherboardRepository;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class MotherboardServiceTest {
     private final MotherboardRepository motherboardRepository = mock(MotherboardRepository.class);
     private final MotherboardService motherboardService = new MotherboardService(motherboardRepository);
 
+    private static Motherboard getMotherboard() {
+        return new Motherboard(new HardwareSpec(
+                "1",
+                "test",
+                "test",
+                new BigDecimal("1"),
+                1.01f),
+                9500,
+                new GPU[]{},
+                new CPU[]{}
+        );
+    }
+
     @Test
     void getAll_ReturnsAllMotherboards() {
         // Arrange
-        List<Motherboard> expected = new ArrayList<>(List.of(new Motherboard("1", "test", "test", 1.01f, 1, new GPU[]{}, new CPU[]{}, 1.01f)));
+        List<Motherboard> expected = new ArrayList<>(List.of(getMotherboard()));
         when(motherboardRepository.findAll()).thenReturn(expected);
 
         // Act
@@ -43,22 +53,18 @@ class MotherboardServiceTest {
         List<Motherboard> expected = new ArrayList<>();
         when(motherboardRepository.findAll()).thenReturn(expected);
 
-        // Act
-        List<Motherboard> actual = motherboardService.getAll();
-
-        // Assert
-        assertEquals(expected, actual, "getAll should return an empty list when no Motherboards exist");
-        verify(motherboardRepository).findAll();
+        // Act & Assert
+        assertThrows(HardwareNotFoundException.class, motherboardService::getAll);
     }
 
     @Test
     void getById_ReturnsMotherboardWhenExists() {
         //Arrange
-        Optional<Motherboard> expected = Optional.of(new Motherboard("1", "test", "test", 1.01f, 1, new GPU[]{}, new CPU[]{}, 1.01f));
-        when(motherboardRepository.findById("1")).thenReturn(expected);
+        Motherboard expected = getMotherboard();
+        when(motherboardRepository.findById("1")).thenReturn(Optional.of(expected));
 
         //Act
-        Optional<Motherboard> actual = motherboardService.getById("1");
+        Motherboard actual = motherboardService.getById("1");
 
         //Assert
         assertEquals(expected, actual, "getById should return the Motherboard when it exists");
@@ -66,80 +72,60 @@ class MotherboardServiceTest {
     }
 
     @Test
-    void getById_ReturnsEmptyWhenMotherboardDoesNotExist() {
+    void getById_ThrowsExceptionWhenMotherboardDoesNotExist() {
         //Arrange
-        Optional<Motherboard> expected = Optional.empty();
-        when(motherboardRepository.findById("1")).thenReturn(expected);
+        when(motherboardRepository.findById("1")).thenReturn(Optional.empty());
 
-        //Act
-        Optional<Motherboard> actual = motherboardService.getById("1");
-
-        //Assert
-        assertEquals(expected, actual, "getById should return empty when the Motherboard does not exist");
+        //Act & Assert
+        assertThrows(HardwareNotFoundException.class, () -> motherboardService.getById("1"),
+                "getById should throw HardwareNotFoundException when the Motherboard does not exist");
         verify(motherboardRepository).findById("1");
     }
 
     @Test
-    void save_ReturnsTrueWhenMotherboardIsPersisted() {
+    void save_ReturnsSavedMotherboard() {
         // Arrange
-        Motherboard motherboardToSave = new Motherboard("1", "test", "test", 1.01f, 1, new GPU[]{}, new CPU[]{}, 1.01f);
-        when(motherboardRepository.existsById("1")).thenReturn(true);
+        Motherboard expected = getMotherboard();
+        when(motherboardRepository.save(expected)).thenReturn(expected);
 
         // Act
-        boolean result = motherboardService.save(motherboardToSave);
+        Motherboard actual = motherboardService.save(expected);
 
         // Assert
-        assertTrue(result, "save should return true when the Motherboard is persisted");
-        verify(motherboardRepository).save(motherboardToSave);
+        assertEquals(expected, actual, "save should return the saved Motherboard");
+        verify(motherboardRepository).save(expected);
+    }
+
+    @Test
+    void update_ReturnsUpdatedMotherboardWhenMotherboardExists() {
+        // Arrange
+        Motherboard expected = getMotherboard();
+        when(motherboardRepository.existsById("1")).thenReturn(true);
+        when(motherboardRepository.save(expected)).thenReturn(expected);
+
+        // Act
+        Motherboard actual = motherboardService.update(expected);
+
+        // Assert
+        assertEquals(expected, actual, "update should return the updated Motherboard");
+        verify(motherboardRepository).save(expected);
         verify(motherboardRepository).existsById("1");
     }
 
     @Test
-    void save_ReturnsFalseWhenMotherboardIsNotPersisted() {
+    void update_ThrowsExceptionWhenMotherboardDoesNotExist() {
         // Arrange
-        Motherboard motherboardToSave = new Motherboard("1", "test", "test", 1.01f, 1, new GPU[]{}, new CPU[]{}, 1.01f);
+        Motherboard expected = getMotherboard();
         when(motherboardRepository.existsById("1")).thenReturn(false);
 
-        // Act
-        boolean result = motherboardService.save(motherboardToSave);
-
-        // Assert
-        assertFalse(result, "save should return false when the Motherboard is not persisted");
-        verify(motherboardRepository).save(motherboardToSave);
+        // Act & Assert
+        assertThrows(HardwareNotFoundException.class, () -> motherboardService.update(expected),
+                "update should throw HardwareNotFoundException when the Motherboard does not exist");
         verify(motherboardRepository).existsById("1");
     }
 
     @Test
-    void update_ReturnsTrueWhenMotherboardExists() {
-        // Arrange
-        Motherboard motherboardToUpdate = new Motherboard("1", "test", "test", 1.01f, 1, new GPU[]{}, new CPU[]{}, 1.01f);
-        when(motherboardRepository.existsById("1")).thenReturn(true);
-
-        // Act
-        boolean result = motherboardService.update(motherboardToUpdate);
-
-        // Assert
-        assertTrue(result, "update should return true when the Motherboard exists and is updated");
-        verify(motherboardRepository).save(motherboardToUpdate);
-        verify(motherboardRepository).existsById("1");
-    }
-
-    @Test
-    void update_ReturnsFalseWhenMotherboardDoesNotExist() {
-        // Arrange
-        Motherboard motherboardToUpdate = new Motherboard("1", "test", "test", 1.01f, 1, new GPU[]{}, new CPU[]{}, 1.01f);
-        when(motherboardRepository.existsById("1")).thenReturn(false);
-
-        // Act
-        boolean result = motherboardService.update(motherboardToUpdate);
-
-        // Assert
-        assertFalse(result, "update should return false when the Motherboard does not exist");
-        verify(motherboardRepository).existsById("1");
-    }
-
-    @Test
-    void deleteById_ReturnsTrueWhenMotherboardIsDeleted() {
+    void deleteById_DeletesMotherboardWhenExists() {
         // Arrange
         String id = "1";
         when(motherboardRepository.existsById(id)).thenReturn(true).thenReturn(false);
@@ -150,20 +136,17 @@ class MotherboardServiceTest {
         // Assert
         assertTrue(result, "deleteById should return true when the Motherboard exists and is deleted");
         verify(motherboardRepository).deleteById(id);
+        verify(motherboardRepository, times(2)).existsById(id);
     }
 
     @Test
-    void deleteById_ReturnsFalseWhenMotherboardDoesNotExist() {
+    void deleteById_ThrowsHardwareNotFoundExceptionWhenMotherboardDoesNotExist() {
         // Arrange
         String id = "1";
         when(motherboardRepository.existsById(id)).thenReturn(false);
 
-        // Act
-        boolean result = motherboardService.deleteById(id);
-
-        // Assert
-        assertFalse(result, "deleteById should return false when the Motherboard does not exist");
+        // Act & Assert
+        assertThrows(HardwareNotFoundException.class, () -> motherboardService.deleteById(id), "Expected HardwareNotFoundException when Motherboard does not exist");
         verify(motherboardRepository).existsById(id);
-        verifyNoMoreInteractions(motherboardRepository);
     }
 }

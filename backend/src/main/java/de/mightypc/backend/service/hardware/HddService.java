@@ -13,6 +13,6 @@ public class HddService extends BaseService<HDD, String, HddRepository> {
 
     @Override
     protected String getId(HDD entity) {
-        return null;
+        return entity.hardwareSpec().id();
     }
 }

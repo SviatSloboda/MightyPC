@@ -1,30 +1,39 @@
 package de.mightypc.backend.service.hardware;
 
+import de.mightypc.backend.exception.HardwareNotFoundException;
 import de.mightypc.backend.model.specs.CPU;
+import de.mightypc.backend.model.specs.HardwareSpec;
 import de.mightypc.backend.repository.hardware.CpuRepository;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class CpuServiceTest {
     private final CpuRepository cpuRepository = mock(CpuRepository.class);
     private final CpuService cpuService = new CpuService(cpuRepository);
 
+    private static CPU getCpu() {
+        return new CPU(new HardwareSpec(
+                "1",
+                "test",
+                "test",
+                new BigDecimal("1"),
+                1.01f),
+                9500,
+                125
+        );
+    }
+
     @Test
     void getAll_ReturnsAllCpus() {
         // Arrange
-        List<CPU> expected = new ArrayList<>(List.of(new CPU("test", "test", 1.01f, 1, 1, 1.01f)));
+        List<CPU> expected = new ArrayList<>(List.of(getCpu()));
         when(cpuRepository.findAll()).thenReturn(expected);
 
         // Act
@@ -41,22 +50,18 @@ class CpuServiceTest {
         List<CPU> expected = new ArrayList<>();
         when(cpuRepository.findAll()).thenReturn(expected);
 
-        // Act
-        List<CPU> actual = cpuService.getAll();
-
-        // Assert
-        assertEquals(expected, actual, "getAll should return an empty list when no CPUs exist");
-        verify(cpuRepository).findAll();
+        // Act & Assert
+        assertThrows(HardwareNotFoundException.class, cpuService::getAll);
     }
 
     @Test
     void getById_ReturnsCpuWhenExists() {
         //Arrange
-        Optional<CPU> expected = Optional.of(new CPU("1", "test", "test", 1.01f, 1, 1, 1.01f));
-        when(cpuRepository.findById("1")).thenReturn(expected);
+        CPU expected = getCpu();
+        when(cpuRepository.findById("1")).thenReturn(Optional.of(expected));
 
         //Act
-        Optional<CPU> actual = cpuService.getById("1");
+        CPU actual = cpuService.getById("1");
 
         //Assert
         assertEquals(expected, actual, "getById should return the CPU when it exists");
@@ -64,80 +69,60 @@ class CpuServiceTest {
     }
 
     @Test
-    void getById_ReturnsEmptyWhenCpuDoesNotExist() {
+    void getById_ThrowsExceptionWhenCpuDoesNotExist() {
         //Arrange
-        Optional<CPU> expected = Optional.empty();
-        when(cpuRepository.findById("1")).thenReturn(expected);
+        when(cpuRepository.findById("1")).thenReturn(Optional.empty());
 
-        //Act
-        Optional<CPU> actual = cpuService.getById("1");
-
-        //Assert
-        assertEquals(expected, actual, "getById should return empty when the CPU does not exist");
+        //Act & Assert
+        assertThrows(HardwareNotFoundException.class, () -> cpuService.getById("1"),
+                "getById should throw HardwareNotFoundException when the CPU does not exist");
         verify(cpuRepository).findById("1");
     }
 
     @Test
-    void save_ReturnsTrueWhenCpuIsPersisted() {
+    void save_ReturnsSavedCpu() {
         // Arrange
-        CPU cpuToSave = new CPU("1", "test", "test", 1.01f, 1, 1, 1.01f);
-        when(cpuRepository.existsById("1")).thenReturn(true);
+        CPU expected = getCpu();
+        when(cpuRepository.save(expected)).thenReturn(expected);
 
         // Act
-        boolean result = cpuService.save(cpuToSave);
+        CPU actual = cpuService.save(expected);
 
         // Assert
-        assertTrue(result, "save should return true when the CPU is persisted");
-        verify(cpuRepository).save(cpuToSave);
+        assertEquals(expected, actual, "save should return the saved CPU");
+        verify(cpuRepository).save(expected);
+    }
+
+    @Test
+    void update_ReturnsUpdatedCpuWhenCpuExists() {
+        // Arrange
+        CPU expected = getCpu();
+        when(cpuRepository.existsById("1")).thenReturn(true);
+        when(cpuRepository.save(expected)).thenReturn(expected);
+
+        // Act
+        CPU actual = cpuService.update(expected);
+
+        // Assert
+        assertEquals(expected, actual, "update should return the updated CPU");
+        verify(cpuRepository).save(expected);
         verify(cpuRepository).existsById("1");
     }
 
     @Test
-    void save_ReturnsFalseWhenCpuIsNotPersisted() {
+    void update_ThrowsExceptionWhenCpuDoesNotExist() {
         // Arrange
-        CPU cpuToSave = new CPU("1", "test", "test", 1.01f, 1, 1, 1.01f);
+        CPU expected = getCpu();
         when(cpuRepository.existsById("1")).thenReturn(false);
 
-        // Act
-        boolean result = cpuService.save(cpuToSave);
-
-        // Assert
-        assertFalse(result, "save should return false when the CPU is not persisted");
-        verify(cpuRepository).save(cpuToSave);
+        // Act & Assert
+        assertThrows(HardwareNotFoundException.class, () -> cpuService.update(expected),
+                "update should throw HardwareNotFoundException when the CPU does not exist");
         verify(cpuRepository).existsById("1");
     }
 
     @Test
-    void update_ReturnsTrueWhenCpuExists() {
-        // Arrange
-        CPU cpuToUpdate = new CPU("1", "test", "test", 1.01f, 1, 1, 1.01f);
-        when(cpuRepository.existsById("1")).thenReturn(true);
-
-        // Act
-        boolean result = cpuService.update(cpuToUpdate);
-
-        // Assert
-        assertTrue(result, "update should return true when the CPU exists and is updated");
-        verify(cpuRepository).save(cpuToUpdate);
-        verify(cpuRepository).existsById("1");
-    }
-
-    @Test
-    void update_ReturnsFalseWhenCpuDoesNotExist() {
-        // Arrange
-        CPU cpuToUpdate = new CPU("1", "test", "test", 1.01f, 1, 1, 1.01f);
-        when(cpuRepository.existsById("1")).thenReturn(false);
-
-        // Act
-        boolean result = cpuService.update(cpuToUpdate);
-
-        // Assert
-        assertFalse(result, "update should return false when the CPU does not exist");
-        verify(cpuRepository).existsById("1");
-    }
-
-    @Test
-    void deleteById_ReturnsTrueWhenCpuIsDeleted() {
+    void deleteById_DeletesCpuWhenExists() {
         // Arrange
         String id = "1";
         when(cpuRepository.existsById(id)).thenReturn(true).thenReturn(false);
@@ -148,20 +133,17 @@ class CpuServiceTest {
         // Assert
         assertTrue(result, "deleteById should return true when the CPU exists and is deleted");
         verify(cpuRepository).deleteById(id);
+        verify(cpuRepository, times(2)).existsById(id);
     }
 
     @Test
-    void deleteById_ReturnsFalseWhenCpuDoesNotExist() {
+    void deleteById_ThrowsHardwareNotFoundExceptionWhenCpuDoesNotExist() {
         // Arrange
         String id = "1";
         when(cpuRepository.existsById(id)).thenReturn(false);
 
-        // Act
-        boolean result = cpuService.deleteById(id);
-
-        // Assert
-        assertFalse(result, "deleteById should return false when the CPU does not exist");
+        // Act & Assert
+        assertThrows(HardwareNotFoundException.class, () -> cpuService.deleteById(id), "Expected HardwareNotFoundException when CPU does not exist");
         verify(cpuRepository).existsById(id);
-        verifyNoMoreInteractions(cpuRepository);
     }
 }

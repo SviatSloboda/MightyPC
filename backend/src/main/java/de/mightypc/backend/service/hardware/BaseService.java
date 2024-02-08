@@ -45,7 +45,7 @@ public abstract class BaseService<T, ID, R extends MongoRepository<T, ID>> {
     }
 
     @Transactional
-    public boolean delete(ID id) {
+    public boolean deleteById(ID id) {
         if (!repository.existsById(id)) {
             throw new HardwareNotFoundException((getNotFoundMessage(id)));
         }
