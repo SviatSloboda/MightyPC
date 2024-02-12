@@ -6,8 +6,8 @@ import java.util.Objects;
 public record Motherboard(
         HardwareSpec hardwareSpec,
         int energyConsumption,
-        GPU[] graphicCardCompatibility,
-        CPU[] processorCompatibility
+        String[] graphicCardCompatibility,
+        String[] processorCompatibility
 ) {
     @Override
     public boolean equals(Object o) {

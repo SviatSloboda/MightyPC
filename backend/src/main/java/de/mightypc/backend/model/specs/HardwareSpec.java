@@ -23,7 +23,7 @@ public record HardwareSpec(
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         HardwareSpec that = (HardwareSpec) o;
-        return Float.compare(rating, that.rating) == 0 && Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(price, that.price);
+        return Float.compare(rating, that.rating) == 0 && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(price, that.price);
     }
 
     @Override

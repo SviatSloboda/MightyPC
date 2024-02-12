@@ -1,13 +1,8 @@
 package de.mightypc.backend.model.specs.createspecs;
 
-import java.math.BigDecimal;
-
 public record CreateGpu (
-        String name,
-        String description,
-        BigDecimal price,
+        CreateHardwareSpec hardwareSpec,
         int performance,
-        int energyConsumption,
-        float rating
+        int energyConsumption
 ){
 }
