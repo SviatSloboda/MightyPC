@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RequestBody;
 
-
 import java.util.UUID;
 
 @RestController
@@ -38,7 +37,6 @@ public class CpuController extends BaseController<CPU, String, CpuService> {
 
     @PostMapping("/all")
     @ResponseStatus(HttpStatus.CREATED)
-
     public void saveAllCpus(@RequestBody CreateCpu[] createCpu) {
         for (CreateCpu cpu : createCpu) {
             HardwareSpec hardwareSpec = new HardwareSpec(

@@ -50,5 +50,4 @@ public class RamController extends BaseController<RAM, String, RamService> {
             service.save(new RAM(hardwareSpec, ram.type(), ram.energyConsumption(), ram.memorySize()));
         }
     }
-
 }

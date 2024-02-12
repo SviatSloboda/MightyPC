@@ -1,8 +1,6 @@
 package de.mightypc.backend.service.hardware;
 
 import de.mightypc.backend.exception.HardwareNotFoundException;
-import de.mightypc.backend.model.specs.CPU;
-import de.mightypc.backend.model.specs.GPU;
 import de.mightypc.backend.model.specs.Motherboard;
 import de.mightypc.backend.model.specs.HardwareSpec;
 import de.mightypc.backend.repository.hardware.MotherboardRepository;
@@ -28,8 +26,8 @@ class MotherboardServiceTest {
                 new BigDecimal("1"),
                 1.01f),
                 9500,
-                new GPU[]{},
-                new CPU[]{}
+                new String[]{},
+                new String[]{}
         );
     }
 

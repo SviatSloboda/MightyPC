@@ -7,3 +7,4 @@ public record CreateMotherboard(
         String[] processorCompatibility
 ) {
 }
+
