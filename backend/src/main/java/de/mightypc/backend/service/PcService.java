@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 public class PcService {
     private final PcRepository pcRepository;
 
-    public PcService(PcRepository pcRepository){
+    public PcService(PcRepository pcRepository) {
         this.pcRepository = pcRepository;
     }
 }

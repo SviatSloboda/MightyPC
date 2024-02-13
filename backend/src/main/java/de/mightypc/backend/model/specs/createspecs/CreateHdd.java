@@ -1,10 +1,8 @@
 package de.mightypc.backend.model.specs.createspecs;
 
 public record CreateHdd(
-        String name,
-        String description,
+        CreateHardwareSpec hardwareSpec,
         int capacity,
-        int energyConsumption,
-        float price
+        int energyConsumption
 ) {
 }

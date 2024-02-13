@@ -1,12 +1,8 @@
 package de.mightypc.backend.model.specs.createspecs;
 
-public record CreateCpu (
-    String name,
-    String description,
-    float price,
-    int performance,
-    int energyConsumption,
-    double rating
-){
-
+public record CreateCpu(
+        CreateHardwareSpec hardwareSpec,
+        int performance,
+        int energyConsumption
+) {
 }

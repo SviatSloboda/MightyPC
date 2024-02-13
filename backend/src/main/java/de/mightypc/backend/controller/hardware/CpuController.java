@@ -1,86 +1,53 @@
 package de.mightypc.backend.controller.hardware;
 
-import de.mightypc.backend.model.specs.createspecs.CreateCpu;
 import de.mightypc.backend.model.specs.CPU;
+import de.mightypc.backend.model.specs.HardwareSpec;
+import de.mightypc.backend.model.specs.createspecs.CreateCpu;
 import de.mightypc.backend.service.hardware.CpuService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RequestBody;
+
 import java.util.UUID;
 
 @RestController
 @RequestMapping("api/hardware/cpu")
-public class CpuController {
-    private final CpuService cpuService;
-
-    public CpuController(CpuService cpuService) {
-        this.cpuService = cpuService;
-    }
-
-    @GetMapping
-    public List<CPU> getAllCPUs() {
-        List<CPU> cpus = cpuService.getAll();
-
-        return cpus;
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<CPU> getById(@PathVariable String id) {
-        return cpuService.getById(id)
-                .map(cpu -> new ResponseEntity<>(cpu, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+public class CpuController extends BaseController<CPU, String, CpuService> {
+    protected CpuController(CpuService service) {
+        super(service);
     }
 
     @PostMapping
-    public ResponseEntity<Void> save(@RequestBody CreateCpu createCpu) {
-        CPU cpu = new CPU(UUID.randomUUID().toString(),
-                createCpu.name(),
-                createCpu.description(),
-                createCpu.price(),
-                createCpu.performance(),
-                createCpu.energyConsumption(),
-                createCpu.rating());
+    @ResponseStatus(HttpStatus.CREATED)
+    public CPU saveCpu(@RequestBody CreateCpu createCpu) {
+        HardwareSpec hardwareSpec = new HardwareSpec(
+                UUID.randomUUID().toString(),
+                createCpu.hardwareSpec().name(),
+                createCpu.hardwareSpec().description(),
+                createCpu.hardwareSpec().price(),
+                createCpu.hardwareSpec().rating()
+        );
 
-        if (cpuService.save(cpu)) {
-            return new ResponseEntity<>(HttpStatus.CREATED);
-        }
-
-        return new ResponseEntity<>(HttpStatus.CONFLICT);
+        return service.save(new CPU(hardwareSpec, createCpu.performance(), createCpu.energyConsumption()));
     }
 
     @PostMapping("/all")
-    public ResponseEntity<Void> saveAll(@RequestBody CreateCpu[] cpuArr) {
-        for(CreateCpu createCpu: cpuArr){
-            CPU cpu = new CPU(UUID.randomUUID().toString(),
-                    createCpu.name(),
-                    createCpu.description(),
-                    createCpu.price(),
-                    createCpu.performance(),
-                    createCpu.energyConsumption(),
-                    createCpu.rating());
+    @ResponseStatus(HttpStatus.CREATED)
+    public void saveAllCpus(@RequestBody CreateCpu[] createCpu) {
+        for (CreateCpu cpu : createCpu) {
+            HardwareSpec hardwareSpec = new HardwareSpec(
+                    UUID.randomUUID().toString(),
+                    cpu.hardwareSpec().name(),
+                    cpu.hardwareSpec().description(),
+                    cpu.hardwareSpec().price(),
+                    cpu.hardwareSpec().rating()
+            );
 
-            cpuService.save(cpu);
+            service.save(new CPU(hardwareSpec, cpu.performance(), cpu.energyConsumption()));
         }
-        return new ResponseEntity<>(HttpStatus.CREATED);
     }
-
-@PutMapping
-public ResponseEntity<Void> update(@RequestBody CPU cpu) {
-    if (cpuService.update(cpu)) {
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-}
-
-@DeleteMapping("/{id}")
-public ResponseEntity<Void> delete(@PathVariable String id) {
-    if (cpuService.deleteById(id)) {
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-}
 }
