@@ -5,13 +5,13 @@ import de.mightypc.backend.repository.hardware.MotherboardRepository;
 import org.springframework.stereotype.Service;
 
 @Service
-public class MotherboardService extends BaseService<Motherboard, String, MotherboardRepository> {
+public class MotherboardService extends BaseService<Motherboard, MotherboardRepository> {
     protected MotherboardService(MotherboardRepository motherboardRepository) {
         super(motherboardRepository);
     }
 
     @Override
     protected String getId(Motherboard entity) {
-        return entity.hardwareSpec().id();
+        return entity.id();
     }
 }

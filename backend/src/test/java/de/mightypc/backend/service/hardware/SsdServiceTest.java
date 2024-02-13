@@ -19,8 +19,7 @@ class SsdServiceTest {
     private final SsdService ssdService = new SsdService(ssdRepository);
 
     private static SSD getSsd() {
-        return new SSD(new HardwareSpec(
-                "1",
+        return new SSD("1", new HardwareSpec(
                 "test",
                 "test",
                 new BigDecimal("1"),

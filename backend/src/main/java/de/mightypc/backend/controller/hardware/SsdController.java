@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("api/hardware/ssd")
-public class SsdController extends BaseController<SSD, String, SsdService> {
+public class SsdController extends BaseController<SSD, SsdService> {
     protected SsdController(SsdService service) {
         super(service);
     }
@@ -25,14 +25,13 @@ public class SsdController extends BaseController<SSD, String, SsdService> {
     @ResponseStatus(HttpStatus.CREATED)
     public SSD save(@RequestBody CreateSsd createSsd) {
         HardwareSpec hardwareSpec = new HardwareSpec(
-                UUID.randomUUID().toString(),
                 createSsd.hardwareSpec().name(),
                 createSsd.hardwareSpec().description(),
                 createSsd.hardwareSpec().price(),
                 createSsd.hardwareSpec().rating()
         );
 
-        return service.save(new SSD(hardwareSpec, createSsd.energyConsumption()));
+        return service.save(new SSD(UUID.randomUUID().toString(), hardwareSpec, createSsd.energyConsumption()));
     }
 
     @PostMapping("/all")
@@ -40,14 +39,13 @@ public class SsdController extends BaseController<SSD, String, SsdService> {
     public void saveAll(@RequestBody CreateSsd[] createSsd) {
         for (CreateSsd ssd : createSsd) {
             HardwareSpec hardwareSpec = new HardwareSpec(
-                    UUID.randomUUID().toString(),
                     ssd.hardwareSpec().name(),
                     ssd.hardwareSpec().description(),
                     ssd.hardwareSpec().price(),
                     ssd.hardwareSpec().rating()
             );
 
-            service.save(new SSD(hardwareSpec, ssd.energyConsumption()));
+            service.save(new SSD(UUID.randomUUID().toString(), hardwareSpec, ssd.energyConsumption()));
         }
     }
 }

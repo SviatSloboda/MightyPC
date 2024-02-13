@@ -19,8 +19,7 @@ class RamServiceTest {
     private final RamService ramService = new RamService(ramRepository);
 
     private static RAM getRam() {
-        return new RAM(new HardwareSpec(
-                "1",
+        return new RAM("1",new HardwareSpec(
                 "test",
                 "test",
                 new BigDecimal("1"),

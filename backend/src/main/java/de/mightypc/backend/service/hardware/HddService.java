@@ -6,13 +6,13 @@ import de.mightypc.backend.repository.hardware.HddRepository;
 import org.springframework.stereotype.Service;
 
 @Service
-public class HddService extends BaseService<HDD, String, HddRepository> {
+public class HddService extends BaseService<HDD, HddRepository> {
     protected HddService(HddRepository hddRepository) {
         super(hddRepository);
     }
 
     @Override
     protected String getId(HDD entity) {
-        return entity.hardwareSpec().id();
+        return entity.id();
     }
 }

@@ -19,8 +19,7 @@ class MotherboardServiceTest {
     private final MotherboardService motherboardService = new MotherboardService(motherboardRepository);
 
     private static Motherboard getMotherboard() {
-        return new Motherboard(new HardwareSpec(
-                "1",
+        return new Motherboard("1",new HardwareSpec(
                 "test",
                 "test",
                 new BigDecimal("1"),

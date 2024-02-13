@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("api/hardware/gpu")
-public class GpuController extends BaseController<GPU, String, GpuService> {
+public class GpuController extends BaseController<GPU, GpuService> {
     protected GpuController(GpuService service) {
         super(service);
     }
@@ -25,14 +25,13 @@ public class GpuController extends BaseController<GPU, String, GpuService> {
     @ResponseStatus(HttpStatus.CREATED)
     public GPU save(@RequestBody CreateGpu createGpu) {
         HardwareSpec hardwareSpec = new HardwareSpec(
-                UUID.randomUUID().toString(),
                 createGpu.hardwareSpec().name(),
                 createGpu.hardwareSpec().description(),
                 createGpu.hardwareSpec().price(),
                 createGpu.hardwareSpec().rating()
         );
 
-        return service.save(new GPU(hardwareSpec, createGpu.performance(), createGpu.energyConsumption()));
+        return service.save(new GPU(UUID.randomUUID().toString(), hardwareSpec, createGpu.performance(), createGpu.energyConsumption()));
     }
 
     @PostMapping("/all")
@@ -40,14 +39,13 @@ public class GpuController extends BaseController<GPU, String, GpuService> {
     public void saveAll(@RequestBody CreateGpu[] createGpu) {
         for (CreateGpu gpu : createGpu) {
             HardwareSpec hardwareSpec = new HardwareSpec(
-                    UUID.randomUUID().toString(),
                     gpu.hardwareSpec().name(),
                     gpu.hardwareSpec().description(),
                     gpu.hardwareSpec().price(),
                     gpu.hardwareSpec().rating()
             );
 
-            service.save(new GPU(hardwareSpec, gpu.performance(), gpu.energyConsumption()));
+            service.save(new GPU(UUID.randomUUID().toString(), hardwareSpec, gpu.performance(), gpu.energyConsumption()));
         }
     }
 }

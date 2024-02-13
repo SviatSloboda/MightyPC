@@ -19,8 +19,7 @@ class CpuServiceTest {
     private final CpuService cpuService = new CpuService(cpuRepository);
 
     private static CPU getCpu() {
-        return new CPU(new HardwareSpec(
-                "1",
+        return new CPU("1", new HardwareSpec(
                 "test",
                 "test",
                 new BigDecimal("1"),

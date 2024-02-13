@@ -19,8 +19,7 @@ class GpuServiceTest {
     private final GpuService gpuService = new GpuService(gpuRepository);
 
     private static GPU getGpu() {
-        return new GPU(new HardwareSpec(
-                "1",
+        return new GPU("1",new HardwareSpec(
                 "test",
                 "test",
                 new BigDecimal("1"),

@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("api/hardware/pc-case")
-public class PcCaseController extends BaseController<PcCase, String, PcCaseService> {
+public class PcCaseController extends BaseController<PcCase, PcCaseService> {
     protected PcCaseController(PcCaseService service) {
         super(service);
     }
@@ -25,14 +25,13 @@ public class PcCaseController extends BaseController<PcCase, String, PcCaseServi
     @ResponseStatus(HttpStatus.CREATED)
     public PcCase save(@RequestBody CreatePcCase createPcCase) {
         HardwareSpec hardwareSpec = new HardwareSpec(
-                UUID.randomUUID().toString(),
                 createPcCase.hardwareSpec().name(),
                 createPcCase.hardwareSpec().description(),
                 createPcCase.hardwareSpec().price(),
                 createPcCase.hardwareSpec().rating()
         );
 
-        return service.save(new PcCase(hardwareSpec, createPcCase.dimensions()));
+        return service.save(new PcCase(UUID.randomUUID().toString(), hardwareSpec, createPcCase.dimensions()));
     }
 
     @PostMapping("/all")
@@ -41,14 +40,13 @@ public class PcCaseController extends BaseController<PcCase, String, PcCaseServi
         for (CreatePcCase pcCase : createPcCase) {
 
             HardwareSpec hardwareSpec = new HardwareSpec(
-                    UUID.randomUUID().toString(),
-                    pcCase.hardwareSpec().name(),
+                        pcCase.hardwareSpec().name(),
                     pcCase.hardwareSpec().description(),
                     pcCase.hardwareSpec().price(),
                     pcCase.hardwareSpec().rating()
             );
 
-            service.save(new PcCase(hardwareSpec, pcCase.dimensions()));
+            service.save(new PcCase(UUID.randomUUID().toString(), hardwareSpec, pcCase.dimensions()));
         }
     }
 }

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 import java.util.List;
 
-public abstract class BaseController<T, ID, S extends BaseService<T, ID, ?>> {
+public abstract class BaseController<T, S extends BaseService<T, ?>> {
     S service;
 
     protected BaseController(S service) {
@@ -21,12 +21,12 @@ public abstract class BaseController<T, ID, S extends BaseService<T, ID, ?>> {
     }
 
     @GetMapping("/{id}")
-    public T getById(@PathVariable ID id) {
+    public T getById(@PathVariable String id) {
         return service.getById(id);
     }
 
     @DeleteMapping("/{id}")
-    public boolean deleteById(@PathVariable ID id) {
+    public boolean deleteById(@PathVariable String id) {
         return service.deleteById(id);
     }
 

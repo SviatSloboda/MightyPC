@@ -5,13 +5,13 @@ import de.mightypc.backend.repository.hardware.PcCaseRepository;
 import org.springframework.stereotype.Service;
 
 @Service
-public class PcCaseService extends BaseService<PcCase, String, PcCaseRepository> {
+public class PcCaseService extends BaseService<PcCase, PcCaseRepository> {
     protected PcCaseService(PcCaseRepository repository) {
         super(repository);
     }
 
     @Override
     protected String getId(PcCase entity) {
-        return entity.hardwareSpec().id();
+        return entity.id();
     }
 }
