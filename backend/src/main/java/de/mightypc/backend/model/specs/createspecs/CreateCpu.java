@@ -1,7 +1,9 @@
 package de.mightypc.backend.model.specs.createspecs;
 
+import de.mightypc.backend.model.specs.HardwareSpec;
+
 public record CreateCpu(
-        CreateHardwareSpec hardwareSpec,
+        HardwareSpec hardwareSpec,
         int performance,
         int energyConsumption
 ) {

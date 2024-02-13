@@ -1,7 +1,9 @@
 package de.mightypc.backend.model.specs.createspecs;
 
+import de.mightypc.backend.model.specs.HardwareSpec;
+
 public record CreatePcCase (
-        CreateHardwareSpec hardwareSpec,
+        HardwareSpec hardwareSpec,
         String dimensions
 ){
 }
