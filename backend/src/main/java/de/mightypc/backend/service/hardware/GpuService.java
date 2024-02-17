@@ -5,13 +5,13 @@ import de.mightypc.backend.repository.hardware.GpuRepository;
 import org.springframework.stereotype.Service;
 
 @Service
-public class GpuService extends BaseService<GPU, String, GpuRepository> {
+public class GpuService extends BaseService<GPU, GpuRepository> {
     protected GpuService(GpuRepository repository) {
         super(repository);
     }
 
     @Override
     protected String getId(GPU entity) {
-        return entity.hardwareSpec().id();
+        return entity.id();
     }
 }

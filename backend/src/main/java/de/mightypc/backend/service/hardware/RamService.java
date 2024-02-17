@@ -5,13 +5,13 @@ import de.mightypc.backend.repository.hardware.RamRepository;
 import org.springframework.stereotype.Service;
 
 @Service
-public class RamService extends BaseService<RAM, String, RamRepository> {
+public class RamService extends BaseService<RAM, RamRepository> {
     protected RamService(RamRepository ramRepository) {
         super(ramRepository);
     }
 
     @Override
     protected String getId(RAM entity) {
-        return entity.hardwareSpec().id();
+        return entity.id();
     }
 }

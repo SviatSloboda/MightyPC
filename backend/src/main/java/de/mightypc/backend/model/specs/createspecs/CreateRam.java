@@ -1,7 +1,9 @@
 package de.mightypc.backend.model.specs.createspecs;
 
+import de.mightypc.backend.model.specs.HardwareSpec;
+
 public record CreateRam(
-        CreateHardwareSpec hardwareSpec,
+        HardwareSpec hardwareSpec,
         String type,
         int energyConsumption,
         int memorySize

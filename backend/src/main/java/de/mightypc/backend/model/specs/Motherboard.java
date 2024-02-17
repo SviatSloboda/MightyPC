@@ -1,14 +1,23 @@
 package de.mightypc.backend.model.specs;
 
+import org.springframework.data.annotation.Id;
+
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.UUID;
 
 public record Motherboard(
+        @Id
+        String id,
         HardwareSpec hardwareSpec,
         int energyConsumption,
         String[] graphicCardCompatibility,
         String[] processorCompatibility
 ) {
+    public Motherboard(HardwareSpec hardwareSpec, int energyConsumption, String[] graphicCardCompatibility, String[] processorCompatibility) {
+        this(UUID.randomUUID().toString(), hardwareSpec, energyConsumption, graphicCardCompatibility, processorCompatibility);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

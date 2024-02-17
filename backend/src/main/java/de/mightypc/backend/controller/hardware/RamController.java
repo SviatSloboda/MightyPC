@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("api/hardware/ram")
-public class RamController extends BaseController<RAM, String, RamService> {
+public class RamController extends BaseController<RAM, RamService> {
     protected RamController(RamService service) {
         super(service);
     }
@@ -25,14 +25,13 @@ public class RamController extends BaseController<RAM, String, RamService> {
     @ResponseStatus(HttpStatus.CREATED)
     public RAM save(@RequestBody CreateRam createRam) {
         HardwareSpec hardwareSpec = new HardwareSpec(
-                UUID.randomUUID().toString(),
                 createRam.hardwareSpec().name(),
                 createRam.hardwareSpec().description(),
                 createRam.hardwareSpec().price(),
                 createRam.hardwareSpec().rating()
         );
 
-        return service.save(new RAM(hardwareSpec, createRam.type(), createRam.energyConsumption(), createRam.memorySize()));
+        return service.save(new RAM(UUID.randomUUID().toString(),hardwareSpec, createRam.type(), createRam.energyConsumption(), createRam.memorySize()));
     }
 
     @PostMapping("all")
@@ -40,14 +39,13 @@ public class RamController extends BaseController<RAM, String, RamService> {
     public void saveAll(@RequestBody CreateRam[] createRam) {
         for (CreateRam ram : createRam) {
             HardwareSpec hardwareSpec = new HardwareSpec(
-                    UUID.randomUUID().toString(),
                     ram.hardwareSpec().name(),
                     ram.hardwareSpec().description(),
                     ram.hardwareSpec().price(),
                     ram.hardwareSpec().rating()
             );
 
-            service.save(new RAM(hardwareSpec, ram.type(), ram.energyConsumption(), ram.memorySize()));
+            service.save(new RAM(UUID.randomUUID().toString(),hardwareSpec, ram.type(), ram.energyConsumption(), ram.memorySize()));
         }
     }
 }

@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("api/hardware/motherboard")
-public class MotherboardController extends BaseController<Motherboard, String, MotherboardService> {
+public class MotherboardController extends BaseController<Motherboard, MotherboardService> {
     protected MotherboardController(MotherboardService service) {
         super(service);
     }
@@ -25,7 +25,6 @@ public class MotherboardController extends BaseController<Motherboard, String, M
     @ResponseStatus(HttpStatus.CREATED)
     public Motherboard save(@RequestBody CreateMotherboard createMotherboard) {
         HardwareSpec hardwareSpec = new HardwareSpec(
-                UUID.randomUUID().toString(),
                 createMotherboard.hardwareSpec().name(),
                 createMotherboard.hardwareSpec().description(),
                 createMotherboard.hardwareSpec().price(),
@@ -33,6 +32,7 @@ public class MotherboardController extends BaseController<Motherboard, String, M
         );
 
         return service.save(new Motherboard(
+                UUID.randomUUID().toString(),
                 hardwareSpec,
                 createMotherboard.energyConsumption(),
                 createMotherboard.graphicCardCompatibility(),
@@ -45,7 +45,6 @@ public class MotherboardController extends BaseController<Motherboard, String, M
     public void saveAll(@RequestBody CreateMotherboard[] createMotherboard) {
         for (CreateMotherboard motherboard : createMotherboard) {
             HardwareSpec hardwareSpec = new HardwareSpec(
-                    UUID.randomUUID().toString(),
                     motherboard.hardwareSpec().name(),
                     motherboard.hardwareSpec().description(),
                     motherboard.hardwareSpec().price(),
@@ -53,6 +52,7 @@ public class MotherboardController extends BaseController<Motherboard, String, M
             );
 
             service.save(new Motherboard(
+                    UUID.randomUUID().toString(),
                     hardwareSpec,
                     motherboard.energyConsumption(),
                     motherboard.graphicCardCompatibility(),

@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("api/hardware/hdd")
-public class HddController extends BaseController<HDD, String, HddService> {
+public class HddController extends BaseController<HDD, HddService> {
     protected HddController(HddService service) {
         super(service);
     }
@@ -25,14 +25,13 @@ public class HddController extends BaseController<HDD, String, HddService> {
     @ResponseStatus(HttpStatus.CREATED)
     public HDD save(@RequestBody CreateHdd createHdd) {
         HardwareSpec hardwareSpec = new HardwareSpec(
-                UUID.randomUUID().toString(),
                 createHdd.hardwareSpec().name(),
                 createHdd.hardwareSpec().description(),
                 createHdd.hardwareSpec().price(),
                 createHdd.hardwareSpec().rating()
         );
 
-        return service.save(new HDD(hardwareSpec, createHdd.capacity(), createHdd.energyConsumption()));
+        return service.save(new HDD(UUID.randomUUID().toString(), hardwareSpec, createHdd.capacity(), createHdd.energyConsumption()));
     }
 
     @PostMapping("/all")
@@ -40,14 +39,13 @@ public class HddController extends BaseController<HDD, String, HddService> {
     public void saveAll(@RequestBody CreateHdd[] createHdd) {
         for (CreateHdd hdd : createHdd) {
             HardwareSpec hardwareSpec = new HardwareSpec(
-                    UUID.randomUUID().toString(),
                     hdd.hardwareSpec().name(),
                     hdd.hardwareSpec().description(),
                     hdd.hardwareSpec().price(),
                     hdd.hardwareSpec().rating()
             );
 
-            service.save(new HDD(hardwareSpec, hdd.capacity(), hdd.energyConsumption()));
+            service.save(new HDD(UUID.randomUUID().toString(), hardwareSpec, hdd.capacity(), hdd.energyConsumption()));
         }
     }
 }

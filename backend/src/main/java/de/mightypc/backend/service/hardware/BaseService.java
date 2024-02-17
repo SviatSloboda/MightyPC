@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-public abstract class BaseService<T, ID, R extends MongoRepository<T, ID>> {
+public abstract class BaseService<T, R extends MongoRepository<T, String>> {
     protected R repository;
 
     protected BaseService(R repository) {
@@ -23,7 +23,7 @@ public abstract class BaseService<T, ID, R extends MongoRepository<T, ID>> {
     }
 
     @Transactional(readOnly = true)
-    public T getById(ID id) {
+    public T getById(String id) {
         return repository.findById(id).orElseThrow(
                 () -> new HardwareNotFoundException((getNotFoundMessage(id))));
     }
@@ -35,7 +35,7 @@ public abstract class BaseService<T, ID, R extends MongoRepository<T, ID>> {
 
     @Transactional
     public T update(T entity) {
-        ID entityId = getId(entity);
+        String entityId = getId(entity);
 
         if (!repository.existsById(entityId)) {
             throw new HardwareNotFoundException((getNotFoundMessage(entityId)));
@@ -45,7 +45,7 @@ public abstract class BaseService<T, ID, R extends MongoRepository<T, ID>> {
     }
 
     @Transactional
-    public boolean deleteById(ID id) {
+    public boolean deleteById(String id) {
         if (!repository.existsById(id)) {
             throw new HardwareNotFoundException((getNotFoundMessage(id)));
         }
@@ -55,9 +55,9 @@ public abstract class BaseService<T, ID, R extends MongoRepository<T, ID>> {
         return !repository.existsById(id);
     }
 
-    private String getNotFoundMessage(ID id) {
+    private String getNotFoundMessage(String id) {
         return "Entity was not Found. Id of entity: " + id;
     }
 
-    protected abstract ID getId(T entity);
+    protected abstract String getId(T entity);
 }

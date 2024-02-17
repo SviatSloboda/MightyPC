@@ -19,8 +19,7 @@ class HddServiceTest {
     private final HddService hddService = new HddService(hddRepository);
 
     private static HDD getHdd() {
-        return new HDD(new HardwareSpec(
-                "1",
+        return new HDD("1",new HardwareSpec(
                 "test",
                 "test",
                 new BigDecimal("1"),

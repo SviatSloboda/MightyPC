@@ -19,8 +19,7 @@ class PowerSupplyServiceTest {
     private final PowerSupplyService powerSupplyService = new PowerSupplyService(powerSupplyRepository);
 
     private static PowerSupply getPowerSupply() {
-        return new PowerSupply(new HardwareSpec(
-                "1",
+        return new PowerSupply("1", new HardwareSpec(
                 "test",
                 "test",
                 new BigDecimal("1"),

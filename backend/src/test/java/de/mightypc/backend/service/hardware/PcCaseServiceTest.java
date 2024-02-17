@@ -19,8 +19,7 @@ class PcCaseServiceTest {
     private final PcCaseService pcCaseService = new PcCaseService(pcCaseRepository);
 
     private static PcCase getPcCase() {
-        return new PcCase(new HardwareSpec(
-                "1",
+        return new PcCase("1", new HardwareSpec(
                 "test",
                 "test",
                 new BigDecimal("1"),

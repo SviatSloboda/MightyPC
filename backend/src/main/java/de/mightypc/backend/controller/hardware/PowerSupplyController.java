@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("api/hardware/psu")
-public class PowerSupplyController extends BaseController<PowerSupply, String, PowerSupplyService> {
+public class PowerSupplyController extends BaseController<PowerSupply, PowerSupplyService> {
     protected PowerSupplyController(PowerSupplyService service) {
         super(service);
     }
@@ -20,14 +20,13 @@ public class PowerSupplyController extends BaseController<PowerSupply, String, P
     @ResponseStatus(HttpStatus.CREATED)
     public PowerSupply save(@RequestBody CreatePowerSupply createPowerSupply) {
         HardwareSpec hardwareSpec = new HardwareSpec(
-                UUID.randomUUID().toString(),
                 createPowerSupply.hardwareSpec().name(),
                 createPowerSupply.hardwareSpec().description(),
                 createPowerSupply.hardwareSpec().price(),
                 createPowerSupply.hardwareSpec().rating()
         );
 
-        return service.save(new PowerSupply(hardwareSpec, createPowerSupply.power()));
+        return service.save(new PowerSupply(UUID.randomUUID().toString(), hardwareSpec, createPowerSupply.power()));
     }
 
     @PostMapping("/all")
@@ -35,14 +34,13 @@ public class PowerSupplyController extends BaseController<PowerSupply, String, P
     public void saveAll(@RequestBody CreatePowerSupply[] createPowerSupply) {
         for (CreatePowerSupply powerSupply : createPowerSupply) {
             HardwareSpec hardwareSpec = new HardwareSpec(
-                    UUID.randomUUID().toString(),
                     powerSupply.hardwareSpec().name(),
                     powerSupply.hardwareSpec().description(),
                     powerSupply.hardwareSpec().price(),
                     powerSupply.hardwareSpec().rating()
             );
 
-            service.save(new PowerSupply(hardwareSpec, powerSupply.power()));
+            service.save(new PowerSupply(UUID.randomUUID().toString(), hardwareSpec, powerSupply.power()));
         }
     }
 }
