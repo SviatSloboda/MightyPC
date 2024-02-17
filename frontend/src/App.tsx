@@ -18,6 +18,14 @@ import SsdPage from "./components/hardware/SsdPage.tsx";
 import HddPage from "./components/hardware/HddPage.tsx";
 import PowerSupplyPage from "./components/hardware/PowerSupplyPage.tsx";
 import PcCasePage from "./components/hardware/PcCasePage.tsx";
+import CpuCharacteristics from "./components/hardware/characteristicsPage/CpuCharacteristics.tsx";
+import MotherboardCharacteristics from "./components/hardware/characteristicsPage/MotherboardCharacteristics.tsx";
+import GpuCharacteristics from "./components/hardware/characteristicsPage/GpuCharacteristics.tsx";
+import RamCharacteristics from "./components/hardware/characteristicsPage/RamCharacteristics.tsx";
+import SsdCharacteristics from "./components/hardware/characteristicsPage/SsdCharacteristics.tsx";
+import HddCharacteristics from "./components/hardware/characteristicsPage/HddCharacteristics.tsx";
+import PsuCharacteristics from "./components/hardware/characteristicsPage/PsuCharacteristics.tsx";
+import PcCaseCharacteristics from "./components/hardware/characteristicsPage/PcCaseCharacteristics.tsx";
 
 export default function App() {
     return (
@@ -40,6 +48,15 @@ export default function App() {
                 <Route path="/hardware/hdd" element={<HddPage/>}/>
                 <Route path="/hardware/power-supply" element={<PowerSupplyPage/>}/>
                 <Route path="/hardware/pc-case" element={<PcCasePage/>}/>
+
+                <Route path="/hardware/cpu/:id" element={<CpuCharacteristics/>}/>
+                <Route path="/hardware/gpu/:id" element={<GpuCharacteristics/>}/>
+                <Route path="/hardware/motherboard/:id" element={<MotherboardCharacteristics/>}/>
+                <Route path="/hardware/ram/:id" element={<RamCharacteristics/>}/>
+                <Route path="/hardware/ssd/:id" element={<SsdCharacteristics/>}/>
+                <Route path="/hardware/hdd/:id" element={<HddCharacteristics/>}/>
+                <Route path="/hardware/psu/:id" element={<PsuCharacteristics/>}/>
+                <Route path="/hardware/pc-case/:id" element={<PcCaseCharacteristics/>}/>
 
                 <Route path="/services" element={<ServicesPage/>}/>
                 <Route path="/account" element={<AccountPage/>}/>

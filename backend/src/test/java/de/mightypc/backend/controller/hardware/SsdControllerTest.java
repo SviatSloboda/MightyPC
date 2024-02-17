@@ -45,6 +45,7 @@ class SsdControllerTest {
                                                 "price": 169.99,
                                                 "rating": 4.9
                                             },
+                                            "capacity": 5,
                                             "energyConsumption": 5
                                         }
                                         """
@@ -52,6 +53,7 @@ class SsdControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").exists())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.hardwareSpec.name").value("Samsung 970 EVO Plus"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.capacity").value(5))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.energyConsumption").value(5));
     }
 
@@ -59,7 +61,7 @@ class SsdControllerTest {
     @Test
     void getAllSsds_shouldReturnListWithOneSsd_whenOneSsdWasSavedInRepository() throws Exception {
         HardwareSpec hardwareSpec = new HardwareSpec("Samsung 970 EVO Plus", "1TB NVMe M.2 SSD", new BigDecimal("169.99"), 4.9f);
-        SSD ssd = new SSD(hardwareSpec, 5);
+        SSD ssd = new SSD(hardwareSpec, 5, 5);
         ssdService.save(ssd);
 
         mvc.perform(MockMvcRequestBuilders.get("/api/hardware/ssd"))
@@ -74,6 +76,7 @@ class SsdControllerTest {
                                         "price": 169.99,
                                         "rating": 4.9
                                     },
+                                    "capacity": 5,
                                     "energyConsumption": 5
                                 }]
                                 """.formatted(ssd.id())
@@ -84,13 +87,14 @@ class SsdControllerTest {
     @Test
     void getSsdById_shouldReturnSsd_whenSsdExists() throws Exception {
         HardwareSpec hardwareSpec = new HardwareSpec("Samsung 970 EVO Plus", "1TB NVMe M.2 SSD", new BigDecimal("169.99"), 4.9f);
-        SSD ssd = new SSD(hardwareSpec, 5);
+        SSD ssd = new SSD(hardwareSpec,5, 5);
         SSD savedSsd = ssdService.save(ssd);
 
         mvc.perform(MockMvcRequestBuilders.get("/api/hardware/ssd/" + savedSsd.id()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(savedSsd.id()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.hardwareSpec.name").value("Samsung 970 EVO Plus"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.capacity").value(5))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.energyConsumption").value(5));
     }
 
@@ -98,7 +102,7 @@ class SsdControllerTest {
     @Test
     void deleteSsdById_shouldDeleteSsd_whenSsdExists() throws Exception {
         HardwareSpec hardwareSpec = new HardwareSpec("Samsung 970 EVO Plus", "1TB NVMe M.2 SSD", new BigDecimal("169.99"), 4.9f);
-        SSD ssd = new SSD(hardwareSpec, 5);
+        SSD ssd = new SSD(hardwareSpec,5, 5);
         SSD savedSsd = ssdService.save(ssd);
 
         mvc.perform(MockMvcRequestBuilders.delete("/api/hardware/ssd/" + savedSsd.id()))
@@ -112,7 +116,7 @@ class SsdControllerTest {
     @Test
     void updateSsd_shouldUpdateSsdDetails() throws Exception {
         HardwareSpec hardwareSpec = new HardwareSpec("Samsung 970 EVO Plus", "1TB NVMe M.2 SSD", new BigDecimal("169.99"), 4.9f);
-        SSD ssd = new SSD(hardwareSpec, 5);
+        SSD ssd = new SSD(hardwareSpec,5, 5);
         SSD savedSsd = ssdService.save(ssd);
 
         String updatedJson = String.format(
@@ -125,6 +129,7 @@ class SsdControllerTest {
                                 "price": 99.99,
                                 "rating": 4.8
                             },
+                            "capacity": 4,
                             "energyConsumption": 4
                         }
                         """,
@@ -136,6 +141,7 @@ class SsdControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(savedSsd.id()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.hardwareSpec.name").value("WD Blue SN550"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.capacity").value(4))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.energyConsumption").value(4));
     }
 }

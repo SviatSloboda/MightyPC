@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.Collections;
 import java.util.UUID;
 
 @RestController
@@ -31,7 +32,7 @@ public class SsdController extends BaseController<SSD, SsdService> {
                 createSsd.hardwareSpec().rating()
         );
 
-        return service.save(new SSD(UUID.randomUUID().toString(), hardwareSpec, createSsd.energyConsumption()));
+        return service.save(new SSD(UUID.randomUUID().toString(), hardwareSpec, createSsd.capacity(), createSsd.energyConsumption(), Collections.emptyList()));
     }
 
     @PostMapping("/all")
@@ -45,7 +46,7 @@ public class SsdController extends BaseController<SSD, SsdService> {
                     ssd.hardwareSpec().rating()
             );
 
-            service.save(new SSD(UUID.randomUUID().toString(), hardwareSpec, ssd.energyConsumption()));
+            service.save(new SSD(UUID.randomUUID().toString(), hardwareSpec, ssd.capacity(), ssd.energyConsumption(), Collections.emptyList()));
         }
     }
 }

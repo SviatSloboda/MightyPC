@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.Collections;
 import java.util.UUID;
 
 @RestController
@@ -31,7 +32,7 @@ public class PcCaseController extends BaseController<PcCase, PcCaseService> {
                 createPcCase.hardwareSpec().rating()
         );
 
-        return service.save(new PcCase(UUID.randomUUID().toString(), hardwareSpec, createPcCase.dimensions()));
+        return service.save(new PcCase(UUID.randomUUID().toString(), hardwareSpec, createPcCase.dimensions(), Collections.emptyList()));
     }
 
     @PostMapping("/all")
@@ -40,13 +41,13 @@ public class PcCaseController extends BaseController<PcCase, PcCaseService> {
         for (CreatePcCase pcCase : createPcCase) {
 
             HardwareSpec hardwareSpec = new HardwareSpec(
-                        pcCase.hardwareSpec().name(),
+                    pcCase.hardwareSpec().name(),
                     pcCase.hardwareSpec().description(),
                     pcCase.hardwareSpec().price(),
                     pcCase.hardwareSpec().rating()
             );
 
-            service.save(new PcCase(UUID.randomUUID().toString(), hardwareSpec, pcCase.dimensions()));
+            service.save(new PcCase(UUID.randomUUID().toString(), hardwareSpec, pcCase.dimensions(), Collections.emptyList()));
         }
     }
 }

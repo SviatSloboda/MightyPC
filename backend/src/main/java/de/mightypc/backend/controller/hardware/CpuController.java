@@ -6,8 +6,13 @@ import de.mightypc.backend.model.specs.createspecs.CreateCpu;
 import de.mightypc.backend.service.hardware.CpuService;
 import org.springframework.http.HttpStatus;
 
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.Collections;
 import java.util.UUID;
 
 @RestController
@@ -27,7 +32,7 @@ public class CpuController extends BaseController<CPU, CpuService> {
                 createCpu.hardwareSpec().rating()
         );
 
-        return service.save(new CPU(UUID.randomUUID().toString(), hardwareSpec, createCpu.performance(), createCpu.energyConsumption()));
+        return service.save(new CPU(UUID.randomUUID().toString(), hardwareSpec, createCpu.performance(), createCpu.energyConsumption(), Collections.emptyList()));
     }
 
     @PostMapping("/all")
@@ -41,7 +46,7 @@ public class CpuController extends BaseController<CPU, CpuService> {
                     cpu.hardwareSpec().rating()
             );
 
-            service.save(new CPU(UUID.randomUUID().toString(), hardwareSpec, cpu.performance(), cpu.energyConsumption()));
+            service.save(new CPU(UUID.randomUUID().toString(), hardwareSpec, cpu.performance(), cpu.energyConsumption(), Collections.emptyList()));
         }
     }
 }

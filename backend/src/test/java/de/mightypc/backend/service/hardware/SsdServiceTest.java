@@ -24,6 +24,7 @@ class SsdServiceTest {
                 "test",
                 new BigDecimal("1"),
                 1.01f),
+                5,
                 950
         );
     }

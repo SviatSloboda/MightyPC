@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.Collections;
 import java.util.UUID;
 
 @RestController
@@ -31,7 +32,7 @@ public class HddController extends BaseController<HDD, HddService> {
                 createHdd.hardwareSpec().rating()
         );
 
-        return service.save(new HDD(UUID.randomUUID().toString(), hardwareSpec, createHdd.capacity(), createHdd.energyConsumption()));
+        return service.save(new HDD(UUID.randomUUID().toString(), hardwareSpec, createHdd.capacity(), createHdd.energyConsumption(), Collections.emptyList()));
     }
 
     @PostMapping("/all")
@@ -45,7 +46,7 @@ public class HddController extends BaseController<HDD, HddService> {
                     hdd.hardwareSpec().rating()
             );
 
-            service.save(new HDD(UUID.randomUUID().toString(), hardwareSpec, hdd.capacity(), hdd.energyConsumption()));
+            service.save(new HDD(UUID.randomUUID().toString(), hardwareSpec, hdd.capacity(), hdd.energyConsumption(), Collections.emptyList()));
         }
     }
 }

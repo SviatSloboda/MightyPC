@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.Collections;
 import java.util.UUID;
 
 @RestController
@@ -31,7 +32,7 @@ public class RamController extends BaseController<RAM, RamService> {
                 createRam.hardwareSpec().rating()
         );
 
-        return service.save(new RAM(UUID.randomUUID().toString(),hardwareSpec, createRam.type(), createRam.energyConsumption(), createRam.memorySize()));
+        return service.save(new RAM(UUID.randomUUID().toString(), hardwareSpec, createRam.type(), createRam.energyConsumption(), createRam.memorySize(), Collections.emptyList()));
     }
 
     @PostMapping("all")
@@ -45,7 +46,7 @@ public class RamController extends BaseController<RAM, RamService> {
                     ram.hardwareSpec().rating()
             );
 
-            service.save(new RAM(UUID.randomUUID().toString(),hardwareSpec, ram.type(), ram.energyConsumption(), ram.memorySize()));
+            service.save(new RAM(UUID.randomUUID().toString(), hardwareSpec, ram.type(), ram.energyConsumption(), ram.memorySize(), Collections.emptyList()));
         }
     }
 }
