@@ -18,7 +18,7 @@ import java.util.UUID;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class MotherboardControllerTest {
+class MotherboardControllerIntegrationTest {
 
     @Autowired
     private MockMvc mvc;

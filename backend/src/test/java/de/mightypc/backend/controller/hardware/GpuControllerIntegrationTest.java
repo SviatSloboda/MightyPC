@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class GpuControllerTest {
+class GpuControllerIntegrationTest {
 
     @Autowired
     private MockMvc mvc;

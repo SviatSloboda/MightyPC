@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class SsdControllerTest {
+class SsdControllerIntegrationTest {
 
     @Autowired
     private MockMvc mvc;
