@@ -11,15 +11,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.any;
 
 class GpuServiceTest {
     private final GpuRepository gpuRepository = mock(GpuRepository.class);
     private final GpuService gpuService = new GpuService(gpuRepository);
 
     private static GPU getGpu() {
-        return new GPU("1",new HardwareSpec(
+        return new GPU("1", new HardwareSpec(
                 "test",
                 "test",
                 new BigDecimal("1"),
@@ -144,5 +150,43 @@ class GpuServiceTest {
         // Act & Assert
         assertThrows(HardwareNotFoundException.class, () -> gpuService.deleteById(id), "Expected HardwareNotFoundException when GPU does not exist");
         verify(gpuRepository).existsById(id);
+    }
+
+    @Test
+    void attachPhoto_WhenGpuExists_ThenPhotoIsAttached() {
+        // Arrange
+        String gpuId = "1";
+        String photoUrl = "https://example.com/photo.jpg";
+        GPU gpuBeforeUpdate = new GPU("1", new HardwareSpec("test", "test", new BigDecimal("1"), 1.01f), 9500, 125, new ArrayList<>());
+        Optional<GPU> optionalGpuBeforeUpdate = Optional.of(gpuBeforeUpdate);
+
+        List<String> photosWithNewUrl = new ArrayList<>();
+        photosWithNewUrl.add(photoUrl);
+        GPU gpuAfterUpdate = new GPU("1", new HardwareSpec("test", "test", new BigDecimal("1"), 1.01f), 9500, 125, photosWithNewUrl);
+
+        when(gpuRepository.findById(gpuId)).thenReturn(optionalGpuBeforeUpdate);
+        when(gpuRepository.save(any(GPU.class))).thenReturn(gpuAfterUpdate);
+
+        // Act
+        gpuService.attachPhoto(gpuId, photoUrl);
+
+        // Assert
+        verify(gpuRepository).findById(gpuId);
+        verify(gpuRepository).save(gpuAfterUpdate);
+    }
+
+
+    @Test
+    void attachPhoto_WhenGpuDoesNotExist_ThenNoActionTaken() {
+        // Arrange
+        String gpuId = "nonExistingId";
+        String photoUrl = "https://example.com/photo.jpg";
+        when(gpuRepository.findById(gpuId)).thenReturn(Optional.empty());
+
+        // Act
+        gpuService.attachPhoto(gpuId, photoUrl);
+
+        // Assert
+        verify(gpuRepository).findById(gpuId);
     }
 }
