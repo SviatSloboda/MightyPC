@@ -4,8 +4,6 @@ import de.mightypc.backend.model.specs.GPU;
 import de.mightypc.backend.model.specs.HardwareSpec;
 import de.mightypc.backend.model.specs.createspecs.CreateGpu;
 import de.mightypc.backend.service.hardware.GpuService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.web.bind.annotation.*;

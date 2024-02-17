@@ -2,8 +2,6 @@ package de.mightypc.backend.service.hardware;
 
 import de.mightypc.backend.model.specs.GPU;
 import de.mightypc.backend.repository.hardware.GpuRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

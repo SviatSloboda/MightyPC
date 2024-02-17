@@ -1,7 +1,6 @@
 package de.mightypc.backend.service.hardware;
 
 import de.mightypc.backend.exception.HardwareNotFoundException;
-import de.mightypc.backend.model.specs.GPU;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
