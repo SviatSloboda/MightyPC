@@ -1,17 +1,25 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import {useParams} from "react-router-dom";
-import {HDD} from "../../../model/hardware/HDD.tsx";
+import {useNavigate, useParams} from "react-router-dom";
+import { HDD } from "../../../model/hardware/HDD.tsx";
 import hddPhoto from "../../../assets/hdd.png";
 import Photo from "../Photo.tsx";
 import Rating from "./Rating.tsx";
 
 export default function HddCharacteristics() {
     const [hdd, setHdd] = useState<HDD>();
-    const {id} = useParams<{ id: string }>();
+    const { id } = useParams<{ id: string }>();
     const [photos, setPhotos] = useState<string[]>([]);
-
     const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+    const [updatedName, setUpdatedName] = useState('');
+    const [updatedDescription, setUpdatedDescription] = useState('');
+    const [updatedPrice, setUpdatedPrice] = useState('');
+    const [updatedRating, setUpdatedRating] = useState(0);
+    const [updatedCapacity, setUpdatedCapacity] = useState('');
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (id) {
@@ -19,10 +27,15 @@ export default function HddCharacteristics() {
                 .then(response => {
                     setHdd(response.data);
                     setPhotos(response.data.hddPhotos || []);
+                    setUpdatedName(response.data.hardwareSpec.name);
+                    setUpdatedDescription(response.data.hardwareSpec.description);
+                    setUpdatedPrice(response.data.hardwareSpec.price);
+                    setUpdatedRating(response.data.hardwareSpec.rating);
+                    setUpdatedCapacity(response.data.capacity);
                 })
                 .catch(console.error);
         }
-    }, [id]);
+    }, [id, isUpdateModalOpen]);
 
     const plusSlides = (n: number) => {
         setCurrentSlideIndex(prevIndex => (prevIndex + n + photos.length) % photos.length);
@@ -40,6 +53,35 @@ export default function HddCharacteristics() {
         } catch (error) {
             console.error('Error uploading image', error);
         }
+    };
+
+    const handleDelete = () => {
+        axios.delete(`/api/hardware/hdd/${id}`)
+            .then(() => {
+                navigate('/hardware/hdd');
+            })
+            .catch(console.error);
+    };
+
+    const handleUpdate = () => {
+        const payload = {
+            id: hdd?.id,
+            hardwareSpec: {
+                name: updatedName,
+                description: updatedDescription,
+                price: updatedPrice,
+                rating: updatedRating,
+            },
+            capacity: updatedCapacity,
+            energyConsumption: hdd?.energyConsumption,
+            hddPhotos: hdd?.hddPhotos
+        };
+        axios.put(`/api/hardware/hdd`, payload)
+            .then(response => {
+                setHdd(response.data);
+                setIsUpdateModalOpen(false);
+            })
+            .catch(console.error);
     };
 
     return (
@@ -79,7 +121,52 @@ export default function HddCharacteristics() {
                 </div>
             </div>
             <Photo savePhoto={savePhoto}/>
-            <br/>
+
+            <button className="upload-button item__delete" onClick={() => setIsUpdateModalOpen(true)}>Update</button>
+            {isUpdateModalOpen && (
+                <div className="modal-overlay">
+                    <div className="modal">
+                        <div className="modal__header">
+                            <h3 className="modal__title">Update HDD</h3>
+                            <button className="modal__close-btn" onClick={() => setIsUpdateModalOpen(false)}>×</button>
+                        </div>
+                        <div className="modal__body">
+                            <div className="modal__form-group">
+                                <input className="modal__input" value={updatedName} onChange={(e) => setUpdatedName(e.target.value)} placeholder="Name"/>
+                            </div>
+                            <div className="modal__form-group">
+                                <input className="modal__input" value={updatedDescription} onChange={(e) => setUpdatedDescription(e.target.value)} placeholder="Description"/>
+                            </div>
+                            <div className="modal__form-group">
+                                <input className="modal__input" type="number" value={updatedPrice} onChange={(e) => setUpdatedPrice(e.target.value)} placeholder="Price"/>
+                            </div>
+                            <div className="modal__form-group">
+                                <input className="modal__input" type="number" value={updatedRating} onChange={(e) => setUpdatedRating(Number(e.target.value))} placeholder="Rating" min="0" max="5"/>
+                            </div>
+                            <div className="modal__form-group">
+                                <input className="modal__input" type="text" value={updatedCapacity} onChange={(e) => setUpdatedCapacity(e.target.value)} placeholder="Capacity"/>
+                            </div>
+                        </div>
+                        <div className="modal__footer">
+                            <button className="modal__save-btn" onClick={handleUpdate}>Save Changes</button>
+                            <button className="modal__close-btn" onClick={() => setIsUpdateModalOpen(false)}>Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <button className="upload-button item__delete" onClick={() => setIsModalOpen(true)}>Delete</button>
+            {isModalOpen && (
+                <div className="modal-overlay">
+                    <div className="modal">
+                        <h2>Are you sure you want to delete this HDD?</h2>
+                        <div className="modal__delete">
+                            <button className="default-button modal__delete-button" onClick={handleDelete}>Delete</button>
+                            <button className="default-button modal__delete-button" onClick={() => setIsModalOpen(false)}>Close</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 }

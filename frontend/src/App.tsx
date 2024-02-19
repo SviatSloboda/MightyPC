@@ -46,7 +46,7 @@ export default function App() {
                 <Route path="/hardware/ram" element={<RamPage/>}/>
                 <Route path="/hardware/ssd" element={<SsdPage/>}/>
                 <Route path="/hardware/hdd" element={<HddPage/>}/>
-                <Route path="/hardware/power-supply" element={<PowerSupplyPage/>}/>
+                <Route path="/hardware/psu" element={<PowerSupplyPage/>}/>
                 <Route path="/hardware/pc-case" element={<PcCasePage/>}/>
 
                 <Route path="/hardware/cpu/:id" element={<CpuCharacteristics/>}/>

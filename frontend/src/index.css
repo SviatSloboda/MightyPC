@@ -632,7 +632,7 @@ a.nav__link {
 }
 
 
-.nums{
+.nums {
     font-size: 4rem;
     color: white;
 }
@@ -669,8 +669,9 @@ a.nav__link {
     color: #000;
 }
 
-.default-button{
+.default-button {
     margin-top: 3rem;
+    margin-left: 3rem;
     background-color: transparent;
     color: #fff;
     padding: 0.5rem 1rem;
@@ -681,4 +682,20 @@ a.nav__link {
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.3s, color 0.3s;
+}
+
+.default-button:hover {
+    background-color: #fff;
+    color: #000;
+}
+
+.modal__delete {
+    display: flex;
+    justify-content: space-between;
+}
+
+.item__delete{
+    background-color: #000;
+    color: #fff;
+    margin-left: 3rem;
 }

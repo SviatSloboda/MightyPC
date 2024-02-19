@@ -41,6 +41,6 @@ public abstract class BaseController<T, S extends BaseService<T, ?>> {
 
     @PutMapping
     public T update(@RequestBody T entity) {
-        return service.save(entity);
+        return service.update(entity);
     }
 }

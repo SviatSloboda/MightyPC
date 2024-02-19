@@ -1,4 +1,4 @@
-package de.mightypc.backend.model;
+package de.mightypc.backend.model.pc;
 
 import de.mightypc.backend.model.specs.PcCase;
 

@@ -1,15 +1,24 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
-import { CPU } from "../../../model/hardware/CPU.tsx";
+import {useNavigate, useParams} from "react-router-dom";
+import {CPU} from "../../../model/hardware/CPU.tsx";
 import cpuPhoto from "../../../assets/cpu.png";
 import Photo from "../Photo.tsx";
 import Rating from "./Rating.tsx";
 
 export default function CpuCharacteristics() {
     const [cpu, setCpu] = useState<CPU>();
-    const { id } = useParams<{ id: string }>();
+    const {id} = useParams<{ id: string }>();
     const [photos, setPhotos] = useState<string[]>([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+    const [updatedName, setUpdatedName] = useState('');
+    const [updatedDescription, setUpdatedDescription] = useState('');
+    const [updatedPrice, setUpdatedPrice] = useState('');
+    const [updatedRating, setUpdatedRating] = useState(0);
+
+    const navigate = useNavigate();
 
     const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
 
@@ -19,10 +28,14 @@ export default function CpuCharacteristics() {
                 .then(response => {
                     setCpu(response.data);
                     setPhotos(response.data.cpuPhotos || []);
+                    setUpdatedName(response.data.hardwareSpec.name);
+                    setUpdatedDescription(response.data.hardwareSpec.description);
+                    setUpdatedPrice(response.data.hardwareSpec.price);
+                    setUpdatedRating(response.data.hardwareSpec.rating);
                 })
                 .catch(console.error);
         }
-    }, [id]);
+    }, [id, isUpdateModalOpen]);
 
     const plusSlides = (n: number) => {
         setCurrentSlideIndex(prevIndex => (prevIndex + n + photos.length) % photos.length);
@@ -34,13 +47,44 @@ export default function CpuCharacteristics() {
 
         try {
             const response = await axios.post(`/api/cpu/upload/image/${id}`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
+                headers: {'Content-Type': 'multipart/form-data'}
             });
             setPhotos(prevPhotos => [response.data, ...prevPhotos]);
         } catch (error) {
             console.error('Error uploading image', error);
         }
     };
+
+    const handleDelete = () => {
+        axios.delete(`/api/hardware/cpu/${id}`)
+            .then(() => {
+                navigate('/hardware/cpu');
+            })
+            .catch(console.error);
+    };
+
+    const handleUpdate = () => {
+        const payload = {
+            id: cpu?.id,
+            hardwareSpec: {
+                name: updatedName,
+                description: updatedDescription,
+                price: updatedPrice,
+                rating: updatedRating,
+            },
+            performance: cpu?.performance,
+            energyConsumption: cpu?.energyConsumption,
+            cpuPhotos: cpu?.cpuPhotos
+        };
+        axios.put(`/api/hardware/cpu`, payload)
+            .then(response => {
+                setCpu(response.data);
+                setIsUpdateModalOpen(false);
+            })
+            .catch(console.error);
+    };
+
+
 
     return (
         <>
@@ -52,22 +96,24 @@ export default function CpuCharacteristics() {
                             key={index}
                         >
                             <div className="product-characteristics__number-text">{index + 1} / {photos.length}</div>
-                            <img src={photo} alt="CPU" className="product-characteristics__photo-img" />
+                            <img src={photo} alt="CPU" className="product-characteristics__photo-img"/>
                         </div>
                     ))}
-                    {!photos.length && <img src={cpuPhoto} alt="CPU" className="product-characteristics__photo-img" />}
+                    {!photos.length && <img src={cpuPhoto} alt="CPU" className="product-characteristics__photo-img"/>}
                     {photos.length >= 2 && (
                         <>
-                            <button className="product-characteristics__control product-characteristics__control--prev" onClick={() => plusSlides(-1)}>&#10094;</button>
-                            <button className="product-characteristics__control product-characteristics__control--next" onClick={() => plusSlides(1)}>&#10095;</button>
+                            <button className="product-characteristics__control product-characteristics__control--prev"
+                                    onClick={() => plusSlides(-1)}>&#10094;</button>
+                            <button className="product-characteristics__control product-characteristics__control--next"
+                                    onClick={() => plusSlides(1)}>&#10095;</button>
                         </>
                     )}
                 </div>
-                <br />
+                <br/>
                 <div className="product-characteristics__details">
                     <h1 className="product-characteristics__name">{cpu?.hardwareSpec.name}</h1>
                     <div className="product-characteristics__info">
-                        <Rating rating={cpu?.hardwareSpec.rating ?? 0} />
+                        <Rating rating={cpu?.hardwareSpec.rating ?? 0}/>
                         <span className="product-characteristics__rating">{cpu?.hardwareSpec.rating}/5</span>
                     </div>
                     <p className="product-characteristics__description">{cpu?.hardwareSpec.description}</p>
@@ -75,8 +121,61 @@ export default function CpuCharacteristics() {
                     <button className="product-characteristics__buy-btn">Add to basket</button>
                 </div>
             </div>
-            <Photo savePhoto={savePhoto} />
-            <br />
+            <Photo savePhoto={savePhoto}/>
+
+            <button className="upload-button item__delete" onClick={() => setIsUpdateModalOpen(true)}>Update
+            </button>
+            {isUpdateModalOpen && (
+                <div className="modal-overlay">
+                    <div className="modal">
+                        <div className="modal__header">
+                            <h3 className="modal__title">Update CPU</h3>
+                            <button className="modal__close-btn" onClick={() => setIsUpdateModalOpen(false)}>×</button>
+                        </div>
+                        <div className="modal__body">
+                            <div className="modal__form-group">
+                                <input className="modal__input" value={updatedName}
+                                       onChange={(e) => setUpdatedName(e.target.value)} placeholder="Name"/>
+                            </div>
+                            <div className="modal__form-group">
+                                <input className="modal__input" value={updatedDescription}
+                                       onChange={(e) => setUpdatedDescription(e.target.value)}
+                                       placeholder="Description"/>
+                            </div>
+                            <div className="modal__form-group">
+                                <input className="modal__input" type="number" value={updatedPrice}
+                                       onChange={(e) => setUpdatedPrice(e.target.value)} placeholder="Price"/>
+                            </div>
+                            <div className="modal__form-group">
+                                <input className="modal__input" type="number" value={updatedRating}
+                                       onChange={(e) => setUpdatedRating(Number(e.target.value))} placeholder="Rating"
+                                       min="0" max="5"/>
+                            </div>
+                        </div>
+                        <div className="modal__footer">
+                            <button className="modal__save-btn" onClick={handleUpdate}>Save Changes</button>
+                            <button className="modal__close-btn" onClick={() => setIsUpdateModalOpen(false)}>Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <button className="upload-button item__delete" onClick={() => setIsModalOpen(true)}>Delete</button>
+            {isModalOpen && (
+                <div className="modal-overlay">
+                    <div className="modal">
+                        <h2>Are you sure you want to delete this CPU?</h2>
+                        <div className="modal__delete">
+                            <button className="default-button modal__delete-button" onClick={handleDelete}>Delete
+                            </button>
+                            <button className="default-button modal__delete-button"
+                                    onClick={() => setIsModalOpen(false)}>Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 }

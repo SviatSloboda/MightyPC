@@ -15,7 +15,7 @@ const hardwareItems = [
     {name: 'RAM', image: ram, path: '/hardware/ram'},
     {name: 'SSD', image: ssd, path: '/hardware/ssd'},
     {name: 'HDD', image: hdd, path: '/hardware/hdd'},
-    {name: 'Power Supply', image: psu, path: '/hardware/power-supply'},
+    {name: 'Power Supply', image: psu, path: '/hardware/psu'},
     {name: 'PC Case', image: pcCase, path: '/hardware/pc-case'},
 ];
 
