@@ -1,6 +1,6 @@
 package de.mightypc.backend.service.hardware;
 
-import de.mightypc.backend.model.specs.RAM;
+import de.mightypc.backend.model.pc.specs.RAM;
 import de.mightypc.backend.repository.hardware.RamRepository;
 import org.springframework.stereotype.Service;
 

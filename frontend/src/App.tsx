@@ -8,7 +8,7 @@ import WorkstationsPage from "./components/workstations/WorkstationsPage.tsx";
 import LaptopsPage from "./components/laptops/LaptopsPage.tsx";
 import HardwarePage from "./components/hardware/HardwarePage.tsx";
 import ServicesPage from "./components/services/ServicesPage.tsx";
-import AccountPage from "./components/account/AccountPage.tsx";
+import ProfilePage from "./components/account/ProfilePage.tsx";
 import CpuPage from "./components/hardware/CpuPage.tsx";
 import NoMatch from "./components/mainpage/NoMatch.tsx";
 import GpuPage from "./components/hardware/GpuPage.tsx";
@@ -26,8 +26,26 @@ import SsdCharacteristics from "./components/hardware/characteristicsPage/SsdCha
 import HddCharacteristics from "./components/hardware/characteristicsPage/HddCharacteristics.tsx";
 import PsuCharacteristics from "./components/hardware/characteristicsPage/PsuCharacteristics.tsx";
 import PcCaseCharacteristics from "./components/hardware/characteristicsPage/PcCaseCharacteristics.tsx";
+import {useEffect, useState} from "react";
+import {User} from "./model/shop/User.tsx";
+import axios from "axios";
 
 export default function App() {
+    const [user, setUser] = useState<User>(null);
+
+    function getCurrentUser() {
+        axios.get<User>("/api/user").then((response) => {
+            setUser(response.data);
+            console.log(response.data);
+            console.log(user);
+        });
+    }
+
+    useEffect(() => {
+        getCurrentUser();
+    }, []);
+
+
     return (
         <BrowserRouter>
             <NavigationBar/>
@@ -59,7 +77,7 @@ export default function App() {
                 <Route path="/hardware/pc-case/:id" element={<PcCaseCharacteristics/>}/>
 
                 <Route path="/services" element={<ServicesPage/>}/>
-                <Route path="/account" element={<AccountPage/>}/>
+                <Route path="/user" element={<ProfilePage />}/>
                 <Route path="/*" element={<NoMatch/>}/>
             </Routes>
             <FooterBar/>

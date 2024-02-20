@@ -1,6 +1,6 @@
 package de.mightypc.backend.service.hardware;
 
-import de.mightypc.backend.model.specs.CPU;
+import de.mightypc.backend.model.pc.specs.CPU;
 import de.mightypc.backend.repository.hardware.CpuRepository;
 import org.springframework.stereotype.Service;
 

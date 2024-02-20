@@ -699,3 +699,39 @@ a.nav__link {
     color: #fff;
     margin-left: 3rem;
 }
+
+
+.login{
+    margin-top: 5rem;
+}
+
+.nav__account-dropdown {
+    position: absolute;
+    right: 1rem;
+    top: 3.5rem;
+    background-color: #000000;
+    border: 1px solid rgba(252, 255, 233, 0.2);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    z-index: 3;
+}
+
+.nav__account-dropdown-link {
+    color: #ffffff;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 1rem;
+    padding: 0.75rem 1.5rem;
+    display: block;
+    border-bottom: 1px solid rgba(252, 255, 233, 0.1);
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.nav__account-dropdown-link:hover {
+    background-color: rgba(252, 255, 233, 0.1);
+}
+
+.nav__account-dropdown-link:last-child {
+    border-bottom: none;
+}

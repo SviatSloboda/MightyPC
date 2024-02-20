@@ -1,6 +1,6 @@
 package de.mightypc.backend.service.hardware;
 
-import de.mightypc.backend.model.specs.GPU;
+import de.mightypc.backend.model.pc.specs.GPU;
 import de.mightypc.backend.repository.hardware.GpuRepository;
 import org.springframework.stereotype.Service;
 

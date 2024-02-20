@@ -1,7 +1,7 @@
 package de.mightypc.backend.controller.hardware;
 
-import de.mightypc.backend.model.specs.HardwareSpec;
-import de.mightypc.backend.model.specs.PowerSupply;
+import de.mightypc.backend.model.pc.specs.HardwareSpec;
+import de.mightypc.backend.model.pc.specs.PowerSupply;
 import de.mightypc.backend.service.hardware.PowerSupplyService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

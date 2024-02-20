@@ -1,7 +1,7 @@
 package de.mightypc.backend.controller.hardware;
 
-import de.mightypc.backend.model.specs.HardwareSpec;
-import de.mightypc.backend.model.specs.RAM;
+import de.mightypc.backend.model.pc.specs.HardwareSpec;
+import de.mightypc.backend.model.pc.specs.RAM;
 import de.mightypc.backend.service.hardware.RamService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

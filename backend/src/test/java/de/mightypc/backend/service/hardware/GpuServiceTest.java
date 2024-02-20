@@ -1,8 +1,8 @@
 package de.mightypc.backend.service.hardware;
 
-import de.mightypc.backend.exception.HardwareNotFoundException;
-import de.mightypc.backend.model.specs.GPU;
-import de.mightypc.backend.model.specs.HardwareSpec;
+import de.mightypc.backend.exception.pc.HardwareNotFoundException;
+import de.mightypc.backend.model.pc.specs.GPU;
+import de.mightypc.backend.model.pc.specs.HardwareSpec;
 import de.mightypc.backend.repository.hardware.GpuRepository;
 import org.junit.jupiter.api.Test;
 
