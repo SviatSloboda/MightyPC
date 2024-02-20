@@ -11,8 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.any;
 
 class CpuServiceTest {
     private final CpuRepository cpuRepository = mock(CpuRepository.class);
@@ -144,5 +150,43 @@ class CpuServiceTest {
         // Act & Assert
         assertThrows(HardwareNotFoundException.class, () -> cpuService.deleteById(id), "Expected HardwareNotFoundException when CPU does not exist");
         verify(cpuRepository).existsById(id);
+    }
+
+    @Test
+    void attachPhoto_WhenCpuExists_ThenPhotoIsAttached() {
+        // Arrange
+        String cpuId = "1";
+        String photoUrl = "https://example.com/photo.jpg";
+        CPU cpuBeforeUpdate = new CPU("1", new HardwareSpec("test", "test", new BigDecimal("1"), 1.01f), 9500, 125, new ArrayList<>());
+        Optional<CPU> optionalCpuBeforeUpdate = Optional.of(cpuBeforeUpdate);
+
+        List<String> photosWithNewUrl = new ArrayList<>();
+        photosWithNewUrl.add(photoUrl);
+        CPU cpuAfterUpdate = new CPU("1", new HardwareSpec("test", "test", new BigDecimal("1"), 1.01f), 9500, 125, photosWithNewUrl);
+
+        when(cpuRepository.findById(cpuId)).thenReturn(optionalCpuBeforeUpdate);
+        when(cpuRepository.save(any(CPU.class))).thenReturn(cpuAfterUpdate);
+
+        // Act
+        cpuService.attachPhoto(cpuId, photoUrl);
+
+        // Assert
+        verify(cpuRepository).findById(cpuId);
+        verify(cpuRepository).save(cpuAfterUpdate);
+    }
+
+
+    @Test
+    void attachPhoto_WhenCpuDoesNotExist_ThenNoActionTaken() {
+        // Arrange
+        String cpuId = "nonExistingId";
+        String photoUrl = "https://example.com/photo.jpg";
+        when(cpuRepository.findById(cpuId)).thenReturn(Optional.empty());
+
+        // Act
+        cpuService.attachPhoto(cpuId, photoUrl);
+
+        // Assert
+        verify(cpuRepository).findById(cpuId);
     }
 }

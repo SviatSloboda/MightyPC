@@ -11,15 +11,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.any;
 
 class MotherboardServiceTest {
     private final MotherboardRepository motherboardRepository = mock(MotherboardRepository.class);
     private final MotherboardService motherboardService = new MotherboardService(motherboardRepository);
 
     private static Motherboard getMotherboard() {
-        return new Motherboard("1",new HardwareSpec(
+        return new Motherboard("1", new HardwareSpec(
                 "test",
                 "test",
                 new BigDecimal("1"),
@@ -145,5 +151,42 @@ class MotherboardServiceTest {
         // Act & Assert
         assertThrows(HardwareNotFoundException.class, () -> motherboardService.deleteById(id), "Expected HardwareNotFoundException when Motherboard does not exist");
         verify(motherboardRepository).existsById(id);
+    }
+
+    @Test
+    void attachPhoto_WhenMotherboardExists_ThenPhotoIsAttached() {
+        // Arrange
+        String motherboardId = "1";
+        String photoUrl = "https://example.com/photo.jpg";
+        Motherboard motherboardBeforeUpdate = new Motherboard("1", new HardwareSpec("test", "test", new BigDecimal("1"), 1.01f), 9500, new String[]{}, new String[]{}, new ArrayList<>());
+        Optional<Motherboard> optionalMotherboardBeforeUpdate = Optional.of(motherboardBeforeUpdate);
+
+        List<String> photosWithNewUrl = new ArrayList<>();
+        photosWithNewUrl.add(photoUrl);
+        Motherboard motherboardAfterUpdate = new Motherboard("1", new HardwareSpec("test", "test", new BigDecimal("1"), 1.01f), 9500, new String[]{}, new String[]{}, photosWithNewUrl);
+
+        when(motherboardRepository.findById(motherboardId)).thenReturn(optionalMotherboardBeforeUpdate);
+        when(motherboardRepository.save(any(Motherboard.class))).thenReturn(motherboardAfterUpdate);
+
+        // Act
+        motherboardService.attachPhoto(motherboardId, photoUrl);
+
+        // Assert
+        verify(motherboardRepository).findById(motherboardId);
+        verify(motherboardRepository).save(motherboardAfterUpdate);
+    }
+
+    @Test
+    void attachPhoto_WhenMotherboardDoesNotExist_ThenNoActionTaken() {
+        // Arrange
+        String motherboardId = "nonExistingId";
+        String photoUrl = "https://example.com/photo.jpg";
+        when(motherboardRepository.findById(motherboardId)).thenReturn(Optional.empty());
+
+        // Act
+        motherboardService.attachPhoto(motherboardId, photoUrl);
+
+        // Assert
+        verify(motherboardRepository).findById(motherboardId);
     }
 }

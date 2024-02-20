@@ -11,15 +11,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.any;
 
 class RamServiceTest {
     private final RamRepository ramRepository = mock(RamRepository.class);
     private final RamService ramService = new RamService(ramRepository);
 
     private static RAM getRam() {
-        return new RAM("1",new HardwareSpec(
+        return new RAM("1", new HardwareSpec(
                 "test",
                 "test",
                 new BigDecimal("1"),
@@ -145,5 +151,43 @@ class RamServiceTest {
         // Act & Assert
         assertThrows(HardwareNotFoundException.class, () -> ramService.deleteById(id), "Expected HardwareNotFoundException when RAM does not exist");
         verify(ramRepository).existsById(id);
+    }
+
+    @Test
+    void attachPhoto_WhenRamExists_ThenPhotoIsAttached() {
+        // Arrange
+        String ramId = "1";
+        String photoUrl = "https://example.com/photo.jpg";
+        RAM ramBeforeUpdate = new RAM("1", new HardwareSpec("test", "test", new BigDecimal("1"), 1.01f), "ddr2", 123, 125, new ArrayList<>());
+        Optional<RAM> optionalRamBeforeUpdate = Optional.of(ramBeforeUpdate);
+
+        List<String> photosWithNewUrl = new ArrayList<>();
+        photosWithNewUrl.add(photoUrl);
+        RAM ramAfterUpdate = new RAM("1", new HardwareSpec("test", "test", new BigDecimal("1"), 1.01f), "ddr2", 123, 125, photosWithNewUrl);
+
+        when(ramRepository.findById(ramId)).thenReturn(optionalRamBeforeUpdate);
+        when(ramRepository.save(any(RAM.class))).thenReturn(ramAfterUpdate);
+
+        // Act
+        ramService.attachPhoto(ramId, photoUrl);
+
+        // Assert
+        verify(ramRepository).findById(ramId);
+        verify(ramRepository).save(ramAfterUpdate);
+    }
+
+
+    @Test
+    void attachPhoto_WhenRamDoesNotExist_ThenNoActionTaken() {
+        // Arrange
+        String ramId = "nonExistingId";
+        String photoUrl = "https://example.com/photo.jpg";
+        when(ramRepository.findById(ramId)).thenReturn(Optional.empty());
+
+        // Act
+        ramService.attachPhoto(ramId, photoUrl);
+
+        // Assert
+        verify(ramRepository).findById(ramId);
     }
 }

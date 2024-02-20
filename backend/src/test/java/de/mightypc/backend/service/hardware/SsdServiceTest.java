@@ -11,8 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.any;
 
 class SsdServiceTest {
     private final SsdRepository ssdRepository = mock(SsdRepository.class);
@@ -144,5 +150,43 @@ class SsdServiceTest {
         // Act & Assert
         assertThrows(HardwareNotFoundException.class, () -> ssdService.deleteById(id), "Expected HardwareNotFoundException when SSD does not exist");
         verify(ssdRepository).existsById(id);
+    }
+
+    @Test
+    void attachPhoto_WhenSsdExists_ThenPhotoIsAttached() {
+        // Arrange
+        String ssdId = "1";
+        String photoUrl = "https://example.com/photo.jpg";
+        SSD ssdBeforeUpdate = new SSD("1", new HardwareSpec("test", "test", new BigDecimal("1"), 1.01f), 5, 950, new ArrayList<>());
+        Optional<SSD> optionalSsdBeforeUpdate = Optional.of(ssdBeforeUpdate);
+
+        List<String> photosWithNewUrl = new ArrayList<>();
+        photosWithNewUrl.add(photoUrl);
+        SSD ssdAfterUpdate = new SSD("1", new HardwareSpec("test", "test", new BigDecimal("1"), 1.01f), 5, 950, photosWithNewUrl);
+
+        when(ssdRepository.findById(ssdId)).thenReturn(optionalSsdBeforeUpdate);
+        when(ssdRepository.save(any(SSD.class))).thenReturn(ssdAfterUpdate);
+
+        // Act
+        ssdService.attachPhoto(ssdId, photoUrl);
+
+        // Assert
+        verify(ssdRepository).findById(ssdId);
+        verify(ssdRepository).save(ssdAfterUpdate);
+    }
+
+
+    @Test
+    void attachPhoto_WhenSsdDoesNotExist_ThenNoActionTaken() {
+        // Arrange
+        String ssdId = "nonExistingId";
+        String photoUrl = "https://example.com/photo.jpg";
+        when(ssdRepository.findById(ssdId)).thenReturn(Optional.empty());
+
+        // Act
+        ssdService.attachPhoto(ssdId, photoUrl);
+
+        // Assert
+        verify(ssdRepository).findById(ssdId);
     }
 }

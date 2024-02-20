@@ -11,8 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.any;
 
 class PcCaseServiceTest {
     private final PcCaseRepository pcCaseRepository = mock(PcCaseRepository.class);
@@ -143,5 +149,43 @@ class PcCaseServiceTest {
         // Act & Assert
         assertThrows(HardwareNotFoundException.class, () -> pcCaseService.deleteById(id), "Expected HardwareNotFoundException when PcCase does not exist");
         verify(pcCaseRepository).existsById(id);
+    }
+
+    @Test
+    void attachPhoto_WhenPcCaseExists_ThenPhotoIsAttached() {
+        // Arrange
+        String pcCaseId = "1";
+        String photoUrl = "https://example.com/photo.jpg";
+        PcCase pcCaseBeforeUpdate = new PcCase("1", new HardwareSpec("test", "test", new BigDecimal("1"), 1.01f), "10x10x10", new ArrayList<>());
+        Optional<PcCase> optionalPcCaseBeforeUpdate = Optional.of(pcCaseBeforeUpdate);
+
+        List<String> photosWithNewUrl = new ArrayList<>();
+        photosWithNewUrl.add(photoUrl);
+        PcCase pcCaseAfterUpdate = new PcCase("1", new HardwareSpec("test", "test", new BigDecimal("1"), 1.01f), "10x10x10", photosWithNewUrl);
+
+        when(pcCaseRepository.findById(pcCaseId)).thenReturn(optionalPcCaseBeforeUpdate);
+        when(pcCaseRepository.save(any(PcCase.class))).thenReturn(pcCaseAfterUpdate);
+
+        // Act
+        pcCaseService.attachPhoto(pcCaseId, photoUrl);
+
+        // Assert
+        verify(pcCaseRepository).findById(pcCaseId);
+        verify(pcCaseRepository).save(pcCaseAfterUpdate);
+    }
+
+
+    @Test
+    void attachPhoto_WhenPcCaseDoesNotExist_ThenNoActionTaken() {
+        // Arrange
+        String pcCaseId = "nonExistingId";
+        String photoUrl = "https://example.com/photo.jpg";
+        when(pcCaseRepository.findById(pcCaseId)).thenReturn(Optional.empty());
+
+        // Act
+        pcCaseService.attachPhoto(pcCaseId, photoUrl);
+
+        // Assert
+        verify(pcCaseRepository).findById(pcCaseId);
     }
 }

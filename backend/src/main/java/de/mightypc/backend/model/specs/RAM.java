@@ -14,7 +14,6 @@ public record RAM(
         int energyConsumption,
         int memorySize,
         List<String> ramPhotos
-
 ) {
     public RAM(String id, HardwareSpec hardwareSpec, String type, int energyConsumption, int memorySize) {
         this(id, hardwareSpec, type, energyConsumption, memorySize, Collections.emptyList());
@@ -25,6 +24,6 @@ public record RAM(
     }
 
     public RAM withPhotos(List<String> allPhotos) {
-        return new RAM(id(), hardwareSpec(), type(), memorySize(), energyConsumption(), allPhotos);
+        return new RAM(id(), hardwareSpec(), type(), energyConsumption(), memorySize(), allPhotos);
     }
 }
