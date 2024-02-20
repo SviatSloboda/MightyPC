@@ -5,8 +5,14 @@ import de.mightypc.backend.model.specs.PowerSupply;
 import de.mightypc.backend.model.specs.createspecs.CreatePowerSupply;
 import de.mightypc.backend.service.hardware.PowerSupplyService;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
 
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.Collections;
 import java.util.UUID;
 
 @RestController
@@ -26,7 +32,7 @@ public class PowerSupplyController extends BaseController<PowerSupply, PowerSupp
                 createPowerSupply.hardwareSpec().rating()
         );
 
-        return service.save(new PowerSupply(UUID.randomUUID().toString(), hardwareSpec, createPowerSupply.power()));
+        return service.save(new PowerSupply(UUID.randomUUID().toString(), hardwareSpec, createPowerSupply.power(), Collections.emptyList()));
     }
 
     @PostMapping("/all")
@@ -40,7 +46,7 @@ public class PowerSupplyController extends BaseController<PowerSupply, PowerSupp
                     powerSupply.hardwareSpec().rating()
             );
 
-            service.save(new PowerSupply(UUID.randomUUID().toString(), hardwareSpec, powerSupply.power()));
+            service.save(new PowerSupply(UUID.randomUUID().toString(), hardwareSpec, powerSupply.power(), Collections.emptyList()));
         }
     }
 }

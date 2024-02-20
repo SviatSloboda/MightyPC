@@ -1,7 +1,14 @@
 package de.mightypc.backend.controller.hardware;
 
 import de.mightypc.backend.service.hardware.BaseService;
-import org.springframework.web.bind.annotation.*;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -20,6 +27,11 @@ public abstract class BaseController<T, S extends BaseService<T, ?>> {
     @GetMapping("/{id}")
     public T getById(@PathVariable String id) {
         return service.getById(id);
+    }
+
+    @GetMapping("/page")
+    public Page<T> getAllByPage(Pageable pageable) {
+        return service.getAllByPage(pageable);
     }
 
     @DeleteMapping("/{id}")

@@ -6,12 +6,9 @@ import de.mightypc.backend.model.specs.createspecs.CreateGpu;
 import de.mightypc.backend.service.hardware.GpuService;
 import org.springframework.http.HttpStatus;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.UUID;
 
 @RestController
@@ -31,7 +28,7 @@ public class GpuController extends BaseController<GPU, GpuService> {
                 createGpu.hardwareSpec().rating()
         );
 
-        return service.save(new GPU(UUID.randomUUID().toString(), hardwareSpec, createGpu.performance(), createGpu.energyConsumption()));
+        return service.save(new GPU(UUID.randomUUID().toString(), hardwareSpec, createGpu.performance(), createGpu.energyConsumption(), Collections.emptyList()));
     }
 
     @PostMapping("/all")
@@ -45,7 +42,7 @@ public class GpuController extends BaseController<GPU, GpuService> {
                     gpu.hardwareSpec().rating()
             );
 
-            service.save(new GPU(UUID.randomUUID().toString(), hardwareSpec, gpu.performance(), gpu.energyConsumption()));
+            service.save(new GPU(UUID.randomUUID().toString(), hardwareSpec, gpu.performance(), gpu.energyConsumption(), Collections.emptyList()));
         }
     }
 }

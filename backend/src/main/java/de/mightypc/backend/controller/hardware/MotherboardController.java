@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.Collections;
 import java.util.UUID;
 
 @RestController
@@ -36,7 +37,8 @@ public class MotherboardController extends BaseController<Motherboard, Motherboa
                 hardwareSpec,
                 createMotherboard.energyConsumption(),
                 createMotherboard.graphicCardCompatibility(),
-                createMotherboard.processorCompatibility()
+                createMotherboard.processorCompatibility(),
+                Collections.emptyList()
         ));
     }
 
@@ -56,7 +58,8 @@ public class MotherboardController extends BaseController<Motherboard, Motherboa
                     hardwareSpec,
                     motherboard.energyConsumption(),
                     motherboard.graphicCardCompatibility(),
-                    motherboard.processorCompatibility()
+                    motherboard.processorCompatibility(),
+                    Collections.emptyList()
             ));
         }
     }
