@@ -1,43 +1,42 @@
 import React from 'react';
-import StarIcon from '@material-ui/icons/Star';
-import StarHalfIcon from '@material-ui/icons/StarHalf';
+import ReactStars from 'react-stars';
 
 interface Props {
     rating: number;
     totalStars?: number;
 }
 
-const Rating: React.FC<Props> = ({rating, totalStars = 5}) => {
+const Rating: React.FC<Props> = ({ rating, totalStars = 5 }) => {
     let fullStars: number;
-    let hasHalfStar: boolean;
+    let halfStar: number = 0;
 
-    if (rating === 5) {
-        fullStars = 5;
-        hasHalfStar = false;
-    } else if (rating >= 4.5) {
-        fullStars = 4;
-        hasHalfStar = true;
+    if (rating === totalStars) {
+        fullStars = totalStars;
+    } else if (rating >= totalStars - 0.5) {
+        fullStars = totalStars - 1;
+        halfStar = 1;
     } else {
         fullStars = Math.floor(rating);
-        hasHalfStar = rating % 1 !== 0;
+        halfStar = rating % 1 >= 0.5 ? 1 : 0;
     }
 
-    const stars = [];
-    for (let i = 0; i < fullStars; i++) {
-        stars.push(<StarIcon key={`star-${i}`} className="star" style={{fill: "#fff400", fontSize: 30}}/>);
-    }
-
-    if (hasHalfStar) {
-        stars.push(<StarHalfIcon key="half-star" className="star" style={{fill: "#fff400", fontSize: 30}}/>);
-    }
-
-    for (let i = fullStars + (hasHalfStar ? 1 : 0); i < totalStars; i++) {
-        stars.push(<StarIcon key={`empty-star-${i}`} className="star" style={{fill: "#ffffff", fontSize: 30}}/>);
-    }
+    const renderStars = () => {
+        const stars = [];
+        for (let i = 0; i < fullStars; i++) {
+            stars.push(<ReactStars key={`star-${i}`} count={1} value={1} size={30} color2={"#fff400"} edit={false} />);
+        }
+        if (halfStar) {
+            stars.push(<ReactStars key="half-star" count={1} value={0.5} size={30} color2={"#fff400"} edit={false} />);
+        }
+        for (let i = fullStars + halfStar; i < totalStars; i++) {
+            stars.push(<ReactStars key={`empty-star-${i}`} count={1} value={0} size={30} color2={"#ffffff"} edit={false} />);
+        }
+        return stars;
+    };
 
     return (
-        <div>
-            {stars}
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            {renderStars()}
         </div>
     );
 };
