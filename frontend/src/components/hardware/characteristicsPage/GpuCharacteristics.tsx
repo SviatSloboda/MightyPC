@@ -5,13 +5,14 @@ import {GPU} from "../../../model/hardware/GPU.tsx";
 import gpuPhoto from "../../../assets/gpu.png";
 import Photo from "../Photo.tsx";
 import Rating from "./Rating.tsx";
+import {useAuth} from "../../../contexts/AuthContext.tsx";
 
 export default function GpuCharacteristics() {
     const [gpu, setGpu] = useState<GPU>();
     const {id} = useParams<{ id: string }>();
     const [photos, setPhotos] = useState<string[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
-
+    const {user} = useAuth();
     const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
     const [updatedName, setUpdatedName] = useState('');
     const [updatedDescription, setUpdatedDescription] = useState('');
@@ -84,6 +85,23 @@ export default function GpuCharacteristics() {
             .catch(console.error);
     };
 
+    const handleAddToBasket = () => {
+        const payload = {
+            id: gpu?.id,
+            type: "gpu",
+            name: gpu?.hardwareSpec.name,
+            description: gpu?.hardwareSpec.description,
+            price: gpu?.hardwareSpec.price,
+            photos: gpu?.gpuPhotos
+        }
+
+        axios.post(`/api/basket/${user?.id}`, payload)
+            .then(() => {
+                navigate("../../../../basket/")
+            })
+            .catch(console.error);
+    }
+
     return (
         <>
             <div className="product-characteristics">
@@ -116,7 +134,7 @@ export default function GpuCharacteristics() {
                     </div>
                     <p className="product-characteristics__description">{gpu?.hardwareSpec.description}</p>
                     <span className="product-characteristics__price">{gpu?.hardwareSpec.price}$</span>
-                    <button className="product-characteristics__buy-btn">Add to basket</button>
+                    <button className="product-characteristics__buy-btn" onClick={handleAddToBasket}>Add to basket</button>
                 </div>
             </div>
             <Photo savePhoto={savePhoto}/>

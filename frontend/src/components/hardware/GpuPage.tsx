@@ -5,6 +5,7 @@ import Modal, {useModal} from './Modal';
 import {useNavigate} from "react-router-dom";
 import gpuPhoto from "../../assets/gpu.png";
 import {GPU} from "../../model/hardware/GPU.tsx";
+import {useAuth} from "../../contexts/AuthContext.tsx";
 
 export default function GpuPage() {
     const [GPUs, setGPUs] = useState<GPU[]>([]);
@@ -19,6 +20,8 @@ export default function GpuPage() {
     const [performance, setPerformance] = useState(0);
     const [energyConsumption, setEnergyConsumption] = useState(0);
     const navigate = useNavigate();
+
+    const {user} = useAuth();
 
     useEffect(() => {
         async function fetchGpus() {
@@ -58,6 +61,23 @@ export default function GpuPage() {
             })
             .catch(error => console.error('Failed to add GPU:', error));
     }
+
+    const handleAddToBasket = (gpu: GPU) => {
+        const payload = {
+            id: gpu?.id,
+            type: "gpu",
+            name: gpu?.hardwareSpec.name,
+            description: gpu?.hardwareSpec.description,
+            price: gpu?.hardwareSpec.price,
+            photos: gpu && gpu.gpuPhotos && gpu.gpuPhotos.length > 0 ? gpu.gpuPhotos : ['https://res.cloudinary.com/dmacmrhwq/image/upload/v1708536729/cloudinary_file_test/plain.png.png']
+        };
+
+        axios.post<void>(`/api/basket/${user?.id}`, payload)
+            .then(() => {
+                navigate("../basket/");
+            })
+            .catch(console.error);
+    };
 
     return (
         <>
@@ -106,6 +126,7 @@ export default function GpuPage() {
                         product={gpu}
                         imgSrc={gpu.gpuPhotos && gpu.gpuPhotos.length > 0 ? gpu.gpuPhotos[0] : gpuPhoto}
                         toCharacteristicsPage={() => navigate(`/hardware/gpu/${gpu.id}`)}
+                        onAddToBasket={() => handleAddToBasket(gpu)}
                     />
                 ))}
             </div>

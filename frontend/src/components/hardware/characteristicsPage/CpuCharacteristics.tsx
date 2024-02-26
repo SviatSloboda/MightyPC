@@ -5,13 +5,14 @@ import {CPU} from "../../../model/hardware/CPU.tsx";
 import cpuPhoto from "../../../assets/cpu.png";
 import Photo from "../Photo.tsx";
 import Rating from "./Rating.tsx";
+import {useAuth} from "../../../contexts/AuthContext.tsx";
 
 export default function CpuCharacteristics() {
     const [cpu, setCpu] = useState<CPU>();
     const {id} = useParams<{ id: string }>();
     const [photos, setPhotos] = useState<string[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
-
+    const {user} = useAuth();
     const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
     const [updatedName, setUpdatedName] = useState('');
     const [updatedDescription, setUpdatedDescription] = useState('');
@@ -84,6 +85,22 @@ export default function CpuCharacteristics() {
             .catch(console.error);
     };
 
+    const handleAddToBasket = () => {
+        const payload = {
+            id: cpu?.id,
+            type: "cpu",
+            name: cpu?.hardwareSpec.name,
+            description: cpu?.hardwareSpec.description,
+            price: cpu?.hardwareSpec.price,
+            photos: cpu && cpu.cpuPhotos && cpu.cpuPhotos.length > 0 ? cpu.cpuPhotos : ['https://res.cloudinary.com/dmacmrhwq/image/upload/v1708536729/cloudinary_file_test/plain.png.png']
+        };
+
+        axios.post<void>(`/api/basket/${user?.id}`, payload)
+            .then(() => {
+                navigate("../basket/");
+            })
+            .catch(console.error);
+    };
 
 
     return (
@@ -118,7 +135,9 @@ export default function CpuCharacteristics() {
                     </div>
                     <p className="product-characteristics__description">{cpu?.hardwareSpec.description}</p>
                     <span className="product-characteristics__price">{cpu?.hardwareSpec.price}$</span>
-                    <button className="product-characteristics__buy-btn">Add to basket</button>
+                    <button className="product-characteristics__buy-btn"
+                            onClick={() => handleAddToBasket()}>Add to basket
+                    </button>
                 </div>
             </div>
             <Photo savePhoto={savePhoto}/>

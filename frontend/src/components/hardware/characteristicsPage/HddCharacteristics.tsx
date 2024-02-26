@@ -1,14 +1,16 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import axios from "axios";
 import {useNavigate, useParams} from "react-router-dom";
-import { HDD } from "../../../model/hardware/HDD.tsx";
+import {HDD} from "../../../model/hardware/HDD.tsx";
 import hddPhoto from "../../../assets/hdd.png";
 import Photo from "../Photo.tsx";
 import Rating from "./Rating.tsx";
+import {useAuth} from "../../../contexts/AuthContext.tsx";
 
 export default function HddCharacteristics() {
     const [hdd, setHdd] = useState<HDD>();
-    const { id } = useParams<{ id: string }>();
+    const {id} = useParams<{ id: string }>();
+    const {user} = useAuth();
     const [photos, setPhotos] = useState<string[]>([]);
     const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -84,6 +86,23 @@ export default function HddCharacteristics() {
             .catch(console.error);
     };
 
+    const handleAddToBasket = () => {
+        const payload = {
+            id: hdd?.id,
+            type: "hdd",
+            name: hdd?.hardwareSpec.name,
+            description: hdd?.hardwareSpec.description,
+            price: hdd?.hardwareSpec.price,
+            photos: hdd?.hddPhotos
+        }
+
+        axios.post(`/api/basket/${user?.id}`, payload)
+            .then(() => {
+                navigate("../../../../basket/")
+            })
+            .catch(console.error);
+    }
+
     return (
         <>
             <div className="product-characteristics">
@@ -117,7 +136,8 @@ export default function HddCharacteristics() {
                     <p className="product-characteristics__description">{hdd?.hardwareSpec.description}</p>
                     <p className="product-characteristics__description">Capacity: {hdd?.capacity}GB</p>
                     <span className="product-characteristics__price">{hdd?.hardwareSpec.price}$</span>
-                    <button className="product-characteristics__buy-btn">Add to basket</button>
+                    <button className="product-characteristics__buy-btn" onClick={handleAddToBasket}>Add to basket
+                    </button>
                 </div>
             </div>
             <Photo savePhoto={savePhoto}/>
@@ -132,24 +152,32 @@ export default function HddCharacteristics() {
                         </div>
                         <div className="modal__body">
                             <div className="modal__form-group">
-                                <input className="modal__input" value={updatedName} onChange={(e) => setUpdatedName(e.target.value)} placeholder="Name"/>
+                                <input className="modal__input" value={updatedName}
+                                       onChange={(e) => setUpdatedName(e.target.value)} placeholder="Name"/>
                             </div>
                             <div className="modal__form-group">
-                                <input className="modal__input" value={updatedDescription} onChange={(e) => setUpdatedDescription(e.target.value)} placeholder="Description"/>
+                                <input className="modal__input" value={updatedDescription}
+                                       onChange={(e) => setUpdatedDescription(e.target.value)}
+                                       placeholder="Description"/>
                             </div>
                             <div className="modal__form-group">
-                                <input className="modal__input" type="number" value={updatedPrice} onChange={(e) => setUpdatedPrice(e.target.value)} placeholder="Price"/>
+                                <input className="modal__input" type="number" value={updatedPrice}
+                                       onChange={(e) => setUpdatedPrice(e.target.value)} placeholder="Price"/>
                             </div>
                             <div className="modal__form-group">
-                                <input className="modal__input" type="number" value={updatedRating} onChange={(e) => setUpdatedRating(Number(e.target.value))} placeholder="Rating" min="0" max="5"/>
+                                <input className="modal__input" type="number" value={updatedRating}
+                                       onChange={(e) => setUpdatedRating(Number(e.target.value))} placeholder="Rating"
+                                       min="0" max="5"/>
                             </div>
                             <div className="modal__form-group">
-                                <input className="modal__input" type="text" value={updatedCapacity} onChange={(e) => setUpdatedCapacity(e.target.value)} placeholder="Capacity"/>
+                                <input className="modal__input" type="text" value={updatedCapacity}
+                                       onChange={(e) => setUpdatedCapacity(e.target.value)} placeholder="Capacity"/>
                             </div>
                         </div>
                         <div className="modal__footer">
                             <button className="modal__save-btn" onClick={handleUpdate}>Save Changes</button>
-                            <button className="modal__close-btn" onClick={() => setIsUpdateModalOpen(false)}>Cancel</button>
+                            <button className="modal__close-btn" onClick={() => setIsUpdateModalOpen(false)}>Cancel
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -161,8 +189,11 @@ export default function HddCharacteristics() {
                     <div className="modal">
                         <h2>Are you sure you want to delete this HDD?</h2>
                         <div className="modal__delete">
-                            <button className="default-button modal__delete-button" onClick={handleDelete}>Delete</button>
-                            <button className="default-button modal__delete-button" onClick={() => setIsModalOpen(false)}>Close</button>
+                            <button className="default-button modal__delete-button" onClick={handleDelete}>Delete
+                            </button>
+                            <button className="default-button modal__delete-button"
+                                    onClick={() => setIsModalOpen(false)}>Close
+                            </button>
                         </div>
                     </div>
                 </div>

@@ -5,6 +5,7 @@ import Modal, {useModal} from './Modal';
 import {useNavigate} from "react-router-dom";
 import cpuPhoto from "../../assets/cpu.png";
 import {CPU} from "../../model/hardware/CPU.tsx";
+import {useAuth} from "../../contexts/AuthContext.tsx";
 
 export default function CpuPage() {
     const [CPUs, setCPUs] = useState<CPU[]>([]);
@@ -19,6 +20,7 @@ export default function CpuPage() {
     const [performance, setPerformance] = useState(0);
     const [energyConsumption, setEnergyConsumption] = useState(0);
     const navigate = useNavigate();
+    const {user} = useAuth();
 
     useEffect(() => {
         async function fetchCpus() {
@@ -58,6 +60,23 @@ export default function CpuPage() {
             })
             .catch(error => console.error('Failed to add CPU:', error));
     }
+
+    const handleAddToBasket = (cpu: CPU) => {
+        const payload = {
+            id: cpu?.id,
+            type: "cpu",
+            name: cpu?.hardwareSpec.name,
+            description: cpu?.hardwareSpec.description,
+            price: cpu?.hardwareSpec.price,
+            photos: cpu && cpu.cpuPhotos && cpu.cpuPhotos.length > 0 ? cpu.cpuPhotos : ['https://res.cloudinary.com/dmacmrhwq/image/upload/v1708536729/cloudinary_file_test/plain.png.png']
+        };
+
+        axios.post<void>(`/api/basket/${user?.id}`, payload)
+            .then(() => {
+                navigate("../basket/");
+            })
+            .catch(console.error);
+    };
 
     return (
         <>
@@ -106,6 +125,7 @@ export default function CpuPage() {
                         product={cpu}
                         imgSrc={cpu.cpuPhotos && cpu.cpuPhotos.length > 0 ? cpu.cpuPhotos[0] : cpuPhoto}
                         toCharacteristicsPage={() => navigate(`/hardware/cpu/${cpu.id}`)}
+                        onAddToBasket={() => handleAddToBasket(cpu)} // Added line for integration
                     />
                 ))}
             </div>

@@ -5,6 +5,7 @@ import Modal, {useModal} from './Modal';
 import {useNavigate} from "react-router-dom";
 import hddPhoto from "../../assets/hdd.png";
 import {HDD} from "../../model/hardware/HDD.tsx";
+import {useAuth} from "../../contexts/AuthContext.tsx";
 
 export default function HddPage() {
     const [HDDs, setHDDs] = useState<HDD[]>([]);
@@ -19,6 +20,7 @@ export default function HddPage() {
     const [capacity, setCapacity] = useState(0);
     const [energyConsumption, setEnergyConsumption] = useState(0);
     const navigate = useNavigate();
+    const {user} = useAuth();
 
     useEffect(() => {
         async function fetchGpus() {
@@ -57,6 +59,23 @@ export default function HddPage() {
                 toggleModal();
             })
             .catch(error => console.error('Failed to add HDD:', error));
+    };
+
+    const handleAddToBasket = (hdd: HDD) => {
+        const payload = {
+            id: hdd?.id,
+            type: "hdd",
+            name: hdd?.hardwareSpec.name,
+            description: hdd?.hardwareSpec.description,
+            price: hdd?.hardwareSpec.price,
+            photos: hdd && hdd.hddPhotos && hdd.hddPhotos.length > 0 ? hdd.hddPhotos : ['https://res.cloudinary.com/dmacmrhwq/image/upload/v1708536729/cloudinary_file_test/plain.png.png']
+        };
+
+        axios.post<void>(`/api/basket/${user?.id}`, payload)
+            .then(() => {
+                navigate("../basket/");
+            })
+            .catch(console.error);
     };
 
     return (
@@ -105,6 +124,7 @@ export default function HddPage() {
                         product={hdd}
                         imgSrc={hdd.hddPhotos && hdd.hddPhotos.length > 0 ? hdd.hddPhotos[0] : hddPhoto}
                         toCharacteristicsPage={() => navigate(`/hardware/hdd/${hdd.id}`)}
+                        onAddToBasket={() => handleAddToBasket(hdd)}
                     />
                 ))}
             </div>
