@@ -1,7 +1,7 @@
 package de.mightypc.backend.controller.pc.hardware.upload;
 
 import de.mightypc.backend.service.CloudinaryService;
-import de.mightypc.backend.service.hardware.PowerSupplyService;
+import de.mightypc.backend.service.pc.hardware.PowerSupplyService;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.web.bind.annotation.PostMapping;

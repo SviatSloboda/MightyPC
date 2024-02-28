@@ -1,21 +1,17 @@
 package de.mightypc.backend.controller.shop;
 
-import de.mightypc.backend.model.pc.PC;
-import de.mightypc.backend.model.shop.Order;
 import de.mightypc.backend.model.shop.UserResponse;
-import de.mightypc.backend.service.UserService;
+import de.mightypc.backend.service.shop.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
-
     private final UserService userService;
 
     public UserController(UserService userService) {
@@ -32,13 +28,10 @@ public class UserController {
         userService.logoutUser(request, response);
     }
 
-    @GetMapping("/{userId}/orders")
-    public List<Order> getAllOrdersOfUser(@PathVariable String userId) {
-        return userService.getAllOrdersOfUser(userId);
-    }
+    @DeleteMapping("/{userId}")
+    public void deleteAccount(HttpServletRequest request, HttpServletResponse response, @PathVariable String userId) {
+        logoutUser(request, response);
 
-    @GetMapping("/{userID}/configurations")
-    public List<PC> getAllPcsOfUser(@PathVariable String userID){
-        return userService.getAllPcsOfUser(userID);
+        userService.deleteAccount(userId);
     }
 }

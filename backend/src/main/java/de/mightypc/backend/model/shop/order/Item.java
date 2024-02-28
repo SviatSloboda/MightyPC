@@ -1,4 +1,4 @@
-package de.mightypc.backend.model.shop;
+package de.mightypc.backend.model.shop.order;
 
 import org.springframework.data.annotation.Id;
 
@@ -8,8 +8,9 @@ import java.util.List;
 public record Item(
         @Id
         String id,
-        String userId,
+        String type,
         String name,
+        String description,
         BigDecimal price,
         List<String> photos
 ) {

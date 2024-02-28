@@ -1,4 +1,4 @@
-package de.mightypc.backend.repository;
+package de.mightypc.backend.repository.shop;
 
 import de.mightypc.backend.model.shop.User;
 import org.springframework.data.mongodb.repository.MongoRepository;

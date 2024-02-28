@@ -1,12 +1,9 @@
-package de.mightypc.backend.service;
+package de.mightypc.backend.service.shop;
 
-import de.mightypc.backend.exception.pc.HardwareNotFoundException;
 import de.mightypc.backend.exception.shop.UserNotFoundException;
-import de.mightypc.backend.model.pc.PC;
-import de.mightypc.backend.model.shop.Order;
 import de.mightypc.backend.model.shop.User;
 import de.mightypc.backend.model.shop.UserResponse;
-import de.mightypc.backend.repository.UserRepository;
+import de.mightypc.backend.repository.shop.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
@@ -15,8 +12,11 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
-import java.util.List;
+
 
 @Service
 public class UserService {
@@ -41,7 +41,7 @@ public class UserService {
         boolean isReturningUser = userRepository.existsByEmail(userEmail.trim());
 
         if (!isReturningUser) {
-            return new UserResponse(userRepository.save(new User(userEmail, new ArrayList<>(), new ArrayList<>(), true)));
+            return new UserResponse(userRepository.save(new User(userEmail, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), true, "default", ZonedDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.FULL)), "")));
         }
 
         return new UserResponse(userRepository.getUserByEmail(userEmail));
@@ -55,19 +55,29 @@ public class UserService {
         }
     }
 
-    public List<Order> getAllOrdersOfUser(String userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User doesn't exist!"));
-
-        return user.orders();
+    public User getUserById(String id) {
+        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("There is no such user"));
     }
 
-    public List<PC> getAllPcsOfUser(String userID) {
-        User user = userRepository.findById(userID).orElseThrow(() -> new UserNotFoundException("User doesn't exist!"));
+    public void attachPhoto(String userId, String photoUrl) {
+        User user = getUserById(userId);
 
-        return user.userPcs();
+        user.setUserPhoto(photoUrl);
+
+        userRepository.save(user);
     }
 
-    public Order saveOrder(Order order){
-        return order;
+    public void deleteImage(String userId) {
+        User user = getUserById(userId);
+
+        user.setUserPhoto("");
+
+        userRepository.save(user);
+    }
+
+    public void deleteAccount(String userId) {
+        User user = getUserById(userId);
+
+        userRepository.delete(user);
     }
 }

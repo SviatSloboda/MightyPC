@@ -1,6 +1,6 @@
-package de.mightypc.backend.service;
+package de.mightypc.backend.service.pc;
 
-import de.mightypc.backend.repository.PcRepository;
+import de.mightypc.backend.repository.pc.PcRepository;
 import org.springframework.stereotype.Service;
 
 @Service

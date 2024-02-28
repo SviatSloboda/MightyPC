@@ -1,7 +1,7 @@
-package de.mightypc.backend.service.hardware;
+package de.mightypc.backend.service.pc.hardware;
 
 import de.mightypc.backend.model.pc.specs.Motherboard;
-import de.mightypc.backend.repository.hardware.MotherboardRepository;
+import de.mightypc.backend.repository.pc.hardware.MotherboardRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

@@ -3,7 +3,7 @@ package de.mightypc.backend.controller.pc.hardware;
 import de.mightypc.backend.model.pc.specs.HDD;
 import de.mightypc.backend.model.pc.specs.HardwareSpec;
 import de.mightypc.backend.model.pc.specs.createspecs.CreateHdd;
-import de.mightypc.backend.service.hardware.HddService;
+import de.mightypc.backend.service.pc.hardware.HddService;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.web.bind.annotation.RequestMapping;

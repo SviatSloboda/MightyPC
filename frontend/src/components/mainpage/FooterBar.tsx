@@ -1,8 +1,7 @@
 import {Link} from "react-router-dom";
 
 export default function FooterBar() {
-    return (
-        <footer className="footer">
+    return (<footer className="footer">
             <div className="footer__info">
                 <div className="footer__info-title">Contact Us</div>
                 <div className="footer__info-content">+1 (555) 123-4567</div>

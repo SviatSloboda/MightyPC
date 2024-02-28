@@ -36,15 +36,13 @@ public class SecurityConfig {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-        }).logout(logout -> {
-            logout
-                    .logoutUrl("/api/logout")
-                    .logoutSuccessHandler((request, response, authentication) -> response.setStatus(HttpServletResponse.SC_OK))
-                    .deleteCookies("JSESSIONID")
-                    .invalidateHttpSession(true)
-                    .clearAuthentication(true)
-                    .permitAll();
-        });
+        }).logout(logout -> logout
+                .logoutUrl("/api/logout")
+                .logoutSuccessHandler((request, response, authentication) -> response.setStatus(HttpServletResponse.SC_OK))
+                .deleteCookies("JSESSIONID")
+                .invalidateHttpSession(true)
+                .clearAuthentication(true)
+                .permitAll());
         return http.build();
     }
 }

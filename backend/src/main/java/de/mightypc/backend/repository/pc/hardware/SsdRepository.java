@@ -1,4 +1,4 @@
-package de.mightypc.backend.repository.hardware;
+package de.mightypc.backend.repository.pc.hardware;
 
 import de.mightypc.backend.model.pc.specs.SSD;
 import org.springframework.data.mongodb.repository.MongoRepository;

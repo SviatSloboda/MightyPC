@@ -1,5 +1,3 @@
-export default function LaptopsPage(){
-    return(
-        <h1 className={"notCompleted"}>Laptops</h1>
-    )
+export default function LaptopsPage() {
+    return (<h1 className={"notCompleted"}>Laptops</h1>)
 }

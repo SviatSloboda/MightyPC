@@ -1,5 +1,3 @@
-export default function ServicesPage(){
-    return(
-        <h1 className={"notCompleted"}>Services</h1>
-    )
+export default function ServicesPage() {
+    return (<h1 className={"notCompleted"}>Services</h1>)
 }

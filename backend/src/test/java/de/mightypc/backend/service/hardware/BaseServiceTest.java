@@ -1,6 +1,7 @@
 package de.mightypc.backend.service.hardware;
 
 import de.mightypc.backend.exception.pc.HardwareNotFoundException;
+import de.mightypc.backend.service.pc.hardware.BaseService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;

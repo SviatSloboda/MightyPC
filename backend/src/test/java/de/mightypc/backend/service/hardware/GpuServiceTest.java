@@ -3,7 +3,8 @@ package de.mightypc.backend.service.hardware;
 import de.mightypc.backend.exception.pc.HardwareNotFoundException;
 import de.mightypc.backend.model.pc.specs.GPU;
 import de.mightypc.backend.model.pc.specs.HardwareSpec;
-import de.mightypc.backend.repository.hardware.GpuRepository;
+import de.mightypc.backend.repository.pc.hardware.GpuRepository;
+import de.mightypc.backend.service.pc.hardware.GpuService;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

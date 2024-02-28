@@ -1,7 +1,7 @@
-package de.mightypc.backend.service.hardware;
+package de.mightypc.backend.service.pc.hardware;
 
 import de.mightypc.backend.model.pc.specs.PowerSupply;
-import de.mightypc.backend.repository.hardware.PowerSupplyRepository;
+import de.mightypc.backend.repository.pc.hardware.PowerSupplyRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

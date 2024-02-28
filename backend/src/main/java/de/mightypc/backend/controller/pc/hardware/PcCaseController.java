@@ -3,7 +3,7 @@ package de.mightypc.backend.controller.pc.hardware;
 import de.mightypc.backend.model.pc.specs.HardwareSpec;
 import de.mightypc.backend.model.pc.specs.PcCase;
 import de.mightypc.backend.model.pc.specs.createspecs.CreatePcCase;
-import de.mightypc.backend.service.hardware.PcCaseService;
+import de.mightypc.backend.service.pc.hardware.PcCaseService;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.web.bind.annotation.RequestMapping;

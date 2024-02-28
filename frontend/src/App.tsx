@@ -8,7 +8,7 @@ import WorkstationsPage from "./components/workstations/WorkstationsPage.tsx";
 import LaptopsPage from "./components/laptops/LaptopsPage.tsx";
 import HardwarePage from "./components/hardware/HardwarePage.tsx";
 import ServicesPage from "./components/services/ServicesPage.tsx";
-import ProfilePage from "./components/account/ProfilePage.tsx";
+import ProfilePage from "./components/shop/ProfilePage.tsx";
 import CpuPage from "./components/hardware/CpuPage.tsx";
 import NoMatch from "./components/mainpage/NoMatch.tsx";
 import GpuPage from "./components/hardware/GpuPage.tsx";
@@ -29,6 +29,8 @@ import PcCaseCharacteristics from "./components/hardware/characteristicsPage/PcC
 import {useEffect, useState} from "react";
 import {User} from "./model/shop/User.tsx";
 import axios from "axios";
+import BasketPage from "./components/shop/BasketPage.tsx";
+import OrderPage from "./components/shop/OrderPage.tsx";
 
 export default function App() {
     const [user, setUser] = useState<User>(null);
@@ -46,8 +48,7 @@ export default function App() {
     }, []);
 
 
-    return (
-        <BrowserRouter>
+    return (<BrowserRouter>
             <NavigationBar/>
 
             <Routes>
@@ -77,10 +78,13 @@ export default function App() {
                 <Route path="/hardware/pc-case/:id" element={<PcCaseCharacteristics/>}/>
 
                 <Route path="/services" element={<ServicesPage/>}/>
-                <Route path="/user" element={<ProfilePage />}/>
+
+                <Route path="/basket" element={<BasketPage/>}/>
+                <Route path="/order" element={<OrderPage/>}/>
+                <Route path="/user" element={<ProfilePage/>}/>
                 <Route path="/*" element={<NoMatch/>}/>
+
             </Routes>
             <FooterBar/>
-        </BrowserRouter>
-    )
+        </BrowserRouter>)
 }

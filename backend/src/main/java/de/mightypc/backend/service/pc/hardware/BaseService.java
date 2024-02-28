@@ -1,4 +1,4 @@
-package de.mightypc.backend.service.hardware;
+package de.mightypc.backend.service.pc.hardware;
 
 import de.mightypc.backend.exception.pc.HardwareNotFoundException;
 import org.springframework.data.domain.Page;

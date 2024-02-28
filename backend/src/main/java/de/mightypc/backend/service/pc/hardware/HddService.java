@@ -1,7 +1,7 @@
-package de.mightypc.backend.service.hardware;
+package de.mightypc.backend.service.pc.hardware;
 
 import de.mightypc.backend.model.pc.specs.HDD;
-import de.mightypc.backend.repository.hardware.HddRepository;
+import de.mightypc.backend.repository.pc.hardware.HddRepository;
 
 import org.springframework.stereotype.Service;
 

@@ -1,7 +1,7 @@
-package de.mightypc.backend.service.hardware;
+package de.mightypc.backend.service.pc.hardware;
 
 import de.mightypc.backend.model.pc.specs.RAM;
-import de.mightypc.backend.repository.hardware.RamRepository;
+import de.mightypc.backend.repository.pc.hardware.RamRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

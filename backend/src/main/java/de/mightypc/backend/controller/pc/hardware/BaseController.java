@@ -1,6 +1,6 @@
 package de.mightypc.backend.controller.pc.hardware;
 
-import de.mightypc.backend.service.hardware.BaseService;
+import de.mightypc.backend.service.pc.hardware.BaseService;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

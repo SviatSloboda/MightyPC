@@ -1,7 +1,6 @@
 package de.mightypc.backend.model.pc;
 
 import de.mightypc.backend.model.pc.specs.*;
-import de.mightypc.backend.model.specs.*;
 
 import java.math.BigDecimal;
 

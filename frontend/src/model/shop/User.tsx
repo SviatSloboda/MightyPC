@@ -1,4 +1,4 @@
-import {PC} from "../PC.tsx";
+import {PC} from "../pc/PC.tsx";
 import {Order} from "./Order.tsx";
 
 export type User = {
@@ -6,4 +6,7 @@ export type User = {
     email: string,
     userPcs: PC[],
     orders: Order[],
+    role: string,
+    dateOfAccountCreation: string,
+    photo: string
 } | null;

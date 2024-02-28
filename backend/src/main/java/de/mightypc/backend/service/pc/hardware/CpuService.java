@@ -1,7 +1,7 @@
-package de.mightypc.backend.service.hardware;
+package de.mightypc.backend.service.pc.hardware;
 
 import de.mightypc.backend.model.pc.specs.CPU;
-import de.mightypc.backend.repository.hardware.CpuRepository;
+import de.mightypc.backend.repository.pc.hardware.CpuRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
