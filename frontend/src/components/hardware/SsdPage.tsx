@@ -1,25 +1,30 @@
 import {useEffect, useState} from 'react';
 import axios from 'axios';
-import ProductBox from './ProductBox';
-import Modal, {useModal} from './Modal';
+import ProductBox from './utils/ProductBox.tsx';
+import Modal, {useModal} from './utils/Modal.tsx';
 import {useNavigate} from "react-router-dom";
 import ssdPhoto from "../../assets/ssd.png";
 import {SSD} from "../../model/pc/hardware/SSD.tsx";
-
+import {useAuth} from "../../contexts/AuthContext.tsx";
+import useLoginModal from "./utils/useLoginModal";
+import LoginModal from "./utils/LoginModal";
 
 export default function SsdPage() {
     const [SSDs, setSSDs] = useState<SSD[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
-    const ssdsPerPage = 8; // This value should match your backend Pageable size
+    const ssdsPerPage = 8;
     const [modalOpen, toggleModal] = useModal();
+    const {user} = useAuth();
+    const {isLoginModalOpen, showLoginModal, hideLoginModal, handleLogin} = useLoginModal();
+    const navigate = useNavigate();
+
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [price, setPrice] = useState("");
     const [rating, setRating] = useState(0);
     const [capacity, setCapacity] = useState(0);
     const [energyConsumption, setEnergyConsumption] = useState(0);
-    const navigate = useNavigate();
 
     useEffect(() => {
         async function fetchSsds() {
@@ -42,85 +47,107 @@ export default function SsdPage() {
     const saveValues = () => {
         const payload = {
             hardwareSpec: {
-                name,
-                description,
-                price,
-                rating,
-            },
-            capacity,
-            energyConsumption,
+                name, description, price, rating,
+            }, capacity, energyConsumption,
         };
 
         axios.post('/api/hardware/ssd', payload)
             .then(response => {
-                console.log('SSD added:', response.data);
                 setSSDs([...SSDs, response.data]);
                 toggleModal();
             })
             .catch(error => console.error('Failed to add SSD:', error));
     };
 
-    return (
-        <>
-            <h1 className="body--product-page">SSD List</h1>
-            <button className="default-button" onClick={toggleModal}>Add SSD</button>
+    const handleAddToBasket = (ssd: SSD) => {
+        if (!user) {
+            showLoginModal();
+            return;
+        }
+        const payload = {
+            id: ssd.id,
+            type: "ssd",
+            name: ssd.hardwareSpec.name,
+            description: ssd.hardwareSpec.description,
+            price: ssd.hardwareSpec.price,
+            photos: ssd.ssdPhotos && ssd.ssdPhotos.length > 0 ? ssd.ssdPhotos : [ssdPhoto]
+        };
 
-            <Modal isOpen={modalOpen} onClose={toggleModal} onSave={saveValues}>
-                <div className="modal__form-group">
-                    <label htmlFor="modal-name" className="modal__form-label">Name:</label>
-                    <input id="modal-name" className="modal__input" value={name}
-                           onChange={(e) => setName(e.target.value)} required/>
-                </div>
-                <div className="modal__form-group">
-                    <label htmlFor="modal-description" className="modal__form-label">Description:</label>
-                    <input id="modal-description" className="modal__input" value={description}
-                           onChange={(e) => setDescription(e.target.value)}
-                           required/>
-                </div>
-                <div className="modal__form-group">
-                    <label htmlFor="modal-price" className="modal__form-label">Price:</label>
-                    <input id="modal-price" className="modal__input" value={price}
-                           onChange={(e) => setPrice(e.target.value)} required/>
-                </div>
-                <div className="modal__form-group">
-                    <label htmlFor="modal-rating" className="modal__form-label">Rating:</label>
-                    <input id="modal-rating" className="modal__input" type="number" value={rating}
-                           onChange={(e) => setRating(parseFloat(e.target.value))} min="0" max="5" step="0.1" required/>
-                </div>
-                <div className="modal__form-group">
-                    <label htmlFor="modal-capacity" className="modal__form-label">Capacity:</label>
-                    <input id="modal-capacity" className="modal__input" type="number" value={capacity}
-                           onChange={(e) => setCapacity(parseInt(e.target.value, 10))} min="0" required/>
-                </div>
-                <div className="modal__form-group">
-                    <label htmlFor="modal-energyConsumption" className="modal__form-label">Energy Consumption:</label>
-                    <input id="modal-energyConsumption" className="modal__input" type="number" value={energyConsumption}
-                           onChange={(e) => setEnergyConsumption(parseInt(e.target.value, 10))} min="0" required/>
-                </div>
-            </Modal>
+        axios.post(`/api/basket/${user.id}`, payload)
+            .then(() => {
+                navigate("../basket/");
+            })
+            .catch(console.error);
+    };
 
+    return (<>
+        <h1 className="body--product-page">SSD List</h1>
+        <button className="default-button" onClick={toggleModal}>Add SSD</button>
 
-            <div className="product-list">
-                {SSDs.map(ssd => (
-                    <ProductBox
-                        key={ssd.id}
-                        product={ssd}
-                        imgSrc={ssd.ssdPhotos && ssd.ssdPhotos.length > 0 ? ssd.ssdPhotos[0] : ssdPhoto}
-                        toCharacteristicsPage={() => navigate(`/hardware/ssd/${ssd.id}`)}
-                    />
-                ))}
+        <Modal isOpen={modalOpen} onClose={toggleModal} onSave={saveValues}>
+            <div className="modal__form-group">
+                <label htmlFor="modal-name" className="modal__form-label">Name:</label>
+                <input id="modal-name" className="modal__input" value={name}
+                       onChange={(e) => setName(e.target.value)} required/>
             </div>
-            <div className="product-list__pagination">
-                {Array.from({length: totalPages}, (_, i) => (
-                    <button
-                        key={i}
-                        onClick={() => paginate(i + 1)}
-                        className={`pagination__button ${currentPage === i ? 'pagination__button--active' : ''}`}
-                    >
-                        {i + 1}
-                    </button>
-                ))}
+            <div className="modal__form-group">
+                <label htmlFor="modal-description" className="modal__form-label">Description:</label>
+                <input id="modal-description" className="modal__input" value={description}
+                       onChange={(e) => setDescription(e.target.value)}
+                       required/>
             </div>
-        </>
-    );
+            <div className="modal__form-group">
+                <label htmlFor="modal-price" className="modal__form-label">Price:</label>
+                <input id="modal-price" className="modal__input" value={price}
+                       onChange={(e) => setPrice(e.target.value)} required/>
+            </div>
+            <div className="modal__form-group">
+                <label htmlFor="modal-rating" className="modal__form-label">Rating:</label>
+                <input id="modal-rating" className="modal__input" type="number" value={rating}
+                       onChange={(e) => setRating(parseFloat(e.target.value))} min="0" max="5" step="0.1" required/>
+            </div>
+            <div className="modal__form-group">
+                <label htmlFor="modal-capacity" className="modal__form-label">Capacity:</label>
+                <input id="modal-capacity" className="modal__input" type="number" value={capacity}
+                       onChange={(e) => setCapacity(parseInt(e.target.value, 10))} min="0" required/>
+            </div>
+            <div className="modal__form-group">
+                <label htmlFor="modal-energyConsumption" className="modal__form-label">Energy Consumption:</label>
+                <input id="modal-energyConsumption" className="modal__input" type="number" value={energyConsumption}
+                       onChange={(e) => setEnergyConsumption(parseInt(e.target.value, 10))} min="0" required/>
+            </div>
+        </Modal>
+
+        <div className="product-list">
+            {SSDs.map(ssd => (<ProductBox
+                key={ssd.id}
+                product={ssd}
+                imgSrc={ssd.ssdPhotos && ssd.ssdPhotos.length > 0 ? ssd.ssdPhotos[0] : ssdPhoto}
+                toCharacteristicsPage={() => navigate(`/hardware/ssd/${ssd.id}`)}
+                onAddToBasket={() => handleAddToBasket(ssd)}
+            />))}
+        </div>
+
+        <div className="product-list">
+            {SSDs.map(ssd => (<ProductBox
+                key={ssd.id}
+                product={ssd}
+                imgSrc={ssd.ssdPhotos && ssd.ssdPhotos.length > 0 ? ssd.ssdPhotos[0] : ssdPhoto}
+                toCharacteristicsPage={() => navigate(`/hardware/ssd/${ssd.id}`)}
+                onAddToBasket={() => handleAddToBasket(ssd)}
+
+            />))}
+        </div>
+        <div className="product-list__pagination">
+            {Array.from({length: totalPages}, (_, i) => (<button
+                key={i}
+                onClick={() => paginate(i + 1)}
+                className={`pagination__button ${currentPage === i ? 'pagination__button--active' : ''}`}
+            >
+                {i + 1}
+            </button>))}
+        </div>
+
+        <LoginModal isOpen={isLoginModalOpen} onLogin={handleLogin} onClose={hideLoginModal}/>
+    </>);
 }

@@ -1,25 +1,29 @@
 import {useEffect, useState} from 'react';
 import axios from 'axios';
-import ProductBox from './ProductBox';
-import Modal, {useModal} from './Modal';
+import ProductBox from './utils/ProductBox.tsx';
+import Modal, {useModal} from './utils/Modal.tsx';
 import {useNavigate} from "react-router-dom";
 import psuPhoto from "../../assets/psu.png";
 import {PSU} from "../../model/pc/hardware/PSU.tsx";
+import {useAuth} from "../../contexts/AuthContext.tsx";
+import useLoginModal from "./utils/useLoginModal";
+import LoginModal from "./utils/LoginModal";
 
-
-export default function PsuPage() {
+export default function PowerSupplyPage() {
     const [PSUs, setPSUs] = useState<PSU[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
-    const psusPerPage = 8; // This value should match your backend Pageable size
+    const psusPerPage = 8;
     const [modalOpen, toggleModal] = useModal();
+    const {user} = useAuth();
+    const {isLoginModalOpen, showLoginModal, hideLoginModal, handleLogin} = useLoginModal();
+    const navigate = useNavigate();
 
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [price, setPrice] = useState("");
     const [rating, setRating] = useState(0);
     const [power, setPower] = useState(0);
-    const navigate = useNavigate();
 
     useEffect(() => {
         async function fetchPsus() {
@@ -52,11 +56,31 @@ export default function PsuPage() {
 
         axios.post('/api/hardware/psu', payload)
             .then(response => {
-                console.log('PSU added:', response.data);
                 setPSUs(prevPSUs => [...prevPSUs, response.data]);
                 toggleModal();
             })
             .catch(error => console.error('Failed to add PSU:', error));
+    };
+
+    const handleAddToBasket = (psu: PSU) => {
+        if (!user) {
+            showLoginModal();
+            return;
+        }
+        const payload = {
+            id: psu.id,
+            type: "psu",
+            name: psu.hardwareSpec.name,
+            description: psu.hardwareSpec.description,
+            price: psu.hardwareSpec.price,
+            photos: psu.psuPhotos && psu.psuPhotos.length > 0 ? psu.psuPhotos : [psuPhoto]
+        };
+
+        axios.post(`/api/basket/${user.id}`, payload)
+            .then(() => {
+                navigate("../basket/");
+            })
+            .catch(console.error);
     };
 
     return (
@@ -93,6 +117,17 @@ export default function PsuPage() {
                 </div>
             </Modal>
 
+            <div className="product-list">
+                {PSUs.map(psu => (
+                    <ProductBox
+                        key={psu.id}
+                        product={psu}
+                        imgSrc={psu.psuPhotos && psu.psuPhotos.length > 0 ? psu.psuPhotos[0] : psuPhoto}
+                        toCharacteristicsPage={() => navigate(`/hardware/psu/${psu.id}`)}
+                        onAddToBasket={() => handleAddToBasket(psu)}
+                    />
+                ))}
+            </div>
 
             <div className="product-list">
                 {PSUs.map(psu => (
@@ -101,6 +136,7 @@ export default function PsuPage() {
                         product={psu}
                         imgSrc={psu.psuPhotos && psu.psuPhotos.length > 0 ? psu.psuPhotos[0] : psuPhoto}
                         toCharacteristicsPage={() => navigate(`/hardware/psu/${psu.id}`)}
+                        onAddToBasket={() => handleAddToBasket(psu)}
                     />
                 ))}
             </div>
@@ -115,6 +151,8 @@ export default function PsuPage() {
                     </button>
                 ))}
             </div>
+
+            <LoginModal isOpen={isLoginModalOpen} onLogin={handleLogin} onClose={hideLoginModal}/>
         </>
     );
 }

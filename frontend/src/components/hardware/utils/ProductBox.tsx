@@ -1,6 +1,6 @@
 import React from 'react';
-import {Product} from "../../model/pc/Product.tsx";
-import Rating from "./characteristicsPage/Rating.tsx";
+import {Product} from "../../../model/pc/Product.tsx";
+import Rating from "./Rating.tsx";
 
 interface ProductBoxProps {
     product: Product;
@@ -24,7 +24,6 @@ const ProductBox: React.FC<ProductBoxProps> = ({product, imgSrc, toCharacteristi
             {/* Use onAddToBasket here */}
             <button className="product-box__button" onClick={toCharacteristicsPage}>Info</button>
         </div>
-    </div>
-);
+    </div>);
 
 export default ProductBox;
