@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
-import { PSU } from "../../../model/hardware/PSU.tsx";
+import { PSU } from "../../../model/pc/hardware/PSU.tsx";
 import psuPhoto from "../../../assets/psu.png";
 import Photo from "../Photo.tsx";
 import Rating from "./Rating.tsx";

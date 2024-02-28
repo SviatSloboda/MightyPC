@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
 import {useNavigate, useParams} from "react-router-dom";
-import {HDD} from "../../../model/hardware/HDD.tsx";
+import {HDD} from "../../../model/pc/hardware/HDD.tsx";
 import hddPhoto from "../../../assets/hdd.png";
 import Photo from "../Photo.tsx";
 import Rating from "./Rating.tsx";

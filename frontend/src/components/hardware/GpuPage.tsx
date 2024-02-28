@@ -4,7 +4,7 @@ import ProductBox from './ProductBox';
 import Modal, {useModal} from './Modal';
 import {useNavigate} from "react-router-dom";
 import gpuPhoto from "../../assets/gpu.png";
-import {GPU} from "../../model/hardware/GPU.tsx";
+import {GPU} from "../../model/pc/hardware/GPU.tsx";
 import {useAuth} from "../../contexts/AuthContext.tsx";
 
 export default function GpuPage() {

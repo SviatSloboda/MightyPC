@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
 import {useNavigate, useParams} from "react-router-dom";
-import {Motherboard} from "../../../model/hardware/Motherboard.tsx";
+import {Motherboard} from "../../../model/pc/hardware/Motherboard.tsx";
 import motherboardPhoto from "../../../assets/motherboard.png";
 import Photo from "../Photo.tsx";
 import Rating from "./Rating.tsx";

@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
 import {useNavigate, useParams} from "react-router-dom";
-import {GPU} from "../../../model/hardware/GPU.tsx";
+import {GPU} from "../../../model/pc/hardware/GPU.tsx";
 import gpuPhoto from "../../../assets/gpu.png";
 import Photo from "../Photo.tsx";
 import Rating from "./Rating.tsx";

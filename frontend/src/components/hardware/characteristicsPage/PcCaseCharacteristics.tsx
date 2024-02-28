@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
-import { PcCase } from "../../../model/hardware/PcCase.tsx";
+import { PcCase } from "../../../model/pc/hardware/PcCase.tsx";
 import pcCasePhoto from "../../../assets/pcCase.png";
 import Photo from "../Photo.tsx";
 import Rating from "./Rating.tsx";

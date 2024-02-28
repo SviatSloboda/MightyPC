@@ -4,7 +4,7 @@ import ProductBox from './ProductBox';
 import Modal, {useModal} from './Modal';
 import {useNavigate} from "react-router-dom";
 import ssdPhoto from "../../assets/ssd.png";
-import {SSD} from "../../model/hardware/SSD.tsx";
+import {SSD} from "../../model/pc/hardware/SSD.tsx";
 
 
 export default function SsdPage() {

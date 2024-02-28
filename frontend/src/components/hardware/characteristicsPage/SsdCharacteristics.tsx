@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
-import { SSD } from "../../../model/hardware/SSD.tsx";
+import { SSD } from "../../../model/pc/hardware/SSD.tsx";
 import ssdPhoto from "../../../assets/ssd.png";
 import Photo from "../Photo.tsx";
 import Rating from "./Rating.tsx";

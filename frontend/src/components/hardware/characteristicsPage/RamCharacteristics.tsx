@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
-import { RAM } from "../../../model/hardware/RAM.tsx";
+import { RAM } from "../../../model/pc/hardware/RAM.tsx";
 import ramPhoto from "../../../assets/ram.png";
 import Photo from "../Photo.tsx";
 import Rating from "./Rating.tsx";

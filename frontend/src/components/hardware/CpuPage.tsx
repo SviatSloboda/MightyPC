@@ -4,7 +4,7 @@ import ProductBox from './ProductBox';
 import Modal, {useModal} from './Modal';
 import {useNavigate} from "react-router-dom";
 import cpuPhoto from "../../assets/cpu.png";
-import {CPU} from "../../model/hardware/CPU.tsx";
+import {CPU} from "../../model/pc/hardware/CPU.tsx";
 import {useAuth} from "../../contexts/AuthContext.tsx";
 
 export default function CpuPage() {
@@ -20,7 +20,7 @@ export default function CpuPage() {
     const [performance, setPerformance] = useState(0);
     const [energyConsumption, setEnergyConsumption] = useState(0);
     const navigate = useNavigate();
-    const {user} = useAuth();
+    const {user, isSuperUser} = useAuth();
 
     useEffect(() => {
         async function fetchCpus() {
@@ -81,7 +81,7 @@ export default function CpuPage() {
     return (
         <>
             <h1 className="body--product-page">CPU List</h1>
-            <button className="default-button" onClick={toggleModal}>Add CPU</button>
+            {isSuperUser() && <button className="default-button" onClick={toggleModal}>Add CPU</button>}
 
             <Modal isOpen={modalOpen} onClose={toggleModal} onSave={saveValues}>
                 <div className="modal__form-group">
@@ -125,7 +125,7 @@ export default function CpuPage() {
                         product={cpu}
                         imgSrc={cpu.cpuPhotos && cpu.cpuPhotos.length > 0 ? cpu.cpuPhotos[0] : cpuPhoto}
                         toCharacteristicsPage={() => navigate(`/hardware/cpu/${cpu.id}`)}
-                        onAddToBasket={() => handleAddToBasket(cpu)} // Added line for integration
+                        onAddToBasket={() => handleAddToBasket(cpu)}
                     />
                 ))}
             </div>

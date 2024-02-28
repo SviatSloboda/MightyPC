@@ -4,7 +4,7 @@ import ProductBox from './ProductBox';
 import Modal, {useModal} from './Modal';
 import {useNavigate} from "react-router-dom";
 import hddPhoto from "../../assets/hdd.png";
-import {HDD} from "../../model/hardware/HDD.tsx";
+import {HDD} from "../../model/pc/hardware/HDD.tsx";
 import {useAuth} from "../../contexts/AuthContext.tsx";
 
 export default function HddPage() {

@@ -4,7 +4,7 @@ import ProductBox from './ProductBox';
 import Modal, {useModal} from './Modal';
 import {useNavigate} from "react-router-dom";
 import motherboardPhoto from "../../assets/motherboard.png";
-import {Motherboard} from "../../model/hardware/Motherboard.tsx";
+import {Motherboard} from "../../model/pc/hardware/Motherboard.tsx";
 
 export default function MotherboardPage() {
     const [Motherboards, setMotherboards] = useState<Motherboard[]>([]);

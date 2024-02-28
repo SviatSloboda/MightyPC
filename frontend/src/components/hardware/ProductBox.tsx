@@ -1,5 +1,5 @@
 import React from 'react';
-import {Product} from "../../model/Product.tsx";
+import {Product} from "../../model/pc/Product.tsx";
 import Rating from "./characteristicsPage/Rating.tsx";
 
 interface ProductBoxProps {

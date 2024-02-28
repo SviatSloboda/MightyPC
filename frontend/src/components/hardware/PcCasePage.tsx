@@ -4,7 +4,7 @@ import ProductBox from './ProductBox';
 import Modal, {useModal} from './Modal';
 import {useNavigate} from "react-router-dom";
 import pcCasePhoto from "../../assets/pcCase.png";
-import {PcCase} from "../../model/hardware/PcCase.tsx";
+import {PcCase} from "../../model/pc/hardware/PcCase.tsx";
 
 export default function PcCasePage() {
     const [PcCases, setPcCases] = useState<PcCase[]>([]);

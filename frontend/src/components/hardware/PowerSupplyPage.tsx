@@ -4,7 +4,7 @@ import ProductBox from './ProductBox';
 import Modal, {useModal} from './Modal';
 import {useNavigate} from "react-router-dom";
 import psuPhoto from "../../assets/psu.png";
-import {PSU} from "../../model/hardware/PSU.tsx";
+import {PSU} from "../../model/pc/hardware/PSU.tsx";
 
 
 export default function PsuPage() {

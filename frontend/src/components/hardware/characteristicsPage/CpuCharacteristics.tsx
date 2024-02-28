@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
 import {useNavigate, useParams} from "react-router-dom";
-import {CPU} from "../../../model/hardware/CPU.tsx";
+import {CPU} from "../../../model/pc/hardware/CPU.tsx";
 import cpuPhoto from "../../../assets/cpu.png";
 import Photo from "../Photo.tsx";
 import Rating from "./Rating.tsx";
@@ -12,7 +12,7 @@ export default function CpuCharacteristics() {
     const {id} = useParams<{ id: string }>();
     const [photos, setPhotos] = useState<string[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const {user} = useAuth();
+    const {user, isSuperUser} = useAuth();
     const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
     const [updatedName, setUpdatedName] = useState('');
     const [updatedDescription, setUpdatedDescription] = useState('');
@@ -140,60 +140,70 @@ export default function CpuCharacteristics() {
                     </button>
                 </div>
             </div>
-            <Photo savePhoto={savePhoto}/>
 
-            <button className="upload-button item__delete" onClick={() => setIsUpdateModalOpen(true)}>Update
-            </button>
-            {isUpdateModalOpen && (
-                <div className="modal-overlay">
-                    <div className="modal">
-                        <div className="modal__header">
-                            <h3 className="modal__title">Update CPU</h3>
-                            <button className="modal__close-btn" onClick={() => setIsUpdateModalOpen(false)}>×</button>
-                        </div>
-                        <div className="modal__body">
-                            <div className="modal__form-group">
-                                <input className="modal__input" value={updatedName}
-                                       onChange={(e) => setUpdatedName(e.target.value)} placeholder="Name"/>
-                            </div>
-                            <div className="modal__form-group">
-                                <input className="modal__input" value={updatedDescription}
-                                       onChange={(e) => setUpdatedDescription(e.target.value)}
-                                       placeholder="Description"/>
-                            </div>
-                            <div className="modal__form-group">
-                                <input className="modal__input" type="number" value={updatedPrice}
-                                       onChange={(e) => setUpdatedPrice(e.target.value)} placeholder="Price"/>
-                            </div>
-                            <div className="modal__form-group">
-                                <input className="modal__input" type="number" value={updatedRating}
-                                       onChange={(e) => setUpdatedRating(Number(e.target.value))} placeholder="Rating"
-                                       min="0" max="5"/>
-                            </div>
-                        </div>
-                        <div className="modal__footer">
-                            <button className="modal__save-btn" onClick={handleUpdate}>Save Changes</button>
-                            <button className="modal__close-btn" onClick={() => setIsUpdateModalOpen(false)}>Cancel
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {isSuperUser() && (
+                <>
+                    <Photo savePhoto={savePhoto}/>
 
-            <button className="upload-button item__delete" onClick={() => setIsModalOpen(true)}>Delete</button>
-            {isModalOpen && (
-                <div className="modal-overlay">
-                    <div className="modal">
-                        <h2>Are you sure you want to delete this CPU?</h2>
-                        <div className="modal__delete">
-                            <button className="default-button modal__delete-button" onClick={handleDelete}>Delete
-                            </button>
-                            <button className="default-button modal__delete-button"
-                                    onClick={() => setIsModalOpen(false)}>Close
-                            </button>
+                    <button className="upload-button item__delete" onClick={() => setIsUpdateModalOpen(true)}>Update
+                    </button>
+                    {isUpdateModalOpen && (
+                        <div className="modal-overlay">
+                            <div className="modal">
+                                <div className="modal__header">
+                                    <h3 className="modal__title">Update CPU</h3>
+                                    <button className="modal__close-btn" onClick={() => setIsUpdateModalOpen(false)}>×
+                                    </button>
+                                </div>
+                                <div className="modal__body">
+                                    <div className="modal__form-group">
+                                        <input className="modal__input" value={updatedName}
+                                               onChange={(e) => setUpdatedName(e.target.value)} placeholder="Name"/>
+                                    </div>
+                                    <div className="modal__form-group">
+                                        <input className="modal__input" value={updatedDescription}
+                                               onChange={(e) => setUpdatedDescription(e.target.value)}
+                                               placeholder="Description"/>
+                                    </div>
+                                    <div className="modal__form-group">
+                                        <input className="modal__input" type="number" value={updatedPrice}
+                                               onChange={(e) => setUpdatedPrice(e.target.value)} placeholder="Price"/>
+                                    </div>
+                                    <div className="modal__form-group">
+                                        <input className="modal__input" type="number" value={updatedRating}
+                                               onChange={(e) => setUpdatedRating(Number(e.target.value))}
+                                               placeholder="Rating"
+                                               min="0" max="5"/>
+                                    </div>
+                                </div>
+                                <div className="modal__footer">
+                                    <button className="modal__save-btn" onClick={handleUpdate}>Save Changes</button>
+                                    <button className="modal__close-btn"
+                                            onClick={() => setIsUpdateModalOpen(false)}>Cancel
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    )}
+
+                    <button className="upload-button item__delete" onClick={() => setIsModalOpen(true)}>Delete</button>
+
+                    {isModalOpen && (
+                        <div className="modal-overlay">
+                            <div className="modal">
+                                <h2>Are you sure you want to delete this CPU?</h2>
+                                <div className="modal__delete">
+                                    <button className="default-button modal__delete-button"
+                                            onClick={handleDelete}>Delete
+                                    </button>
+                                    <button className="default-button modal__delete-button"
+                                            onClick={() => setIsModalOpen(false)}>Close
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </>
             )}
         </>
     );

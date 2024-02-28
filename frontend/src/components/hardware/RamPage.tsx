@@ -4,7 +4,7 @@ import ProductBox from './ProductBox';
 import Modal, {useModal} from './Modal';
 import {useNavigate} from "react-router-dom";
 import ramPhoto from "../../assets/ram.png";
-import {RAM} from "../../model/hardware/RAM.tsx";
+import {RAM} from "../../model/pc/hardware/RAM.tsx";
 
 
 export default function RamPage() {
