@@ -1,16 +1,20 @@
 package de.mightypc.backend.service.pc.hardware;
 
 import de.mightypc.backend.model.pc.specs.GPU;
+import de.mightypc.backend.model.pc.specs.GPU;
 import de.mightypc.backend.repository.pc.hardware.GpuRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class GpuService extends BaseService<GPU, GpuRepository> {
-    protected GpuService(GpuRepository repository) {
+    public GpuService(GpuRepository repository) {
         super(repository);
     }
 
@@ -32,5 +36,19 @@ public class GpuService extends BaseService<GPU, GpuRepository> {
             photos.addFirst(photoUrl);
             repository.save(currGpu.withPhotos(photos));
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public HashMap<String, String> getAllNames(){
+        HashMap<String, String> hashMap = new HashMap<>();
+
+        List<GPU> allGpus = repository.findAll();
+
+        for(GPU gpu: allGpus){
+            hashMap.put(gpu.id(), gpu.hardwareSpec().name());
+        }
+
+        return hashMap;
     }
 }

@@ -58,6 +58,9 @@ public class PcService extends BaseService<PC, PcRepository> {
     }
 
     private Specs getSpecs(CreateSpecs createSpecs) {
+        if (createSpecs == null) {
+            throw new IllegalArgumentException("createSpecs cannot be null");
+        }
         return new Specs(
                 cpuService.getById(createSpecs.cpuId()),
                 gpuService.getById(createSpecs.gpuId()),
@@ -71,8 +74,10 @@ public class PcService extends BaseService<PC, PcRepository> {
     }
 
     public void saveAll(List<CreatePC> createPCS) {
+        List<PC> pcsToSave = new ArrayList<>();
+
         for (CreatePC createPC : createPCS) {
-            Specs specs = getSpecs((createPC.createSpecs()));
+            Specs specs = getSpecs(createPC.createSpecs());
 
             HardwareSpec hardwareSpec = new HardwareSpec(
                     createPC.hardwareSpec().name(),
@@ -81,9 +86,13 @@ public class PcService extends BaseService<PC, PcRepository> {
                     createPC.hardwareSpec().rating()
             );
 
-            repository.save(new PC(hardwareSpec, specs));
+            PC pc = new PC(hardwareSpec, specs);
+            pcsToSave.add(pc);
         }
+
+        repository.saveAll(pcsToSave);
     }
+
 
     private BigDecimal getTotalPrice(Specs specs) {
         BigDecimal totalPrice = BigDecimal.ZERO;

@@ -4,14 +4,16 @@ import de.mightypc.backend.model.pc.specs.HDD;
 import de.mightypc.backend.repository.pc.hardware.HddRepository;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class HddService extends BaseService<HDD, HddRepository> {
-    protected HddService(HddRepository hddRepository) {
+    public HddService(HddRepository hddRepository) {
         super(hddRepository);
     }
 
@@ -33,5 +35,19 @@ public class HddService extends BaseService<HDD, HddRepository> {
             photos.addFirst(photoUrl);
             repository.save(currHdd.withPhotos(photos));
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public HashMap<String, String> getAllNames(){
+        HashMap<String, String> hashMap = new HashMap<>();
+
+        List<HDD> allHdds = repository.findAll();
+
+        for(HDD hdd: allHdds){
+            hashMap.put(hdd.id(), hdd.hardwareSpec().name());
+        }
+
+        return hashMap;
     }
 }

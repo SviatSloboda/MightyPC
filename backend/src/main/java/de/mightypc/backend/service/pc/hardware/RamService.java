@@ -1,16 +1,19 @@
 package de.mightypc.backend.service.pc.hardware;
 
 import de.mightypc.backend.model.pc.specs.RAM;
+import de.mightypc.backend.model.pc.specs.RAM;
 import de.mightypc.backend.repository.pc.hardware.RamRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class RamService extends BaseService<RAM, RamRepository> {
-    protected RamService(RamRepository ramRepository) {
+    public RamService(RamRepository ramRepository) {
         super(ramRepository);
     }
 
@@ -32,5 +35,20 @@ public class RamService extends BaseService<RAM, RamRepository> {
             photos.addFirst(photoUrl);
             repository.save(currRam.withPhotos(photos));
         }
+    }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public HashMap<String, String> getAllNames(){
+        HashMap<String, String> hashMap = new HashMap<>();
+
+        List<RAM> allRams = repository.findAll();
+
+        for(RAM ram: allRams){
+            hashMap.put(ram.id(), ram.hardwareSpec().name());
+        }
+
+        return hashMap;
     }
 }

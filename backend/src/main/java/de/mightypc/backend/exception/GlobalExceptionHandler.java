@@ -1,6 +1,5 @@
 package de.mightypc.backend.exception;
 
-import de.mightypc.backend.exception.pc.HardwareNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,11 +14,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleHardwareNotFoundException(Exception ex) {
-        ErrorResponse globalException = new ErrorResponse(
-                ex.getMessage(),
-                ex.getCause(),
-                HttpStatus.BAD_REQUEST,
-                ZonedDateTime.now());
+        ErrorResponse globalException = new ErrorResponse(ex.getMessage(), ex.getCause(), HttpStatus.BAD_REQUEST, ZonedDateTime.now());
 
         return new ResponseEntity<>(globalException, HttpStatus.BAD_REQUEST);
     }
