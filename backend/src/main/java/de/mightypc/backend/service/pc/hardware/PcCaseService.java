@@ -22,7 +22,7 @@ public class PcCaseService extends BaseService<PcCase, PcCaseRepository> {
     public void attachPhoto(String id, String photoUrl) {
         Optional<PcCase> pcCase = repository.findById(id);
         if (pcCase.isPresent()) {
-            PcCase presentWorkout = pcCase.get();
+            PcCase currMotherboard = pcCase.get();
             List<String> photos = pcCase.get().pcCasePhotos();
 
             if (photos == null) {
@@ -30,7 +30,7 @@ public class PcCaseService extends BaseService<PcCase, PcCaseRepository> {
             }
 
             photos.addFirst(photoUrl);
-            repository.save(presentWorkout.withPhotos(photos));
+            repository.save(currMotherboard.withPhotos(photos));
         }
     }
 }

@@ -1,4 +1,4 @@
-package de.mightypc.backend.controller.pc.hardware.upload;
+package de.mightypc.backend.controller.pc.upload;
 
 import de.mightypc.backend.service.CloudinaryService;
 import de.mightypc.backend.service.pc.hardware.MotherboardService;

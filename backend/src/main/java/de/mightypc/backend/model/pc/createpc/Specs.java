@@ -1,8 +1,6 @@
-package de.mightypc.backend.model.pc;
+package de.mightypc.backend.model.pc.createpc;
 
 import de.mightypc.backend.model.pc.specs.*;
-
-import java.math.BigDecimal;
 
 public record Specs(
         CPU cpu,
@@ -12,7 +10,6 @@ public record Specs(
         SSD ssd,
         HDD hdd,
         PowerSupply powerSupply,
-        BigDecimal totalPrice,
-        int totalPerformance
+        PcCase pcCase
 ) {
 }

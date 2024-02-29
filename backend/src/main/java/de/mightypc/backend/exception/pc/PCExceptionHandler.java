@@ -21,15 +21,4 @@ public class PCExceptionHandler {
 
         return new ResponseEntity<>(hardwareException, HttpStatus.NOT_FOUND);
     }
-
-    @ExceptionHandler(value = {PcNotFoundException.class})
-    public ResponseEntity<Object> handlePcNotFoundException(PcNotFoundException pcNotFoundException) {
-        ErrorResponse pcException = new ErrorResponse(pcNotFoundException.getMessage(),
-                pcNotFoundException.getCause(),
-                HttpStatus.NOT_FOUND,
-                ZonedDateTime.now()
-        );
-
-        return new ResponseEntity<>(pcException, HttpStatus.NOT_FOUND);
-    }
 }

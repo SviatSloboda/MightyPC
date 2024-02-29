@@ -22,7 +22,7 @@ public class SsdService extends BaseService<SSD, SsdRepository> {
     public void attachPhoto(String id, String photoUrl) {
         Optional<SSD> ssd = repository.findById(id);
         if (ssd.isPresent()) {
-            SSD presentWorkout = ssd.get();
+            SSD currSsd = ssd.get();
             List<String> photos = ssd.get().ssdPhotos();
 
             if (photos == null) {
@@ -30,7 +30,7 @@ public class SsdService extends BaseService<SSD, SsdRepository> {
             }
 
             photos.addFirst(photoUrl);
-            repository.save(presentWorkout.withPhotos(photos));
+            repository.save(currSsd.withPhotos(photos));
         }
     }
 }

@@ -22,7 +22,7 @@ public class GpuService extends BaseService<GPU, GpuRepository> {
     public void attachPhoto(String id, String photoUrl) {
         Optional<GPU> gpu = repository.findById(id);
         if (gpu.isPresent()) {
-            GPU presentWorkout = gpu.get();
+            GPU currGpu = gpu.get();
             List<String> photos = gpu.get().gpuPhotos();
 
             if (photos == null) {
@@ -30,7 +30,7 @@ public class GpuService extends BaseService<GPU, GpuRepository> {
             }
 
             photos.addFirst(photoUrl);
-            repository.save(presentWorkout.withPhotos(photos));
+            repository.save(currGpu.withPhotos(photos));
         }
     }
 }

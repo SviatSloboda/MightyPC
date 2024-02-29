@@ -22,7 +22,7 @@ public class RamService extends BaseService<RAM, RamRepository> {
     public void attachPhoto(String id, String photoUrl) {
         Optional<RAM> ram = repository.findById(id);
         if (ram.isPresent()) {
-            RAM presentWorkout = ram.get();
+            RAM currRam = ram.get();
             List<String> photos = ram.get().ramPhotos();
 
             if (photos == null) {
@@ -30,7 +30,7 @@ public class RamService extends BaseService<RAM, RamRepository> {
             }
 
             photos.addFirst(photoUrl);
-            repository.save(presentWorkout.withPhotos(photos));
+            repository.save(currRam.withPhotos(photos));
         }
     }
 }

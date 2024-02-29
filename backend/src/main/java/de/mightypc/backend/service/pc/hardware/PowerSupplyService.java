@@ -22,7 +22,7 @@ public class PowerSupplyService extends BaseService<PowerSupply, PowerSupplyRepo
     public void attachPhoto(String id, String photoUrl) {
         Optional<PowerSupply> powerSupply = repository.findById(id);
         if (powerSupply.isPresent()) {
-            PowerSupply presentWorkout = powerSupply.get();
+            PowerSupply currPsu = powerSupply.get();
             List<String> photos = powerSupply.get().powerSupplyPhotos();
 
             if (photos == null) {
@@ -30,7 +30,7 @@ public class PowerSupplyService extends BaseService<PowerSupply, PowerSupplyRepo
             }
 
             photos.addFirst(photoUrl);
-            repository.save(presentWorkout.withPhotos(photos));
+            repository.save(currPsu.withPhotos(photos));
         }
     }
 }

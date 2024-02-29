@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Service
 public class CpuService extends BaseService<CPU, CpuRepository> {
-    protected CpuService(CpuRepository repository) {
+    public CpuService(CpuRepository repository) {
         super(repository);
     }
 
@@ -22,7 +22,7 @@ public class CpuService extends BaseService<CPU, CpuRepository> {
     public void attachPhoto(String id, String photoUrl) {
         Optional<CPU> cpu = repository.findById(id);
         if (cpu.isPresent()) {
-            CPU presentWorkout = cpu.get();
+            CPU currCpu = cpu.get();
             List<String> photos = cpu.get().cpuPhotos();
 
             if (photos == null) {
@@ -30,7 +30,7 @@ public class CpuService extends BaseService<CPU, CpuRepository> {
             }
 
             photos.addFirst(photoUrl);
-            repository.save(presentWorkout.withPhotos(photos));
+            repository.save(currCpu.withPhotos(photos));
         }
     }
 }

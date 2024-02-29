@@ -23,7 +23,7 @@ public class HddService extends BaseService<HDD, HddRepository> {
     public void attachPhoto(String id, String photoUrl) {
         Optional<HDD> hdd = repository.findById(id);
         if (hdd.isPresent()) {
-            HDD presentWorkout = hdd.get();
+            HDD currHdd = hdd.get();
             List<String> photos = hdd.get().hddPhotos();
 
             if (photos == null) {
@@ -31,7 +31,7 @@ public class HddService extends BaseService<HDD, HddRepository> {
             }
 
             photos.addFirst(photoUrl);
-            repository.save(presentWorkout.withPhotos(photos));
+            repository.save(currHdd.withPhotos(photos));
         }
     }
 }

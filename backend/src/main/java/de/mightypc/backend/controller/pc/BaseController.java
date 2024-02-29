@@ -1,4 +1,4 @@
-package de.mightypc.backend.controller.pc.hardware;
+package de.mightypc.backend.controller.pc;
 
 import de.mightypc.backend.service.pc.hardware.BaseService;
 
