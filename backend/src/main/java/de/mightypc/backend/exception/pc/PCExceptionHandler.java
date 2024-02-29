@@ -9,15 +9,27 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.time.ZonedDateTime;
 
 @ControllerAdvice
-public class HardwareExceptionHandler {
+public class PCExceptionHandler {
     @ExceptionHandler(value = {HardwareNotFoundException.class})
     public ResponseEntity<Object> handleHardwareNotFoundException(HardwareNotFoundException hardwareNotFoundException) {
         ErrorResponse hardwareException = new ErrorResponse(
                 hardwareNotFoundException.getMessage(),
                 hardwareNotFoundException.getCause(),
                 HttpStatus.NOT_FOUND,
-                ZonedDateTime.now());
+                ZonedDateTime.now()
+        );
 
         return new ResponseEntity<>(hardwareException, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = {PcNotFoundException.class})
+    public ResponseEntity<Object> handlePcNotFoundException(PcNotFoundException pcNotFoundException) {
+        ErrorResponse pcException = new ErrorResponse(pcNotFoundException.getMessage(),
+                pcNotFoundException.getCause(),
+                HttpStatus.NOT_FOUND,
+                ZonedDateTime.now()
+        );
+
+        return new ResponseEntity<>(pcException, HttpStatus.NOT_FOUND);
     }
 }
