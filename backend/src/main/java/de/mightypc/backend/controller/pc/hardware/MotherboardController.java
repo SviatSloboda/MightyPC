@@ -1,4 +1,4 @@
-package de.mightypc.backend.controller.pc;
+package de.mightypc.backend.controller.pc.hardware;
 
 import de.mightypc.backend.model.pc.specs.HardwareSpec;
 import de.mightypc.backend.model.pc.specs.Motherboard;

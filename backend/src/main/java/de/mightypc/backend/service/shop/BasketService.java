@@ -5,6 +5,7 @@ import de.mightypc.backend.model.shop.order.Item;
 import de.mightypc.backend.model.shop.User;
 import de.mightypc.backend.repository.shop.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -21,12 +22,14 @@ public class BasketService {
         this.userRepository = userRepository;
     }
 
+    @Transactional(readOnly = true)
     public List<Item> getAllItemsOfUser(String userId) {
         User user = userService.getUserById(userId);
 
         return user.getBasket();
     }
 
+    @Transactional
     public void saveItem(String userId, Item item) {
         User user = userService.getUserById(userId);
 
@@ -49,6 +52,7 @@ public class BasketService {
                 .orElseThrow(() -> new ItemNotFoundException("There is no such item!"));
     }
 
+    @Transactional
     public void deleteItem(String userId, String itemId) {
         User user = userService.getUserById(userId);
 
@@ -59,6 +63,7 @@ public class BasketService {
         userRepository.save(user);
     }
 
+    @Transactional
     public void deleteAll(String userId) {
         User user = userService.getUserById(userId);
 
@@ -67,6 +72,7 @@ public class BasketService {
         userRepository.save(user);
     }
 
+    @Transactional(readOnly = true)
     public BigDecimal getEntirePrice(String userId) {
         BigDecimal price = BigDecimal.ZERO;
 

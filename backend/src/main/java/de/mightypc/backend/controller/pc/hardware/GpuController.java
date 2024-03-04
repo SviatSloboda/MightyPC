@@ -1,4 +1,4 @@
-package de.mightypc.backend.controller.pc;
+package de.mightypc.backend.controller.pc.hardware;
 
 import de.mightypc.backend.model.pc.specs.GPU;
 import de.mightypc.backend.model.pc.specs.HardwareSpec;
@@ -6,7 +6,11 @@ import de.mightypc.backend.model.pc.specs.createspecs.CreateGpu;
 import de.mightypc.backend.service.pc.hardware.GpuService;
 import org.springframework.http.HttpStatus;
 
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Collections;
 

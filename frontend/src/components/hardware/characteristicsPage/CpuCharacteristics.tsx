@@ -93,7 +93,7 @@ export default function CpuCharacteristics() {
             name: cpu?.hardwareSpec.name,
             description: cpu?.hardwareSpec.description,
             price: cpu?.hardwareSpec.price,
-            photos: cpu && (cpu.cpuPhotos?.length ?? 0) > 0 ? cpu.cpuPhotos : ['https://res.cloudinary.com/dmacmrhwq/image/upload/v1708536729/cloudinary_file_test/plain.png.png']
+            photos: cpu && (cpu.cpuPhotos?.length ?? 0) > 0 ? cpu.cpuPhotos : [cpuPhoto]
         };
 
         axios.post<void>(`/api/basket/${user?.id}`, payload)

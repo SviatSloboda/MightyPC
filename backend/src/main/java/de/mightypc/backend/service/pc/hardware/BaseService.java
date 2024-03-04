@@ -29,22 +29,22 @@ public abstract class BaseService<T, R extends MongoRepository<T, String>> {
 
     @Transactional(readOnly = true)
     public T getById(String id) {
-        return repository.findById(id).orElseThrow(
-                () -> new HardwareNotFoundException((getNotFoundMessage(id))));
-    }
-
-    @Transactional
-    public T save(T entity) {
-        return repository.save(entity);
+        return repository.findById(id).orElseThrow(() -> new HardwareNotFoundException((getNotFoundMessage(id))));
     }
 
     @Transactional
     public T update(T entity) {
         String entityId = getId(entity);
+
         if (!repository.existsById(entityId)) {
             throw new HardwareNotFoundException((getNotFoundMessage(entityId)));
         }
 
+        return repository.save(entity);
+    }
+
+    @Transactional
+    public T save(T entity) {
         return repository.save(entity);
     }
 
@@ -59,6 +59,7 @@ public abstract class BaseService<T, R extends MongoRepository<T, String>> {
         return !repository.existsById(id);
     }
 
+    @Transactional(readOnly = true)
     public Page<T> getAllByPage(Pageable pageable) {
         return repository.findAll(pageable);
     }
@@ -69,6 +70,7 @@ public abstract class BaseService<T, R extends MongoRepository<T, String>> {
 
     protected abstract String getId(T entity);
 
+    @Transactional(readOnly = true)
     public Map<String, String> getAllNames() {
         return new HashMap<>(Collections.emptyMap());
     }

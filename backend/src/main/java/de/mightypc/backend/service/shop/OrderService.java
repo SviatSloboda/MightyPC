@@ -8,6 +8,7 @@ import de.mightypc.backend.model.shop.User;
 import de.mightypc.backend.model.shop.order.OrderStatusRequest;
 import de.mightypc.backend.repository.shop.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,6 +26,7 @@ public class OrderService {
         this.userRepository = userRepository;
     }
 
+    @Transactional
     public void placeOrder(String userId, List<Item> items) {
         User user = userService.getUserById(userId);
 
@@ -40,6 +42,7 @@ public class OrderService {
         userRepository.save(user);
     }
 
+    @Transactional
     public void removeOrder(String userId, String orderId) {
         User user = userService.getUserById(userId);
 
@@ -50,6 +53,7 @@ public class OrderService {
         userRepository.save(user);
     }
 
+    @Transactional(readOnly = true)
     public Order getOrderById(String userId, String id) {
         User user = userService.getUserById(userId);
 
@@ -59,16 +63,18 @@ public class OrderService {
                 .orElseThrow(() -> new OrderNotFoundException("There is no such order!"));
     }
 
+    @Transactional(readOnly = true)
     public List<Order> getAllOrders(String userId) {
         User user = userService.getUserById(userId);
 
         return user.getOrders();
     }
 
+    @Transactional
     public void updateStatus(String userId, String orderId, OrderStatusRequest statusRequest) {
         User user = userService.getUserById(userId);
 
-        Order order = getOrderById(userId, orderId);
+        Order order = this.getOrderById(userId,orderId);
 
         user.getOrders().remove(order);
 
@@ -79,6 +85,7 @@ public class OrderService {
         userRepository.save(user);
     }
 
+    @Transactional
     public void deleteAll(String userId) {
         User user = userService.getUserById(userId);
 

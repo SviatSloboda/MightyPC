@@ -5,7 +5,7 @@ import Photo from "../hardware/utils/Photo.tsx";
 import user_image from "../../assets/user_image.png";
 
 export default function ProfilePage() {
-    const {user} = useAuth();
+    const {user, isSuperUser} = useAuth();
     const [userImage, setUserImage] = useState<string>("");
 
     useEffect(() => {
@@ -74,6 +74,12 @@ export default function ProfilePage() {
 
             <h1 className="profile__email">Account created at: </h1>
             <span className="profile__creation-date">{user?.dateOfAccountCreation}</span>
+
+            {isSuperUser() &&
+                <>
+                <h1 className="profile__email">You are super user! </h1>
+            </>}
+
         </div>
 
         {isModalOpen && (<div className="modal-overlay">

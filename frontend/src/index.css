@@ -407,8 +407,9 @@ a.nav__link {
     flex-direction: row;
     justify-content: space-between;
     align-items: flex-start;
-    margin-top: 5rem;
-    margin-left: 5rem;
+    margin-top: 4rem;
+    margin-bottom: 2rem;
+    margin-left: 3rem;
     width: 100%;
     max-width: 90%;
     gap: 2rem;
@@ -1094,4 +1095,241 @@ a.nav__link {
 .modal-header__message {
     font-size: xx-large;
     display: flex;
+}
+
+
+.pc-specification {
+    display: flex;
+    justify-content: space-between;
+    margin: 0.2rem 0 0;
+}
+
+.pc-specification::before {
+    color: white;
+    font-size: large;
+    content: attr(data-label);
+    flex-basis: 30%;
+    text-align: left;
+}
+
+.pc-specification span {
+
+    margin-top: 10px;
+    color: white;
+    font-size: larger;
+    flex-basis: 68%;
+    text-align: left;
+}
+
+
+.product-characteristics--nameAndBuy {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.product-characteristics--Buy {
+    font-size: 1rem;
+    margin-left: 10rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.pc-addToBasket {
+    align-self: flex-start;
+    margin-bottom: 0.5rem;
+}
+
+.product-characteristics__buy-btn.pc-addToBasket-btn {
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    align-self: flex-end;
+}
+
+.pcCharacteristic__name {
+    font-size: 3rem;
+    color: #fff;
+}
+
+.product-characteristics__price.pc-addToBasket {
+    font-size: 2.5rem;
+    color: #fff;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.product-characteristics--nameAndRating {
+    margin-top: 5rem;
+}
+
+.pc-addToBasket--text {
+    align-self: center;
+    font-size: 2.5rem;
+}
+
+
+.order-info-modal .modal-dialog {
+    margin: 30px auto;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+    position: fixed;
+}
+
+.order-info-modal .modal-content {
+    background-color: #1a1a1a;
+    color: #fff;
+    border-radius: 10px;
+    border: 1px solid #333;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+}
+
+.order-info-modal .modal-backdrop.show {
+    opacity: 0.5;
+    backdrop-filter: blur(5px);
+}
+
+.order-info-modal__header {
+    background-color: #282828;
+    color: #fff;
+    border-bottom: 1px solid #333;
+    padding: 1rem;
+}
+
+.order-info-modal__title {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.order-info-modal__body {
+    padding: 20px;
+    background-color: #1a1a1a;
+}
+
+.order-info-modal__group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid #333;
+}
+
+.order-info-modal__label {
+    font-weight: bold;
+    flex: 0 0 150px;
+    display: block;
+    margin-bottom: 5px;
+    color: #fff;
+}
+
+.order-info-modal__input {
+    flex-grow: 1;
+    background-color: #333;
+    color: #fff;
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 0.375rem 0.75rem;
+    margin-left: 10px;
+    margin-top: 5px;
+}
+
+.order-info-modal__footer {
+    background-color: #282828;
+    border-top: 1px solid #333;
+    padding: 1rem;
+    justify-content: flex-end;
+}
+
+.order-info-modal__button {
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    margin-left: 1rem;
+    border-radius: 4px;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease;
+}
+
+.order-info-modal__button--close {
+    background-color: #f44336;
+}
+
+.order-info-modal__button:hover {
+    color: #fff;
+}
+
+.order-info-modal__button:not(.order-info-modal__button--close) {
+    background-color: #008CBA;
+}
+
+
+.order-info-modal .modal-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: auto;
+}
+
+.order-info-modal .modal-content {
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+}
+
+.order-info-modal .modal-backdrop.show {
+    opacity: 0.5;
+    backdrop-filter: blur(10px);
+}
+
+.order-info-modal__header {
+    background-color: #000;
+    color: #fff;
+    border-bottom: 1px solid #333;
+}
+
+.order-info-modal__title {
+    font-weight: bold;
+}
+
+.order-info-modal__body {
+    background-color: #000;
+}
+
+.order-info-modal__group {
+    border-bottom: 1px solid #333;
+}
+
+.order-info-modal__label {
+    color: #fff;
+}
+
+.order-info-modal__input {
+    background-color: #000;
+    color: #fff;
+    background-color: #000;
+}
+
+.order-info-modal__footer {
+    background-color: #000;
+    border-top: 1px solid #333;
+}
+
+.order-info-modal__button--close {
+    background-color: #000;
+    color: #fff;
+}
+
+.order-info-modal__button:hover {
+    background-color: #1a1a1a;
+    color: #fff;
+}
+.order-info-modal .modal-backdrop.show {
+    opacity: 0.5 !important;
+    backdrop-filter: blur(10px) !important;
 }

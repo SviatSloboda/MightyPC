@@ -1,10 +1,9 @@
 package de.mightypc.backend.controller.pc;
 
-import de.mightypc.backend.model.pc.PC;
-import de.mightypc.backend.model.pc.createpc.CreatePC;
-import de.mightypc.backend.model.pc.createpc.PcResponse;
-import de.mightypc.backend.service.pc.PcService;
-
+import de.mightypc.backend.model.pc.Workstation;
+import de.mightypc.backend.model.pc.createpc.CreateWorkstation;
+import de.mightypc.backend.model.pc.createpc.WorkstationResponse;
+import de.mightypc.backend.service.pc.WorkstationService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,31 +18,31 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/pc")
-public class PcController {
-    private final PcService service;
+@RequestMapping("/api/workstation")
+public class WorkstationController {
+    private final WorkstationService service;
 
-    public PcController(PcService service) {
+    public WorkstationController(WorkstationService service) {
         this.service = service;
     }
 
     @PostMapping
-    public PC save(@RequestBody CreatePC createPC) {
-        return service.save(createPC);
+    public Workstation save(@RequestBody CreateWorkstation createWorkstation) {
+        return service.save(createWorkstation);
     }
 
     @PostMapping("/all")
-    public void saveAll(@RequestBody List<CreatePC> createPCS) {
-        service.saveAll(createPCS);
+    public void saveAll(@RequestBody List<CreateWorkstation> createWorkstationS) {
+        service.saveAll(createWorkstationS);
     }
 
     @GetMapping("/page")
-    public Page<PcResponse> getAllByPage(Pageable pageable) {
+    public Page<WorkstationResponse> getAllByPage(Pageable pageable) {
         return service.getAllByPage(pageable);
     }
 
     @GetMapping("/{id}")
-    public PcResponse getById(@PathVariable String id) {
+    public WorkstationResponse getById(@PathVariable String id) {
         return service.getById(id);
     }
 
@@ -53,7 +52,7 @@ public class PcController {
     }
 
     @PutMapping
-    public void update(@RequestBody PcResponse pcResponse) {
-        service.update(pcResponse);
+    public void update(@RequestBody WorkstationResponse workstationResponse) {
+        service.update(workstationResponse);
     }
 }

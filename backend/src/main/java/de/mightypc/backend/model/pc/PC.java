@@ -1,7 +1,6 @@
 package de.mightypc.backend.model.pc;
 
-import de.mightypc.backend.model.pc.createpc.Specs;
-import de.mightypc.backend.model.pc.specs.CPU;
+import de.mightypc.backend.model.pc.specs.Specs;
 import de.mightypc.backend.model.pc.specs.HardwareSpec;
 import org.springframework.data.annotation.Id;
 
@@ -11,8 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 public record PC(
-        @Id
-        String id,
+        @Id String id,
         HardwareSpec hardwareSpec,
         Specs specs,
         List<String> photos

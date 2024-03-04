@@ -17,7 +17,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
 
-
 @Service
 public class UserService {
 
