@@ -6,6 +6,8 @@ import de.mightypc.backend.model.pc.specs.createspecs.CreateCpu;
 import de.mightypc.backend.service.pc.hardware.CpuService;
 import org.springframework.http.HttpStatus;
 
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -18,8 +20,11 @@ import java.util.UUID;
 @RestController
 @RequestMapping("api/hardware/cpu")
 public class CpuController extends BaseController<CPU, CpuService> {
-    protected CpuController(CpuService service) {
+    private final CpuService cpuService;
+
+    protected CpuController(CpuService service, CpuService cpuService) {
         super(service);
+        this.cpuService = cpuService;
     }
 
     @PostMapping
@@ -32,7 +37,7 @@ public class CpuController extends BaseController<CPU, CpuService> {
                 createCpu.hardwareSpec().rating()
         );
 
-        return service.save(new CPU(UUID.randomUUID().toString(), hardwareSpec, createCpu.performance(), createCpu.energyConsumption(), Collections.emptyList()));
+        return service.save(new CPU(UUID.randomUUID().toString(), hardwareSpec, createCpu.performance(), createCpu.energyConsumption(), createCpu.socket(), Collections.emptyList()));
     }
 
     @PostMapping("/all")
@@ -46,7 +51,12 @@ public class CpuController extends BaseController<CPU, CpuService> {
                     cpu.hardwareSpec().rating()
             );
 
-            service.save(new CPU(UUID.randomUUID().toString(), hardwareSpec, cpu.performance(), cpu.energyConsumption(), Collections.emptyList()));
+            service.save(new CPU(UUID.randomUUID().toString(), hardwareSpec, cpu.performance(), cpu.energyConsumption(), cpu.socket(), Collections.emptyList()));
         }
+    }
+
+    @GetMapping("/socket/{cpuId}")
+    public String getSocketOfCpu(@PathVariable String cpuId) {
+        return cpuService.getSocketOfCpuById(cpuId);
     }
 }

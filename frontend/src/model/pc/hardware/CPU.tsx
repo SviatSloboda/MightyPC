@@ -5,5 +5,6 @@ export interface CPU {
     hardwareSpec: HardwareSpec;
     performance: number;
     energyConsumption: number;
+    socket: string;
     cpuPhotos?: string[];
 }

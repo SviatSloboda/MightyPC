@@ -1,4 +1,4 @@
-package de.mightypc.backend.model.shop;
+package de.mightypc.backend.model.shop.user;
 
 import de.mightypc.backend.model.pc.PC;
 import de.mightypc.backend.model.shop.order.Item;

@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
-import {useNavigate, useParams} from "react-router-dom";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {useAuth} from "../../contexts/AuthContext.tsx";
 import useLoginModal from "../hardware/utils/useLoginModal.ts";
 import LoginModal from "../hardware/utils/LoginModal.tsx";
@@ -31,6 +31,9 @@ export default function PcCharacteristics() {
     const [updatedPcCaseId, setUpdatedPcCaseId] = useState<string>("");
     const [updatedPsuId, setUpdatedPsuId] = useState<string>("");
 
+    const location = useLocation();
+    const {state} = location;
+    const isUserPc = state?.isUserPc || false;
 
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
 
@@ -44,7 +47,12 @@ export default function PcCharacteristics() {
         const fetchPcData = async () => {
             if (id) {
                 try {
-                    const response = await axios.get(`/api/pc/${id}`);
+                    let url: string = `/api/pc/${id}`;
+                    if (isUserPc && user) {
+                        url = `/api/user-pcs/${user.id}/${id}`;
+                    }
+
+                    const response = await axios.get(url);
                     setPc(response.data);
                     setPhotos(response.data.photos || []);
 

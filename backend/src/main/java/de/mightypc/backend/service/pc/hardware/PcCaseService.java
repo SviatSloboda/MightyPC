@@ -1,7 +1,6 @@
 package de.mightypc.backend.service.pc.hardware;
 
 import de.mightypc.backend.model.pc.specs.PcCase;
-import de.mightypc.backend.model.pc.specs.PcCase;
 import de.mightypc.backend.repository.pc.hardware.PcCaseRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,13 +38,13 @@ public class PcCaseService extends BaseService<PcCase, PcCaseRepository> {
 
     @Override
     @Transactional(readOnly = true)
-    public HashMap<String, String> getAllNames(){
+    public HashMap<String, String> getAllNamesWithPrices(){
         HashMap<String, String> hashMap = new HashMap<>();
 
         List<PcCase> allPcCases = repository.findAll();
 
         for(PcCase pcCase: allPcCases){
-            hashMap.put(pcCase.id(), pcCase.hardwareSpec().name());
+            hashMap.put(pcCase.id(), pcCase.hardwareSpec().name() + " ($" + pcCase.hardwareSpec().price() + ")");
         }
 
         return hashMap;

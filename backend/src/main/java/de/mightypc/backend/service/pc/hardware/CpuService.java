@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -38,15 +39,22 @@ public class CpuService extends BaseService<CPU, CpuRepository> {
 
     @Override
     @Transactional(readOnly = true)
-    public HashMap<String, String> getAllNames(){
+    public HashMap<String, String> getAllNamesWithPrices() {
         HashMap<String, String> hashMap = new HashMap<>();
 
-        List<CPU> allCpus = repository.findAll();
+        List<CPU> allCpus = repository.findAll()
+                .stream()
+                .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().price()))
+                .toList();
 
-        for(CPU cpu: allCpus){
-            hashMap.put(cpu.id(), cpu.hardwareSpec().name());
+        for (CPU cpu : allCpus) {
+            hashMap.put(cpu.id(), cpu.hardwareSpec().name() + " ($" + cpu.hardwareSpec().price() + ")");
         }
 
         return hashMap;
+    }
+
+    public String getSocketOfCpuById(String cpuId) {
+        return getById(cpuId).socket();
     }
 }

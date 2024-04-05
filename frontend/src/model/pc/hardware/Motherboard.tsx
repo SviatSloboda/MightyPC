@@ -4,7 +4,6 @@ export interface Motherboard {
     id: string;
     hardwareSpec: HardwareSpec;
     energyConsumption: number;
-    graphicCardCompatibility: string[];
-    processorCompatibility: string[];
+    socket: string;
     motherboardPhotos?: string[];
 }

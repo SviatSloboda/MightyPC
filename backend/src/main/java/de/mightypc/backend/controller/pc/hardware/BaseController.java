@@ -47,6 +47,6 @@ public abstract class BaseController<T, S extends BaseService<T, ?>> {
 
     @GetMapping("/names")
     public Map<String, String> getAllNames() {
-        return service.getAllNames();
+        return service.getAllNamesWithPrices();
     }
 }

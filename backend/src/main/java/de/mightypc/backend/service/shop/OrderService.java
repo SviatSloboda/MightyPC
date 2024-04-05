@@ -4,7 +4,7 @@ import de.mightypc.backend.exception.shop.OrderNotFoundException;
 import de.mightypc.backend.model.shop.order.Item;
 import de.mightypc.backend.model.shop.order.Order;
 import de.mightypc.backend.model.shop.order.OrderStatus;
-import de.mightypc.backend.model.shop.User;
+import de.mightypc.backend.model.shop.user.User;
 import de.mightypc.backend.model.shop.order.OrderStatusRequest;
 import de.mightypc.backend.repository.shop.UserRepository;
 import org.springframework.stereotype.Service;

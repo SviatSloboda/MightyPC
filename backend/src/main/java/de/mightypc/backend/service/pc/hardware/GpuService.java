@@ -1,11 +1,9 @@
 package de.mightypc.backend.service.pc.hardware;
 
 import de.mightypc.backend.model.pc.specs.GPU;
-import de.mightypc.backend.model.pc.specs.GPU;
 import de.mightypc.backend.repository.pc.hardware.GpuRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,13 +38,13 @@ public class GpuService extends BaseService<GPU, GpuRepository> {
 
     @Override
     @Transactional(readOnly = true)
-    public HashMap<String, String> getAllNames(){
+    public HashMap<String, String> getAllNamesWithPrices(){
         HashMap<String, String> hashMap = new HashMap<>();
 
         List<GPU> allGpus = repository.findAll();
 
         for(GPU gpu: allGpus){
-            hashMap.put(gpu.id(), gpu.hardwareSpec().name());
+            hashMap.put(gpu.id(), gpu.hardwareSpec().name() + " ($" + gpu.hardwareSpec().price() + ")");
         }
 
         return hashMap;

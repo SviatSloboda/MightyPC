@@ -1,8 +1,8 @@
 package de.mightypc.backend.service.shop;
 
 import de.mightypc.backend.exception.shop.UserNotFoundException;
-import de.mightypc.backend.model.shop.User;
-import de.mightypc.backend.model.shop.UserResponse;
+import de.mightypc.backend.model.shop.user.User;
+import de.mightypc.backend.model.shop.user.UserResponse;
 import de.mightypc.backend.repository.shop.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

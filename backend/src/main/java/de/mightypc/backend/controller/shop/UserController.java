@@ -1,6 +1,6 @@
 package de.mightypc.backend.controller.shop;
 
-import de.mightypc.backend.model.shop.UserResponse;
+import de.mightypc.backend.model.shop.user.UserResponse;
 import de.mightypc.backend.service.shop.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

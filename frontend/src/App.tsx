@@ -27,6 +27,8 @@ import PcCharacteristics from "./components/pc/PcCharacteristics.tsx";
 import WorkstationsPage from "./components/workstation/WorkstationsPage.tsx";
 import WorkstationsCharacteristicsPage from "./components/workstation/WorkstationCharacteristicsPage.tsx";
 import ConfiguratorPage from "./components/configurator/ConfiguratorPage.tsx";
+import UserPcsPage from "./components/pc/UserPcsPage.tsx";
+import TryPage from "./components/configurator/TryPage.tsx";
 
 export default function App() {
 
@@ -66,9 +68,14 @@ export default function App() {
             <Route path="/hardware/psu/:id" element={<PsuCharacteristics/>}/>
             <Route path="/hardware/pc-case/:id" element={<PcCaseCharacteristics/>}/>
 
+            <Route path="/try" element={<TryPage/>}/>
+
+
+
             <Route path="/basket" element={<BasketPage/>}/>
             <Route path="/order" element={<OrderPage/>}/>
             <Route path="/user" element={<ProfilePage/>}/>
+            <Route path="/user-pcs" element={<UserPcsPage/>}/>
 
         </Routes>
         <FooterBar/>

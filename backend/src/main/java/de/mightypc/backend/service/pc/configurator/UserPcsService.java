@@ -1,4 +1,4 @@
-package de.mightypc.backend.service.pc;
+package de.mightypc.backend.service.pc.configurator;
 
 import de.mightypc.backend.exception.pc.HardwareNotFoundException;
 import de.mightypc.backend.model.pc.PC;

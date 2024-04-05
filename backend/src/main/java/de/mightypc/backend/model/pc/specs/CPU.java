@@ -12,17 +12,18 @@ public record CPU(
         HardwareSpec hardwareSpec,
         int performance,
         int energyConsumption,
+        String socket,
         List<String> cpuPhotos
 ) {
-    public CPU(String id, HardwareSpec hardwareSpec, int performance, int energyConsumption) {
-        this(id, hardwareSpec, performance, energyConsumption, Collections.emptyList());
+    public CPU(String id, HardwareSpec hardwareSpec, int performance, int energyConsumption, String socket) {
+        this(id, hardwareSpec, performance, energyConsumption, socket, Collections.emptyList());
     }
 
-    public CPU(HardwareSpec hardwareSpec, int performance, int energyConsumption) {
-        this(UUID.randomUUID().toString(), hardwareSpec, performance, energyConsumption, Collections.emptyList());
+    public CPU(HardwareSpec hardwareSpec, int performance, int energyConsumption, String socket) {
+        this(UUID.randomUUID().toString(), hardwareSpec, performance, energyConsumption, socket, Collections.emptyList());
     }
 
     public CPU withPhotos(List<String> allPhotos) {
-        return new CPU(id(), hardwareSpec(), performance(), energyConsumption(), allPhotos);
+        return new CPU(id(), hardwareSpec(), performance(), energyConsumption(), socket(), allPhotos);
     }
 }

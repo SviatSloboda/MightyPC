@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -45,11 +46,15 @@ public class PcService extends PcBaseService<PC, PcRepository> {
 
     @Transactional
     public PC save(CreatePC createPC) {
+        return pcRepository.save(createPc(createPC));
+    }
+
+    public PC createPc(CreatePC createPC){
         Specs specs = getSpecs(createPC.specsIds());
 
         HardwareSpec hardwareSpec = new HardwareSpec(createPC.hardwareSpec().name(), createPC.hardwareSpec().description(), getTotalPrice(specs), createPC.hardwareSpec().rating());
 
-        return pcRepository.save(new PC(hardwareSpec, specs));
+        return new PC(hardwareSpec, specs);
     }
 
     @Transactional
@@ -68,7 +73,7 @@ public class PcService extends PcBaseService<PC, PcRepository> {
         pcRepository.saveAll(pcsToSave);
     }
 
-    private PcResponse createPcResponse(PC pc) {
+    public PcResponse createPcResponse(PC pc) {
         return new PcResponse(pc.id(), pc.hardwareSpec(), new SpecsIds(pc.specs().cpu().id(), pc.specs().gpu().id(), pc.specs().motherboard().id(), pc.specs().ram().id(), pc.specs().ssd().id(), pc.specs().hdd().id(), pc.specs().powerSupply().id(), pc.specs().pcCase().id()), new SpecsNames(pc.specs().cpu().hardwareSpec().name(), pc.specs().gpu().hardwareSpec().name(), pc.specs().motherboard().hardwareSpec().name(), pc.specs().ram().hardwareSpec().name(), pc.specs().ssd().hardwareSpec().name(), pc.specs().hdd().hardwareSpec().name(), pc.specs().powerSupply().hardwareSpec().name(), pc.specs().pcCase().hardwareSpec().name()), pc.photos());
     }
 
@@ -84,8 +89,13 @@ public class PcService extends PcBaseService<PC, PcRepository> {
         totalPrice = totalPrice.add(specs.powerSupply().hardwareSpec().price());
         totalPrice = totalPrice.add(specs.pcCase().hardwareSpec().price());
 
-        return totalPrice;
+        totalPrice = totalPrice.add(BigDecimal.valueOf(250));
+        totalPrice = totalPrice.setScale(-2, RoundingMode.UP);
+
+        return totalPrice.subtract(BigDecimal.ONE);
     }
+
+
 
     @Transactional(readOnly = true)
     public PcResponse getById(String id) {
@@ -96,7 +106,17 @@ public class PcService extends PcBaseService<PC, PcRepository> {
 
     @Transactional
     public void update(PcResponse pcResponse) {
-        PC pc = new PC(pcResponse.id(), pcResponse.hardwareSpec(), getSpecs(pcResponse.specsIds()), pcResponse.photos());
+        Specs specs = getSpecs(pcResponse.specsIds());
+
+
+        HardwareSpec hardwareSpec = new HardwareSpec(
+                pcResponse.hardwareSpec().name(),
+                pcResponse.hardwareSpec().description(),
+                getTotalPrice(specs),
+                pcResponse.hardwareSpec().rating()
+        );
+
+        PC pc = new PC(pcResponse.id(), hardwareSpec, specs, pcResponse.photos());
 
         pcRepository.save(pc);
     }

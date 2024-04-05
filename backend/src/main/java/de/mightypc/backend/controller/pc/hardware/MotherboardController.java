@@ -6,6 +6,8 @@ import de.mightypc.backend.model.pc.specs.createspecs.CreateMotherboard;
 import de.mightypc.backend.service.pc.hardware.MotherboardService;
 import org.springframework.http.HttpStatus;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,13 +15,17 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("api/hardware/motherboard")
 public class MotherboardController extends BaseController<Motherboard, MotherboardService> {
-    protected MotherboardController(MotherboardService service) {
+    private final MotherboardService motherboardService;
+
+    protected MotherboardController(MotherboardService service, MotherboardService motherboardService) {
         super(service);
+        this.motherboardService = motherboardService;
     }
 
     @PostMapping
@@ -36,8 +42,7 @@ public class MotherboardController extends BaseController<Motherboard, Motherboa
                 UUID.randomUUID().toString(),
                 hardwareSpec,
                 createMotherboard.energyConsumption(),
-                createMotherboard.graphicCardCompatibility(),
-                createMotherboard.processorCompatibility(),
+                createMotherboard.socket(),
                 Collections.emptyList()
         ));
     }
@@ -57,8 +62,7 @@ public class MotherboardController extends BaseController<Motherboard, Motherboa
                     UUID.randomUUID().toString(),
                     hardwareSpec,
                     motherboard.energyConsumption(),
-                    motherboard.graphicCardCompatibility(),
-                    motherboard.processorCompatibility(),
+                    motherboard.socket(),
                     Collections.emptyList()
             ));
         }

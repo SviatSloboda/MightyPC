@@ -5,6 +5,7 @@ import de.mightypc.backend.model.pc.specs.HardwareSpec;
 public record CreateCpu(
         HardwareSpec hardwareSpec,
         int performance,
-        int energyConsumption
+        int energyConsumption,
+        String socket
 ) {
 }

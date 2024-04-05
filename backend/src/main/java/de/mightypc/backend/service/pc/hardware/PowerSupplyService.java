@@ -1,7 +1,6 @@
 package de.mightypc.backend.service.pc.hardware;
 
 import de.mightypc.backend.model.pc.specs.PowerSupply;
-import de.mightypc.backend.model.pc.specs.PowerSupply;
 import de.mightypc.backend.repository.pc.hardware.PowerSupplyRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,13 +38,13 @@ public class PowerSupplyService extends BaseService<PowerSupply, PowerSupplyRepo
 
     @Override
     @Transactional(readOnly = true)
-    public HashMap<String, String> getAllNames(){
+    public HashMap<String, String> getAllNamesWithPrices(){
         HashMap<String, String> hashMap = new HashMap<>();
 
         List<PowerSupply> allPowerSupplies = repository.findAll();
 
         for(PowerSupply powerSupply: allPowerSupplies){
-            hashMap.put(powerSupply.id(), powerSupply.hardwareSpec().name());
+            hashMap.put(powerSupply.id(), powerSupply.hardwareSpec().name() + " ($" + powerSupply.hardwareSpec().price() + ")");
         }
 
         return hashMap;

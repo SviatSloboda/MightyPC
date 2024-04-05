@@ -1333,3 +1333,84 @@ a.nav__link {
     opacity: 0.5 !important;
     backdrop-filter: blur(10px) !important;
 }
+
+
+.pc-configurator {
+    color: #fff;
+    max-width: 960px;
+    margin: 100px auto 50px;
+    padding: 2rem;
+    background-color: #202020;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px 0px rgba(255, 255, 255, 0.1);
+}
+
+.pc-configurator__title {
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.pc-configurator__form {
+    display: flex;
+    flex-direction: column;
+    background: #1a1a1a;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: .5rem;
+    font-size: 1.2rem;
+    color: #ffffff;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group select {
+    width: 100%;
+    padding: 0.5rem;
+    background: #333;
+    border: 1px solid #777;
+    border-radius: 4px;
+    color: #fff;
+    margin-bottom: 1rem;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="number"]:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+.pc-configurator__submit {
+    padding: 1rem 2rem;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.pc-configurator__submit:hover {
+    background-color: #0056b3;
+}
+
+@media (max-width: 768px) {
+    .pc-configurator {
+        margin: 50px auto;
+        width: calc(100% - 40px);
+    }
+}
+
+
+

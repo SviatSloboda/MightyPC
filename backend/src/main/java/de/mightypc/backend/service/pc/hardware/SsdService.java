@@ -31,20 +31,20 @@ public class SsdService extends BaseService<SSD, SsdRepository> {
                 photos = new ArrayList<>();
             }
 
-            photos.addFirst(photoUrl);
+            photos.add(photoUrl);
             repository.save(currSsd.withPhotos(photos));
         }
     }
 
     @Override
     @Transactional(readOnly = true)
-    public HashMap<String, String> getAllNames() {
+    public HashMap<String, String> getAllNamesWithPrices() {
         HashMap<String, String> hashMap = new HashMap<>();
 
         List<SSD> allSsds = repository.findAll();
 
         for (SSD ssd : allSsds) {
-            hashMap.put(ssd.id(), ssd.hardwareSpec().name());
+            hashMap.put(ssd.id(), ssd.hardwareSpec().name() + " ($" + ssd.hardwareSpec().price() + ")");
         }
 
         return hashMap;

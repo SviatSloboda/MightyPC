@@ -55,6 +55,8 @@ export default function NavigationBar() {
             {user && (<>
                 <Link to="/user" className="nav__account-dropdown-link"
                       onClick={closeAccountMenu}>Profile</Link>
+                <Link to="/user-pcs" className="nav__account-dropdown-link"
+                      onClick={closeAccountMenu}>My PCs</Link>
                 <Link to="/order" className="nav__account-dropdown-link"
                       onClick={closeAccountMenu}>Orders</Link>
                 <Link to="/basket" className="nav__account-dropdown-link"

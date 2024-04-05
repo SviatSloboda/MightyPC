@@ -18,7 +18,6 @@ public abstract class BaseService<T, R extends MongoRepository<T, String>> {
         this.repository = repository;
     }
 
-    @Transactional(readOnly = true)
     public List<T> getAll() {
         List<T> entities = repository.findAll();
 
@@ -27,7 +26,6 @@ public abstract class BaseService<T, R extends MongoRepository<T, String>> {
         return entities;
     }
 
-    @Transactional(readOnly = true)
     public T getById(String id) {
         return repository.findById(id).orElseThrow(() -> new HardwareNotFoundException((getNotFoundMessage(id))));
     }
@@ -71,7 +69,7 @@ public abstract class BaseService<T, R extends MongoRepository<T, String>> {
     protected abstract String getId(T entity);
 
     @Transactional(readOnly = true)
-    public Map<String, String> getAllNames() {
+    public Map<String, String> getAllNamesWithPrices() {
         return new HashMap<>(Collections.emptyMap());
     }
 }

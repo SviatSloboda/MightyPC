@@ -1,4 +1,4 @@
-package de.mightypc.backend.model.shop;
+package de.mightypc.backend.model.shop.user;
 
 public record UserResponse(
         String id,

@@ -1,7 +1,6 @@
 package de.mightypc.backend.service.pc.hardware;
 
 import de.mightypc.backend.model.pc.specs.RAM;
-import de.mightypc.backend.model.pc.specs.RAM;
 import de.mightypc.backend.repository.pc.hardware.RamRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,13 +39,13 @@ public class RamService extends BaseService<RAM, RamRepository> {
 
     @Override
     @Transactional(readOnly = true)
-    public HashMap<String, String> getAllNames(){
+    public HashMap<String, String> getAllNamesWithPrices(){
         HashMap<String, String> hashMap = new HashMap<>();
 
         List<RAM> allRams = repository.findAll();
 
         for(RAM ram: allRams){
-            hashMap.put(ram.id(), ram.hardwareSpec().name());
+            hashMap.put(ram.id(), ram.hardwareSpec().name() + " ($" + ram.hardwareSpec().price() + ")");
         }
 
         return hashMap;

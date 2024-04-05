@@ -41,14 +41,13 @@ public class BasketController {
         basketService.saveItem(userId, item);
     }
 
-    @GetMapping("/price")
-    public BigDecimal getEntirePrice(@PathVariable String userId) {
-        return basketService.getEntirePrice(userId);
-    }
-
     @DeleteMapping("/all")
     public void clearBasket(@PathVariable String userId) {
         basketService.deleteAll(userId);
     }
 
+    @GetMapping("/price")
+    public BigDecimal getEntirePrice(@PathVariable String userId){
+        return basketService.getEntirePrice(userId);
+    }
 }

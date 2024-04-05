@@ -174,7 +174,7 @@ export default function PcsPage() {
                         key={pc.id}
                         product={pc}
                         imgSrc={pc.photos && pc.photos.length > 0 ? pc.photos[0] : pcPhoto}
-                        toCharacteristicsPage={() => navigate(`/pc/${pc.id}`)}
+                        toCharacteristicsPage={() => navigate(`/pc/${pc.id}`, { state: { isUserPc: false } })}
                         onAddToBasket={() => handleAddToBasket(pc)}
                     />
                 ))}

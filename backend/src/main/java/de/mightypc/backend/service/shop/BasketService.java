@@ -2,7 +2,7 @@ package de.mightypc.backend.service.shop;
 
 import de.mightypc.backend.exception.shop.ItemNotFoundException;
 import de.mightypc.backend.model.shop.order.Item;
-import de.mightypc.backend.model.shop.User;
+import de.mightypc.backend.model.shop.user.User;
 import de.mightypc.backend.repository.shop.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,9 +74,10 @@ public class BasketService {
 
     @Transactional(readOnly = true)
     public BigDecimal getEntirePrice(String userId) {
+        User user = userService.getUserById(userId);
         BigDecimal price = BigDecimal.ZERO;
 
-        List<Item> items = getAllItemsOfUser(userId);
+        List<Item> items = user.getBasket();
 
         if (items != null && !items.isEmpty()) {
             for (Item item : items) {

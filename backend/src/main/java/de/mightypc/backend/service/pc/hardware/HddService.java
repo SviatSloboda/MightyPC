@@ -39,13 +39,13 @@ public class HddService extends BaseService<HDD, HddRepository> {
 
     @Override
     @Transactional(readOnly = true)
-    public HashMap<String, String> getAllNames(){
+    public HashMap<String, String> getAllNamesWithPrices() {
         HashMap<String, String> hashMap = new HashMap<>();
 
         List<HDD> allHdds = repository.findAll();
 
-        for(HDD hdd: allHdds){
-            hashMap.put(hdd.id(), hdd.hardwareSpec().name());
+        for (HDD hdd : allHdds) {
+            hashMap.put(hdd.id(), hdd.hardwareSpec().name() + " ($" + hdd.hardwareSpec().price() + ")");
         }
 
         return hashMap;
