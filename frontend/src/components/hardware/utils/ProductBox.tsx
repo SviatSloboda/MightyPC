@@ -21,7 +21,6 @@ const ProductBox: React.FC<ProductBoxProps> = ({product, imgSrc, toCharacteristi
         <p className="product-box__price">${product.hardwareSpec.price}</p>
         <div className="product-box__actions">
             <button className="product-box__button" onClick={onAddToBasket}>Buy</button>
-            {/* Use onAddToBasket here */}
             <button className="product-box__button" onClick={toCharacteristicsPage}>Info</button>
         </div>
     </div>);

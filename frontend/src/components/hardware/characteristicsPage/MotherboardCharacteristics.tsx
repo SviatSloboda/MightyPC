@@ -20,6 +20,7 @@ export default function MotherboardCharacteristics() {
     const [updatedDescription, setUpdatedDescription] = useState('');
     const [updatedPrice, setUpdatedPrice] = useState('');
     const [updatedRating, setUpdatedRating] = useState(0);
+    const [updatedSocket, setUpdatedSocket] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const {user, isSuperUser} = useAuth();
     const {isLoginModalOpen, showLoginModal, hideLoginModal, handleLogin} = useLoginModal();
@@ -34,6 +35,7 @@ export default function MotherboardCharacteristics() {
                     setUpdatedDescription(response.data.hardwareSpec.description);
                     setUpdatedPrice(response.data.hardwareSpec.price);
                     setUpdatedRating(response.data.hardwareSpec.rating);
+                    setUpdatedSocket(response.data.socket);
                 })
                 .catch(console.error);
         }
@@ -64,8 +66,7 @@ export default function MotherboardCharacteristics() {
                 name: updatedName, description: updatedDescription, price: updatedPrice, rating: updatedRating,
             },
             energyConsumption: motherboard?.energyConsumption,
-            graphicCardCompatibility: motherboard?.graphicCardCompatibility,
-            processorCompatibility: motherboard?.processorCompatibility,
+            socket: updatedSocket,
             motherboardPhotos: photos
         };
 
@@ -76,6 +77,12 @@ export default function MotherboardCharacteristics() {
             })
             .catch(console.error);
     };
+
+
+
+
+
+
 
     const handleDelete = () => {
         axios.delete(`/api/hardware/motherboard/${id}`)
@@ -137,6 +144,7 @@ export default function MotherboardCharacteristics() {
                         className="product-characteristics__rating">{`${motherboard?.hardwareSpec.rating ?? 0}/5`}</span>
                 </div>
                 <p className="product-characteristics__description">{motherboard?.hardwareSpec.description}</p>
+                <p className="product-characteristics__description">Socket: {motherboard?.socket}</p>
                 <span className="product-characteristics__price">{`${motherboard?.hardwareSpec.price}$`}</span>
                 <button className="product-characteristics__buy-btn" onClick={handleAddToBasket}>
                     Add to basket
@@ -193,6 +201,12 @@ export default function MotherboardCharacteristics() {
                         placeholder="Rating"
                         min="0"
                         max="5"
+                    />
+                    <input
+                        className="modal__input"
+                        value={updatedSocket}
+                        onChange={(e) => setUpdatedSocket(e.target.value)}
+                        placeholder="Socket"
                     />
                 </div>
                 <div className="modal__footer">

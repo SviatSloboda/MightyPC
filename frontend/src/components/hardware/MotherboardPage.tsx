@@ -19,9 +19,8 @@ export default function MotherboardPage() {
     const [description, setDescription] = useState("");
     const [price, setPrice] = useState("");
     const [rating, setRating] = useState(0);
-    const [graphicCardCompatibility, setGraphicCardCompatibility] = useState<string[]>([]);
-    const [processorCompatibility, setProcessorCompatibility] = useState<string[]>([]);
     const [energyConsumption, setEnergyConsumption] = useState('');
+    const [socket, setSocket] = useState('');
     const navigate = useNavigate();
     const {user, isSuperUser} = useAuth();
     const {isLoginModalOpen, showLoginModal, hideLoginModal, handleLogin} = useLoginModal();
@@ -48,7 +47,7 @@ export default function MotherboardPage() {
         const payload = {
             hardwareSpec: {
                 name, description, price, rating,
-            }, energyConsumption, graphicCardCompatibility, processorCompatibility,
+            }, energyConsumption, socket,
         };
 
         axios.post('/api/hardware/motherboard', payload)
@@ -107,20 +106,14 @@ export default function MotherboardPage() {
                 <input id="rating" className="modal__input" type="number" value={rating}
                        onChange={(e) => setRating(parseFloat(e.target.value))} min="0" max="5" step="0.1" required/>
             </div>
+
             <div className="modal__form-group">
-                <label htmlFor="graphicCardCompatibility" className="modal__form-label">Graphic Card
-                    Compatibility:</label>
-                <input id="graphicCardCompatibility" className="modal__input" type="text"
-                       value={graphicCardCompatibility.join(', ')}
-                       onChange={(e) => setGraphicCardCompatibility(e.target.value.split(', '))} required/>
+                <label htmlFor="description" className="modal__form-label">Socket:</label>
+                <input id="description" className="modal__input" value={socket}
+                       onChange={(e) => setSocket(e.target.value)}
+                       required/>
             </div>
-            <div className="modal__form-group">
-                <label htmlFor="processorCompatibility" className="modal__form-label">Processor
-                    Compatibility:</label>
-                <input id="processorCompatibility" className="modal__input" type="text"
-                       value={processorCompatibility.join(', ')}
-                       onChange={(e) => setProcessorCompatibility(e.target.value.split(', '))} required/>
-            </div>
+
             <div className="modal__form-group">
                 <label htmlFor="energyConsumption" className="modal__form-label">Energy Consumption:</label>
                 <input id="energyConsumption" className="modal__input" type="text" value={energyConsumption}

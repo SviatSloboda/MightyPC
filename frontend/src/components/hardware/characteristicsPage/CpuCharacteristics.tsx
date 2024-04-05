@@ -19,6 +19,8 @@ export default function CpuCharacteristics() {
     const [updatedDescription, setUpdatedDescription] = useState('');
     const [updatedPrice, setUpdatedPrice] = useState('');
     const [updatedRating, setUpdatedRating] = useState(0);
+    const [updatedSocket, setUpdatedSocket] = useState('');
+
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
 
     const navigate = useNavigate();
@@ -37,6 +39,7 @@ export default function CpuCharacteristics() {
                     setUpdatedDescription(response.data.hardwareSpec.description);
                     setUpdatedPrice(response.data.hardwareSpec.price);
                     setUpdatedRating(response.data.hardwareSpec.rating);
+                    setUpdatedSocket(response.data.socket || '');
                 })
                 .catch(console.error);
         }
@@ -70,9 +73,14 @@ export default function CpuCharacteristics() {
 
     const handleUpdate = () => {
         const payload = {
-            id: cpu?.id, hardwareSpec: {
+            id: cpu?.id,
+            hardwareSpec: {
                 name: updatedName, description: updatedDescription, price: updatedPrice, rating: updatedRating,
-            }, performance: cpu?.performance, energyConsumption: cpu?.energyConsumption, cpuPhotos: cpu?.cpuPhotos
+            },
+            performance: cpu?.performance,
+            energyConsumption: cpu?.energyConsumption,
+            socket: updatedSocket,
+            cpuPhotos: cpu?.cpuPhotos
         };
         axios.put(`/api/hardware/cpu`, payload)
             .then(response => {
@@ -129,6 +137,7 @@ export default function CpuCharacteristics() {
                     <span className="product-characteristics__rating">{cpu?.hardwareSpec.rating}/5</span>
                 </div>
                 <p className="product-characteristics__description">{cpu?.hardwareSpec.description}</p>
+                <p className="product-characteristics__description">Socket: {cpu?.socket}</p>
                 <span className="product-characteristics__price">{cpu?.hardwareSpec.price}$</span>
                 <button className="product-characteristics__buy-btn"
                         onClick={() => handleAddToBasket()}>Add to basket
@@ -170,6 +179,11 @@ export default function CpuCharacteristics() {
                                    placeholder="Rating"
                                    min="0" max="5"/>
                         </div>
+                        <div className="modal__form-group">
+                            <input className="modal__input" value={updatedSocket}
+                                   onChange={(e) => setUpdatedSocket(e.target.value)}
+                                   placeholder="Socket"/>
+                        </div>
                     </div>
                     <div className="modal__footer">
                         <button className="modal__save-btn" onClick={handleUpdate}>Save Changes</button>
@@ -197,6 +211,5 @@ export default function CpuCharacteristics() {
                 </div>
             </div>)}
         </>)}
-
     </>);
 }

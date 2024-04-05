@@ -128,18 +128,6 @@ export default function PowerSupplyPage() {
                     />
                 ))}
             </div>
-
-            <div className="product-list">
-                {PSUs.map(psu => (
-                    <ProductBox
-                        key={psu.id}
-                        product={psu}
-                        imgSrc={psu.psuPhotos && psu.psuPhotos.length > 0 ? psu.psuPhotos[0] : psuPhoto}
-                        toCharacteristicsPage={() => navigate(`/hardware/psu/${psu.id}`)}
-                        onAddToBasket={() => handleAddToBasket(psu)}
-                    />
-                ))}
-            </div>
             <div className="product-list__pagination">
                 {Array.from({length: totalPages}, (_, i) => (
                     <button
