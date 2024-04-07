@@ -11,8 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.any;
 
 class PowerSupplyServiceTest {
     private final PowerSupplyRepository powerSupplyRepository = mock(PowerSupplyRepository.class);
@@ -143,5 +149,43 @@ class PowerSupplyServiceTest {
         // Act & Assert
         assertThrows(HardwareNotFoundException.class, () -> powerSupplyService.deleteById(id), "Expected HardwareNotFoundException when PowerSupply does not exist");
         verify(powerSupplyRepository).existsById(id);
+    }
+
+    @Test
+    void attachPhoto_WhenPowerSupplyExists_ThenPhotoIsAttached() {
+        // Arrange
+        String powerSupplyId = "1";
+        String photoUrl = "https://example.com/photo.jpg";
+        PowerSupply powerSupplyBeforeUpdate = new PowerSupply("1", new HardwareSpec("test", "test", new BigDecimal("1"), 1.01f), 1, new ArrayList<>());
+        Optional<PowerSupply> optionalPowerSupplyBeforeUpdate = Optional.of(powerSupplyBeforeUpdate);
+
+        List<String> photosWithNewUrl = new ArrayList<>();
+        photosWithNewUrl.add(photoUrl);
+        PowerSupply powerSupplyAfterUpdate = new PowerSupply("1", new HardwareSpec("test", "test", new BigDecimal("1"), 1.01f), 1, photosWithNewUrl);
+
+        when(powerSupplyRepository.findById(powerSupplyId)).thenReturn(optionalPowerSupplyBeforeUpdate);
+        when(powerSupplyRepository.save(any(PowerSupply.class))).thenReturn(powerSupplyAfterUpdate);
+
+        // Act
+        powerSupplyService.attachPhoto(powerSupplyId, photoUrl);
+
+        // Assert
+        verify(powerSupplyRepository).findById(powerSupplyId);
+        verify(powerSupplyRepository).save(powerSupplyAfterUpdate);
+    }
+
+
+    @Test
+    void attachPhoto_WhenPowerSupplyDoesNotExist_ThenNoActionTaken() {
+        // Arrange
+        String powerSupplyId = "nonExistingId";
+        String photoUrl = "https://example.com/photo.jpg";
+        when(powerSupplyRepository.findById(powerSupplyId)).thenReturn(Optional.empty());
+
+        // Act
+        powerSupplyService.attachPhoto(powerSupplyId, photoUrl);
+
+        // Assert
+        verify(powerSupplyRepository).findById(powerSupplyId);
     }
 }

@@ -11,15 +11,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.any;
 
 class HddServiceTest {
     private final HddRepository hddRepository = mock(HddRepository.class);
     private final HddService hddService = new HddService(hddRepository);
 
     private static HDD getHdd() {
-        return new HDD("1",new HardwareSpec(
+        return new HDD("1", new HardwareSpec(
                 "test",
                 "test",
                 new BigDecimal("1"),
@@ -144,5 +150,43 @@ class HddServiceTest {
         // Act & Assert
         assertThrows(HardwareNotFoundException.class, () -> hddService.deleteById(id), "Expected HardwareNotFoundException when HDD does not exist");
         verify(hddRepository).existsById(id);
+    }
+
+    @Test
+    void attachPhoto_WhenHddExists_ThenPhotoIsAttached() {
+        // Arrange
+        String hddId = "1";
+        String photoUrl = "https://example.com/photo.jpg";
+        HDD hddBeforeUpdate = new HDD("1", new HardwareSpec("test", "test", new BigDecimal("1"), 1.01f), 9500, 125, new ArrayList<>());
+        Optional<HDD> optionalHddBeforeUpdate = Optional.of(hddBeforeUpdate);
+
+        List<String> photosWithNewUrl = new ArrayList<>();
+        photosWithNewUrl.add(photoUrl);
+        HDD hddAfterUpdate = new HDD("1", new HardwareSpec("test", "test", new BigDecimal("1"), 1.01f), 9500, 125, photosWithNewUrl);
+
+        when(hddRepository.findById(hddId)).thenReturn(optionalHddBeforeUpdate);
+        when(hddRepository.save(any(HDD.class))).thenReturn(hddAfterUpdate);
+
+        // Act
+        hddService.attachPhoto(hddId, photoUrl);
+
+        // Assert
+        verify(hddRepository).findById(hddId);
+        verify(hddRepository).save(hddAfterUpdate);
+    }
+
+
+    @Test
+    void attachPhoto_WhenHddDoesNotExist_ThenNoActionTaken() {
+        // Arrange
+        String hddId = "nonExistingId";
+        String photoUrl = "https://example.com/photo.jpg";
+        when(hddRepository.findById(hddId)).thenReturn(Optional.empty());
+
+        // Act
+        hddService.attachPhoto(hddId, photoUrl);
+
+        // Assert
+        verify(hddRepository).findById(hddId);
     }
 }
