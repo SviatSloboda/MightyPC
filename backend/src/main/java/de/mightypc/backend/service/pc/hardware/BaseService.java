@@ -6,8 +6,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -66,10 +64,9 @@ public abstract class BaseService<T, R extends MongoRepository<T, String>> {
         return "Entity was not Found. Id of entity: " + id;
     }
 
-    protected abstract String getId(T entity);
+    public abstract Map<String, String> getAllNamesWithPrices();
 
-    @Transactional(readOnly = true)
-    public Map<String, String> getAllNamesWithPrices() {
-        return new HashMap<>(Collections.emptyMap());
-    }
+    public abstract T attachPhoto(String id, String photoUrl);
+
+    protected abstract String getId(T entity);
 }

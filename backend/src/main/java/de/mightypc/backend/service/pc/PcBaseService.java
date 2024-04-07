@@ -2,14 +2,7 @@ package de.mightypc.backend.service.pc;
 
 import de.mightypc.backend.model.pc.specs.Specs;
 import de.mightypc.backend.model.pc.specs.SpecsIds;
-import de.mightypc.backend.service.pc.hardware.CpuService;
-import de.mightypc.backend.service.pc.hardware.GpuService;
-import de.mightypc.backend.service.pc.hardware.HddService;
-import de.mightypc.backend.service.pc.hardware.MotherboardService;
-import de.mightypc.backend.service.pc.hardware.PcCaseService;
-import de.mightypc.backend.service.pc.hardware.PowerSupplyService;
-import de.mightypc.backend.service.pc.hardware.RamService;
-import de.mightypc.backend.service.pc.hardware.SsdService;
+import de.mightypc.backend.service.pc.hardware.*;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -49,7 +42,16 @@ public abstract class PcBaseService<T, R extends MongoRepository<T, String>> {
             throw new IllegalArgumentException("specsIds cannot be null");
         }
 
-        return new Specs(cpuService.getById(specsIds.cpuId()), gpuService.getById(specsIds.gpuId()), motherboardService.getById(specsIds.motherboardId()), ramService.getById(specsIds.ramId()), ssdService.getById(specsIds.ssdId()), hddService.getById(specsIds.hddId()), powerSupplyService.getById(specsIds.powerSupplyId()), pcCaseService.getById(specsIds.pcCaseId()));
+        return new Specs(
+                cpuService.getById(specsIds.cpuId()),
+                gpuService.getById(specsIds.gpuId()),
+                motherboardService.getById(specsIds.motherboardId()),
+                ramService.getById(specsIds.ramId()),
+                ssdService.getById(specsIds.ssdId()),
+                hddService.getById(specsIds.hddId()),
+                powerSupplyService.getById(specsIds.powerSupplyId()),
+                pcCaseService.getById(specsIds.pcCaseId())
+        );
     }
 
     @Transactional

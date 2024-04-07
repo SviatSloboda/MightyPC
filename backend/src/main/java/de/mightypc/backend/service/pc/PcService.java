@@ -49,12 +49,12 @@ public class PcService extends PcBaseService<PC, PcRepository> {
         return pcRepository.save(createPc(createPC));
     }
 
-    public PC createPc(CreatePC createPC){
+    public PC createPc(CreatePC createPC) {
         Specs specs = getSpecs(createPC.specsIds());
 
         HardwareSpec hardwareSpec = new HardwareSpec(createPC.hardwareSpec().name(), createPC.hardwareSpec().description(), getTotalPrice(specs), createPC.hardwareSpec().rating());
 
-        return new PC(hardwareSpec, specs);
+        return new PC(hardwareSpec, specs, calculateEnergyConsumptionOfPC(specs));
     }
 
     @Transactional
@@ -66,7 +66,7 @@ public class PcService extends PcBaseService<PC, PcRepository> {
 
             HardwareSpec hardwareSpec = new HardwareSpec(createPC.hardwareSpec().name(), createPC.hardwareSpec().description(), getTotalPrice(specs), createPC.hardwareSpec().rating());
 
-            PC pc = new PC(hardwareSpec, specs);
+            PC pc = new PC(hardwareSpec, specs, calculateEnergyConsumptionOfPC(specs));
             pcsToSave.add(pc);
         }
 
@@ -74,7 +74,30 @@ public class PcService extends PcBaseService<PC, PcRepository> {
     }
 
     public PcResponse createPcResponse(PC pc) {
-        return new PcResponse(pc.id(), pc.hardwareSpec(), new SpecsIds(pc.specs().cpu().id(), pc.specs().gpu().id(), pc.specs().motherboard().id(), pc.specs().ram().id(), pc.specs().ssd().id(), pc.specs().hdd().id(), pc.specs().powerSupply().id(), pc.specs().pcCase().id()), new SpecsNames(pc.specs().cpu().hardwareSpec().name(), pc.specs().gpu().hardwareSpec().name(), pc.specs().motherboard().hardwareSpec().name(), pc.specs().ram().hardwareSpec().name(), pc.specs().ssd().hardwareSpec().name(), pc.specs().hdd().hardwareSpec().name(), pc.specs().powerSupply().hardwareSpec().name(), pc.specs().pcCase().hardwareSpec().name()), pc.photos());
+        return new PcResponse(
+                pc.id(),
+                pc.hardwareSpec(),
+                new SpecsIds(
+                        pc.specs().cpu().id(),
+                        pc.specs().gpu().id(),
+                        pc.specs().motherboard().id(),
+                        pc.specs().ram().id(),
+                        pc.specs().ssd().id(),
+                        pc.specs().hdd().id(),
+                        pc.specs().powerSupply().id(),
+                        pc.specs().pcCase().id()
+                ),
+                new SpecsNames(pc.specs().cpu().hardwareSpec().name(),
+                        pc.specs().gpu().hardwareSpec().name(),
+                        pc.specs().motherboard().hardwareSpec().name(),
+                        pc.specs().ram().hardwareSpec().name(),
+                        pc.specs().ssd().hardwareSpec().name(),
+                        pc.specs().hdd().hardwareSpec().name(),
+                        pc.specs().powerSupply().hardwareSpec().name(),
+                        pc.specs().pcCase().hardwareSpec().name()
+                ),
+                pc.energyConsumption(),
+                pc.photos());
     }
 
     private BigDecimal getTotalPrice(Specs specs) {
@@ -96,7 +119,6 @@ public class PcService extends PcBaseService<PC, PcRepository> {
     }
 
 
-
     @Transactional(readOnly = true)
     public PcResponse getById(String id) {
         PC pc = pcRepository.findById(id).orElseThrow(() -> new HardwareNotFoundException(getNotFoundMessage(id)));
@@ -108,7 +130,6 @@ public class PcService extends PcBaseService<PC, PcRepository> {
     public void update(PcResponse pcResponse) {
         Specs specs = getSpecs(pcResponse.specsIds());
 
-
         HardwareSpec hardwareSpec = new HardwareSpec(
                 pcResponse.hardwareSpec().name(),
                 pcResponse.hardwareSpec().description(),
@@ -116,7 +137,7 @@ public class PcService extends PcBaseService<PC, PcRepository> {
                 pcResponse.hardwareSpec().rating()
         );
 
-        PC pc = new PC(pcResponse.id(), hardwareSpec, specs, pcResponse.photos());
+        PC pc = new PC(pcResponse.id(), hardwareSpec, specs,calculateEnergyConsumptionOfPC(specs), pcResponse.photos());
 
         pcRepository.save(pc);
     }
@@ -146,5 +167,22 @@ public class PcService extends PcBaseService<PC, PcRepository> {
         List<PcResponse> responses = page.getContent().stream().map(this::createPcResponse).toList();
 
         return new PageImpl<>(responses, pageable, page.getTotalElements());
+    }
+
+    public int calculateEnergyConsumptionOfPC(Specs specs) {
+        int totalConsumption = specs.cpu().energyConsumption() +
+                               specs.gpu().energyConsumption() +
+                               specs.ssd().energyConsumption() +
+                               specs.hdd().energyConsumption() +
+                               specs.motherboard().energyConsumption() +
+                               specs.ram().energyConsumption() +
+                               specs.gpu().energyConsumption();
+
+        int remainder = totalConsumption % 50;
+        if (remainder == 0) {
+            return totalConsumption;
+        }
+
+        return totalConsumption + 50 - remainder;
     }
 }

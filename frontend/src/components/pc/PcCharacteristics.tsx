@@ -208,7 +208,7 @@ export default function PcCharacteristics() {
 
         <LoginModal isOpen={isLoginModalOpen} onLogin={handleLogin} onClose={hideLoginModal}/>
 
-        {isSuperUser() && (<>
+        {(isSuperUser() || isUserPc) && (<>
             <Photo savePhoto={savePhoto}/>
             <button className="upload-button item__delete" onClick={() => setIsUpdateModalOpen(true)}>Update
             </button>

@@ -1,11 +1,14 @@
 package de.mightypc.backend.model.pc.specs;
 
+import lombok.With;
 import org.springframework.data.annotation.Id;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+@With
 public record PowerSupply(
         @Id
         String id,
@@ -15,11 +18,11 @@ public record PowerSupply(
 
 ) {
     public PowerSupply(String id, HardwareSpec hardwareSpec, int power) {
-        this(id, hardwareSpec, power, Collections.emptyList());
+        this(id, hardwareSpec, power, new ArrayList<>());
     }
 
     public PowerSupply(HardwareSpec hardwareSpec, int power) {
-        this(UUID.randomUUID().toString(), hardwareSpec, power, Collections.emptyList());
+        this(UUID.randomUUID().toString(), hardwareSpec, power, new ArrayList<>());
     }
 
     public PowerSupply withPhotos(List<String> allPhotos) {

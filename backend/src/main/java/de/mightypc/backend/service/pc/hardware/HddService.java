@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class HddService extends BaseService<HDD, HddRepository> {
@@ -22,19 +21,17 @@ public class HddService extends BaseService<HDD, HddRepository> {
         return entity.id();
     }
 
-    public void attachPhoto(String id, String photoUrl) {
-        Optional<HDD> hdd = repository.findById(id);
-        if (hdd.isPresent()) {
-            HDD currHdd = hdd.get();
-            List<String> photos = hdd.get().hddPhotos();
+    @Override
+    @Transactional
+    public HDD attachPhoto(String id, String photoUrl) {
+        HDD currHdd = getById(id);
 
-            if (photos == null) {
-                photos = new ArrayList<>();
-            }
+        ArrayList<String> photos = new ArrayList<>(currHdd.hddPhotos());
 
-            photos.addFirst(photoUrl);
-            repository.save(currHdd.withPhotos(photos));
-        }
+        photos.addFirst(photoUrl);
+        HDD updatedHdd = currHdd.withPhotos(photos);
+
+        return repository.save(updatedHdd);
     }
 
     @Override

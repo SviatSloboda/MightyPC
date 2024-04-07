@@ -16,17 +16,18 @@ public record Workstation(
         Specs specs,
         int cpuNumber,
         int gpuNumber,
+        int energyConsumption,
         List<String> photos
 ) {
-    public Workstation(String id, HardwareSpec hardwareSpec, Specs specs, int cpuNumber, int gpuNumber) {
-        this(id, hardwareSpec, specs, cpuNumber, gpuNumber, new ArrayList<>(Collections.emptyList()));
+    public Workstation(String id, HardwareSpec hardwareSpec, Specs specs, int cpuNumber, int gpuNumber, int energyConsumption) {
+        this(id, hardwareSpec, specs, cpuNumber, gpuNumber, energyConsumption, new ArrayList<>(Collections.emptyList()));
     }
 
-    public Workstation(HardwareSpec hardwareSpec, Specs specs, int cpuNumber, int gpuNumber){
-        this(UUID.randomUUID().toString(), hardwareSpec, specs, cpuNumber, gpuNumber);
+    public Workstation(HardwareSpec hardwareSpec, Specs specs, int cpuNumber, int gpuNumber, int energyConsumption){
+        this(UUID.randomUUID().toString(), hardwareSpec, specs, cpuNumber, gpuNumber, energyConsumption);
     }
 
     public Workstation withPhotos(List<String> allPhotos) {
-        return new Workstation(id(), hardwareSpec(), specs(), cpuNumber(), gpuNumber(), allPhotos);
+        return new Workstation(id(), hardwareSpec(), specs(), cpuNumber(), gpuNumber(), energyConsumption(), allPhotos);
     }
 }

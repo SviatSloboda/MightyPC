@@ -15,7 +15,7 @@ public record WorkstationResponse(
         SpecsNames specsNames,
         int cpuNumber,
         int gpuNumber,
+        int energyConsumption,
         List<String> photos
 ) {
-
 }

@@ -1,11 +1,14 @@
 package de.mightypc.backend.model.pc.specs;
 
+import lombok.With;
 import org.springframework.data.annotation.Id;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+@With
 public record SSD(
         @Id
         String id,
@@ -15,11 +18,11 @@ public record SSD(
         List<String> ssdPhotos
 ) {
     public SSD(String id, HardwareSpec hardwareSpec, int capacity, int energyConsumption) {
-        this(id, hardwareSpec, capacity, energyConsumption, Collections.emptyList());
+        this(id, hardwareSpec, capacity, energyConsumption, new ArrayList<>());
     }
 
     public SSD(HardwareSpec hardwareSpec, int capacity, int energyConsumption) {
-        this(UUID.randomUUID().toString(), hardwareSpec, capacity, energyConsumption, Collections.emptyList());
+        this(UUID.randomUUID().toString(), hardwareSpec, capacity, energyConsumption, new ArrayList<>());
     }
 
     public SSD withPhotos(List<String> allPhotos) {

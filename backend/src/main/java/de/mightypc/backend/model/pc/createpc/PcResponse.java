@@ -13,6 +13,7 @@ public record PcResponse(
         HardwareSpec hardwareSpec,
         SpecsIds specsIds,
         SpecsNames specsNames,
+        int energyConsumption,
         List<String> photos
 ) {
 }

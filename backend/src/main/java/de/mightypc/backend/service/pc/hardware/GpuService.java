@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class GpuService extends BaseService<GPU, GpuRepository> {
@@ -21,19 +20,15 @@ public class GpuService extends BaseService<GPU, GpuRepository> {
         return entity.id();
     }
 
-    public void attachPhoto(String id, String photoUrl) {
-        Optional<GPU> gpu = repository.findById(id);
-        if (gpu.isPresent()) {
-            GPU currGpu = gpu.get();
-            List<String> photos = gpu.get().gpuPhotos();
+    public GPU attachPhoto(String id, String photoUrl) {
+        GPU currGpu = getById(id);
 
-            if (photos == null) {
-                photos = new ArrayList<>();
-            }
+        ArrayList<String> photos = new ArrayList<>(currGpu.gpuPhotos());
 
-            photos.addFirst(photoUrl);
-            repository.save(currGpu.withPhotos(photos));
-        }
+        photos.addFirst(photoUrl);
+        GPU updatedGpu = currGpu.withPhotos(photos);
+
+        return repository.save(updatedGpu);
     }
 
     @Override

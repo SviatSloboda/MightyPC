@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 @Service
 public class PowerSupplyService extends BaseService<PowerSupply, PowerSupplyRepository> {
@@ -21,32 +21,46 @@ public class PowerSupplyService extends BaseService<PowerSupply, PowerSupplyRepo
         return entity.id();
     }
 
-    public void attachPhoto(String id, String photoUrl) {
-        Optional<PowerSupply> powerSupply = repository.findById(id);
-        if (powerSupply.isPresent()) {
-            PowerSupply currPsu = powerSupply.get();
-            List<String> photos = powerSupply.get().powerSupplyPhotos();
+    @Override
+    @Transactional
+    public PowerSupply attachPhoto(String id, String photoUrl) {
+        PowerSupply currPowerSupply = getById(id);
 
-            if (photos == null) {
-                photos = new ArrayList<>();
-            }
+        ArrayList<String> photos = new ArrayList<>(currPowerSupply.powerSupplyPhotos());
 
-            photos.addFirst(photoUrl);
-            repository.save(currPsu.withPhotos(photos));
-        }
+        photos.addFirst(photoUrl);
+        PowerSupply updatedPowerSupply = currPowerSupply.withPhotos(photos);
+
+        return repository.save(updatedPowerSupply);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public HashMap<String, String> getAllNamesWithPrices(){
+    public HashMap<String, String> getAllNamesWithPrices() {
         HashMap<String, String> hashMap = new HashMap<>();
 
         List<PowerSupply> allPowerSupplies = repository.findAll();
 
-        for(PowerSupply powerSupply: allPowerSupplies){
+        for (PowerSupply powerSupply : allPowerSupplies) {
             hashMap.put(powerSupply.id(), powerSupply.hardwareSpec().name() + " ($" + powerSupply.hardwareSpec().price() + ")");
         }
 
         return hashMap;
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, String> getAllPowerSuppliesByEnergyConsumption(int energyConsumption) {
+        HashMap<String, String> powerSuppliesWithIdsAndNames = new HashMap<>();
+        List<PowerSupply> allPowerSupplies = getAll();
+
+        List<PowerSupply> suitablePowerSupplies = allPowerSupplies.stream()
+                .filter(powerSupply -> powerSupply.power() >= energyConsumption)
+                .toList();
+
+        for (PowerSupply powerSupply : suitablePowerSupplies) {
+            powerSuppliesWithIdsAndNames.put(powerSupply.id(), powerSupply.hardwareSpec().name() + " ($" + powerSupply.hardwareSpec().price() + ")");
+        }
+
+        return powerSuppliesWithIdsAndNames;
     }
 }

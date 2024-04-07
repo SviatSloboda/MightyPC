@@ -37,7 +37,7 @@ public class CpuController extends BaseController<CPU, CpuService> {
                 createCpu.hardwareSpec().rating()
         );
 
-        return service.save(new CPU(UUID.randomUUID().toString(), hardwareSpec, createCpu.performance(), createCpu.energyConsumption(), createCpu.socket(), Collections.emptyList()));
+        return service.save(new CPU(UUID.randomUUID().toString(), hardwareSpec, createCpu.energyConsumption(), createCpu.socket(), Collections.emptyList()));
     }
 
     @PostMapping("/all")
@@ -51,7 +51,7 @@ public class CpuController extends BaseController<CPU, CpuService> {
                     cpu.hardwareSpec().rating()
             );
 
-            service.save(new CPU(UUID.randomUUID().toString(), hardwareSpec, cpu.performance(), cpu.energyConsumption(), cpu.socket(), Collections.emptyList()));
+            service.save(new CPU(UUID.randomUUID().toString(), hardwareSpec, cpu.energyConsumption(), cpu.socket(), Collections.emptyList()));
         }
     }
 

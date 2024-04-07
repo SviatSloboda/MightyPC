@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PcCaseService extends BaseService<PcCase, PcCaseRepository> {
@@ -21,19 +20,17 @@ public class PcCaseService extends BaseService<PcCase, PcCaseRepository> {
         return entity.id();
     }
 
-    public void attachPhoto(String id, String photoUrl) {
-        Optional<PcCase> pcCase = repository.findById(id);
-        if (pcCase.isPresent()) {
-            PcCase currMotherboard = pcCase.get();
-            List<String> photos = pcCase.get().pcCasePhotos();
+    @Override
+    @Transactional
+    public PcCase attachPhoto(String id, String photoUrl) {
+        PcCase currPcCase = getById(id);
 
-            if (photos == null) {
-                photos = new ArrayList<>();
-            }
+        ArrayList<String> photos = new ArrayList<>(currPcCase.pcCasePhotos());
 
-            photos.addFirst(photoUrl);
-            repository.save(currMotherboard.withPhotos(photos));
-        }
+        photos.addFirst(photoUrl);
+        PcCase updatedPcCase = currPcCase.withPhotos(photos);
+
+        return repository.save(updatedPcCase);
     }
 
     @Override

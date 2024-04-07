@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class SsdService extends BaseService<SSD, SsdRepository> {
@@ -21,19 +20,17 @@ public class SsdService extends BaseService<SSD, SsdRepository> {
         return entity.id();
     }
 
-    public void attachPhoto(String id, String photoUrl) {
-        Optional<SSD> ssd = repository.findById(id);
-        if (ssd.isPresent()) {
-            SSD currSsd = ssd.get();
-            List<String> photos = ssd.get().ssdPhotos();
+    @Override
+    @Transactional
+    public SSD attachPhoto(String id, String photoUrl) {
+        SSD currSSD = getById(id);
 
-            if (photos == null) {
-                photos = new ArrayList<>();
-            }
+        ArrayList<String> photos = new ArrayList<>(currSSD.ssdPhotos());
 
-            photos.add(photoUrl);
-            repository.save(currSsd.withPhotos(photos));
-        }
+        photos.addFirst(photoUrl);
+        SSD updatedSSD = currSSD.withPhotos(photos);
+
+        return repository.save(updatedSSD);
     }
 
     @Override

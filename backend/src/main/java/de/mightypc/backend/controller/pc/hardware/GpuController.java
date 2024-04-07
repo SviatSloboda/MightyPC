@@ -33,7 +33,7 @@ public class GpuController extends BaseController<GPU, GpuService> {
                 createGpu.hardwareSpec().rating()
         );
 
-        return service.save(new GPU(UUID.randomUUID().toString(), hardwareSpec, createGpu.performance(), createGpu.energyConsumption(), Collections.emptyList()));
+        return service.save(new GPU(UUID.randomUUID().toString(), hardwareSpec, createGpu.energyConsumption(), Collections.emptyList()));
     }
 
     @PostMapping("/all")
@@ -47,7 +47,7 @@ public class GpuController extends BaseController<GPU, GpuService> {
                     gpu.hardwareSpec().rating()
             );
 
-            service.save(new GPU(UUID.randomUUID().toString(), hardwareSpec, gpu.performance(), gpu.energyConsumption(), Collections.emptyList()));
+            service.save(new GPU(UUID.randomUUID().toString(), hardwareSpec, gpu.energyConsumption(), Collections.emptyList()));
         }
     }
 }

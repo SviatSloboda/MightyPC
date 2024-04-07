@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CpuService extends BaseService<CPU, CpuRepository> {
@@ -22,19 +21,17 @@ public class CpuService extends BaseService<CPU, CpuRepository> {
         return entity.id();
     }
 
-    public void attachPhoto(String id, String photoUrl) {
-        Optional<CPU> cpu = repository.findById(id);
-        if (cpu.isPresent()) {
-            CPU currCpu = cpu.get();
-            List<String> photos = cpu.get().cpuPhotos();
+    @Override
+    @Transactional
+    public CPU attachPhoto(String id, String photoUrl) {
+        CPU currCpu = getById(id);
 
-            if (photos == null) {
-                photos = new ArrayList<>();
-            }
+        ArrayList<String> photos = new ArrayList<>(currCpu.cpuPhotos());
 
-            photos.addFirst(photoUrl);
-            repository.save(currCpu.withPhotos(photos));
-        }
+        photos.addFirst(photoUrl);
+        CPU updatedCpu = currCpu.withPhotos(photos);
+
+        return repository.save(updatedCpu);
     }
 
     @Override
@@ -54,6 +51,7 @@ public class CpuService extends BaseService<CPU, CpuRepository> {
         return hashMap;
     }
 
+    @Transactional(readOnly = true)
     public String getSocketOfCpuById(String cpuId) {
         return getById(cpuId).socket();
     }

@@ -1,6 +1,5 @@
 package de.mightypc.backend.service.pc.hardware;
 
-import de.mightypc.backend.model.pc.specs.CPU;
 import de.mightypc.backend.model.pc.specs.Motherboard;
 import de.mightypc.backend.repository.pc.hardware.MotherboardRepository;
 import org.springframework.stereotype.Service;
@@ -11,7 +10,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class MotherboardService extends BaseService<Motherboard, MotherboardRepository> {
@@ -24,20 +22,17 @@ public class MotherboardService extends BaseService<Motherboard, MotherboardRepo
         return entity.id();
     }
 
-    public void attachPhoto(String id, String photoUrl) {
-        Optional<Motherboard> motherboard = repository.findById(id);
+    @Override
+    @Transactional
+    public Motherboard attachPhoto(String id, String photoUrl) {
+        Motherboard currMotherboard = getById(id);
 
-        if (motherboard.isPresent()) {
-            Motherboard presentWorkout = motherboard.get();
-            List<String> photos = motherboard.get().motherboardPhotos();
+        ArrayList<String> photos = new ArrayList<>(currMotherboard.motherboardPhotos());
 
-            if (photos == null) {
-                photos = new ArrayList<>();
-            }
+        photos.addFirst(photoUrl);
+        Motherboard updatedMotherboard = currMotherboard.withPhotos(photos);
 
-            photos.addFirst(photoUrl);
-            repository.save(presentWorkout.withPhotos(photos));
-        }
+        return repository.save(updatedMotherboard);
     }
 
     @Transactional(readOnly = true)

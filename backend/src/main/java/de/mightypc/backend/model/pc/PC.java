@@ -13,17 +13,18 @@ public record PC(
         @Id String id,
         HardwareSpec hardwareSpec,
         Specs specs,
+        int energyConsumption,
         List<String> photos
 ) {
-    public PC(String id, HardwareSpec hardwareSpec, Specs specs) {
-        this(id, hardwareSpec, specs, new ArrayList<>(Collections.emptyList()));
+    public PC(String id, HardwareSpec hardwareSpec, Specs specs, int energyConsumption) {
+        this(id, hardwareSpec, specs, energyConsumption, new ArrayList<>(Collections.emptyList()));
     }
 
-    public PC(HardwareSpec hardwareSpec, Specs specs) {
-        this(UUID.randomUUID().toString(), hardwareSpec, specs);
+    public PC(HardwareSpec hardwareSpec, Specs specs, int energyConsumption) {
+        this(UUID.randomUUID().toString(), hardwareSpec, specs, energyConsumption);
     }
 
     public PC withPhotos(List<String> allPhotos) {
-        return new PC(id(), hardwareSpec(), specs(), allPhotos);
+        return new PC(id(), hardwareSpec(), specs(), energyConsumption(), allPhotos);
     }
 }

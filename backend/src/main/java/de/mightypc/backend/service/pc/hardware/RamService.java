@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class RamService extends BaseService<RAM, RamRepository> {
@@ -21,21 +20,18 @@ public class RamService extends BaseService<RAM, RamRepository> {
         return entity.id();
     }
 
-    public void attachPhoto(String id, String photoUrl) {
-        Optional<RAM> ram = repository.findById(id);
-        if (ram.isPresent()) {
-            RAM currRam = ram.get();
-            List<String> photos = ram.get().ramPhotos();
+    @Override
+    @Transactional
+    public RAM attachPhoto(String id, String photoUrl) {
+        RAM currRAM = getById(id);
 
-            if (photos == null) {
-                photos = new ArrayList<>();
-            }
+        ArrayList<String> photos = new ArrayList<>(currRAM.ramPhotos());
 
-            photos.addFirst(photoUrl);
-            repository.save(currRam.withPhotos(photos));
-        }
+        photos.addFirst(photoUrl);
+        RAM updatedRAM = currRAM.withPhotos(photos);
+
+        return repository.save(updatedRAM);
     }
-
 
     @Override
     @Transactional(readOnly = true)

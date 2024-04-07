@@ -42,7 +42,9 @@ public class ChatGptService {
                          "\nIn your configuration you must use all 8 components!!! Do not jump over any!" +
                          "\nOrder of ids must be the same, as in object, that i have gave you higher" +
                          "\nDO NOT ADD ANY COMMENTS OR EXPLANATIONS AT ALL!!!!!!!!!!" +
-                         "\nAnalyze really profoundly, which configuration would match for most for provided values"
+                         "\nAnalyze really profoundly, which configuration would match for most for provided values" +
+                         "\n Be careful by choosing Motherboards, they must match socket of cpu." +
+                         "\n Be careful by choosing PowerSupplies, they must match energy consumption of all entities"
                         )
                 ))
                 .retrieve()

@@ -56,7 +56,14 @@ public class WorkstationService extends PcBaseService<Workstation, WorkstationRe
                 createWorkstation.hardwareSpec().rating()
         );
 
-        return workstationRepository.save(new Workstation(hardwareSpec, specs, createWorkstation.cpuNumber(), createWorkstation.gpuNumber()));
+        return workstationRepository.save(
+                new Workstation(
+                        hardwareSpec,
+                        specs,
+                        createWorkstation.cpuNumber(),
+                        createWorkstation.gpuNumber(),
+                        calculateEnergyConsumptionOfPC(createWorkstation.cpuNumber(), createWorkstation.gpuNumber(), specs)
+                ));
     }
 
     @Transactional
@@ -73,7 +80,13 @@ public class WorkstationService extends PcBaseService<Workstation, WorkstationRe
                     createWorkstation.hardwareSpec().rating()
             );
 
-            Workstation workstation = new Workstation(hardwareSpec, specs, createWorkstation.cpuNumber(), createWorkstation.gpuNumber());
+            Workstation workstation = new Workstation(
+                    hardwareSpec,
+                    specs,
+                    createWorkstation.cpuNumber(),
+                    createWorkstation.gpuNumber(),
+                    calculateEnergyConsumptionOfPC(createWorkstation.cpuNumber(), createWorkstation.gpuNumber(), specs)
+            );
             workStationsToSave.add(workstation);
         }
 
@@ -106,6 +119,7 @@ public class WorkstationService extends PcBaseService<Workstation, WorkstationRe
                 ),
                 workstation.cpuNumber(),
                 workstation.gpuNumber(),
+                workstation.energyConsumption(),
                 workstation.photos()
         );
     }
@@ -168,10 +182,28 @@ public class WorkstationService extends PcBaseService<Workstation, WorkstationRe
                 specs,
                 workstationResponse.cpuNumber(),
                 workstationResponse.gpuNumber(),
+                workstationResponse.energyConsumption(),
                 workstationResponse.photos()
         );
 
         workstationRepository.save(workstation);
+    }
+
+    public int calculateEnergyConsumptionOfPC(int cpuNumber, int gpuNumber, Specs specs) {
+        int totalConsumption = (specs.cpu().energyConsumption() * cpuNumber) +
+                               (specs.gpu().energyConsumption() * gpuNumber) +
+                               specs.ssd().energyConsumption() +
+                               specs.hdd().energyConsumption() +
+                               specs.motherboard().energyConsumption() +
+                               specs.ram().energyConsumption() +
+                               specs.gpu().energyConsumption();
+
+        int remainder = totalConsumption % 50;
+        if (remainder == 0) {
+            return totalConsumption;
+        }
+
+        return totalConsumption + 50 - remainder;
     }
 
     @Transactional(readOnly = true)
