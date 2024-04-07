@@ -73,7 +73,7 @@ export default function GpuCharacteristics() {
         const payload = {
             id: gpu?.id, hardwareSpec: {
                 name: updatedName, description: updatedDescription, price: updatedPrice, rating: updatedRating,
-            }, performance: gpu?.performance, energyConsumption: gpu?.energyConsumption, gpuPhotos: gpu?.gpuPhotos
+            }, energyConsumption: gpu?.energyConsumption, gpuPhotos: gpu?.gpuPhotos
         };
         axios.put(`/api/hardware/gpu`, payload)
             .then(response => {

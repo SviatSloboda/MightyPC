@@ -77,7 +77,6 @@ export default function CpuCharacteristics() {
             hardwareSpec: {
                 name: updatedName, description: updatedDescription, price: updatedPrice, rating: updatedRating,
             },
-            performance: cpu?.performance,
             energyConsumption: cpu?.energyConsumption,
             socket: updatedSocket,
             cpuPhotos: cpu?.cpuPhotos

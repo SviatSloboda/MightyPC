@@ -21,7 +21,6 @@ export default function CpuPage() {
     const [socket, setSocket] = useState("");
     const [price, setPrice] = useState("");
     const [rating, setRating] = useState(0);
-    const [performance, setPerformance] = useState(0);
     const [energyConsumption, setEnergyConsumption] = useState(0);
     const navigate = useNavigate();
     const {user, isSuperUser} = useAuth();
@@ -49,7 +48,7 @@ export default function CpuPage() {
         const payload = {
             hardwareSpec: {
                 name, description, price, rating,
-            }, performance, energyConsumption, socket
+            }, energyConsumption, socket
         };
         axios.post('/api/hardware/cpu', payload)
             .then(response => {
@@ -106,11 +105,6 @@ export default function CpuPage() {
                 <label htmlFor="modal-rating" className="modal__form-label">Rating:</label>
                 <input id="modal-rating" className="modal__input" type="number" value={rating}
                        onChange={(e) => setRating(parseFloat(e.target.value))} min="0" max="5" step="0.1" required/>
-            </div>
-            <div className="modal__form-group">
-                <label htmlFor="modal-performance" className="modal__form-label">Performance:</label>
-                <input id="modal-performance" className="modal__input" type="number" value={performance}
-                       onChange={(e) => setPerformance(parseInt(e.target.value, 10))} min="0" required/>
             </div>
             <div className="modal__form-group">
                 <label htmlFor="modal-energyConsumption" className="modal__form-label">Energy Consumption:</label>
