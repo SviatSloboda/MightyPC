@@ -30,7 +30,7 @@ public class GpuUploadController {
     @ResponseStatus(HttpStatus.CREATED)
     public String uploadImage(@RequestPart(name = "file") MultipartFile file,
                               @PathVariable String id) throws IOException {
-        String photoUrl = cloudinaryService.uploadFile(file, id);
+        String photoUrl = cloudinaryService.uploadFile(file);
         gpuService.attachPhoto(id, photoUrl);
         return photoUrl;
     }

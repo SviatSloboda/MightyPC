@@ -30,7 +30,7 @@ public class MotherboardUploadController {
     @ResponseStatus(HttpStatus.CREATED)
     public String uploadImage(@RequestPart(name = "file") MultipartFile file,
                               @PathVariable String id) throws IOException {
-        String photoUrl = cloudinaryService.uploadFile(file, id);
+        String photoUrl = cloudinaryService.uploadFile(file);
         motherboardService.attachPhoto(id, photoUrl);
         return photoUrl;
     }

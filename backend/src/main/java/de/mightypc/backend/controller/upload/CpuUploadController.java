@@ -31,7 +31,7 @@ public class CpuUploadController {
     public String uploadImage(@RequestPart(name = "file") MultipartFile file,
                               @PathVariable String id) throws IOException {
 
-        String photoUrl = cloudinaryService.uploadFile(file, id);
+        String photoUrl = cloudinaryService.uploadFile(file);
         cpuService.attachPhoto(id, photoUrl);
 
         return photoUrl;

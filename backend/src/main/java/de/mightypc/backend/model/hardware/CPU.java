@@ -24,7 +24,7 @@ public record CPU(
         this(UUID.randomUUID().toString(), hardwareSpec, energyConsumption, socket, new ArrayList<>());
     }
 
-    public CPU withPhotos(List<String> allPhotos) {
+    public CPU withPhotos(List <String> allPhotos) {
         return new CPU(id(), hardwareSpec(), energyConsumption(), socket(), allPhotos);
     }
 }

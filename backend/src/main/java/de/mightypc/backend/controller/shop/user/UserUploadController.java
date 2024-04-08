@@ -31,7 +31,7 @@ public class UserUploadController {
     @ResponseStatus(HttpStatus.CREATED)
     public String uploadImage(@RequestPart(name = "file") MultipartFile file,
                               @PathVariable String userId) throws IOException {
-        String photoUrl = cloudinaryService.uploadFile(file, userId);
+        String photoUrl = cloudinaryService.uploadFile(file);
         userService.attachPhoto(userId, photoUrl);
         return photoUrl;
     }

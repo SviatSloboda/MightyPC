@@ -9,5 +9,6 @@ export interface Workstation {
     specsNames: SpecsNames;
     cpuNumber: number,
     gpuNumber: number,
+    energyConsumption: number;
     photos?: string[];
 }

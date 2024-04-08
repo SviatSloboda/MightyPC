@@ -13,5 +13,4 @@ public record UserPC(
         Specs specs,
         List<String> photos
 ) {
-
 }

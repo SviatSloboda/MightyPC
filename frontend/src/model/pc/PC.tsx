@@ -7,5 +7,6 @@ export interface PC {
     hardwareSpec: HardwareSpec;
     specsIds: SpecsIds;
     specsNames: SpecsNames;
+    energyConsumption: number;
     photos?: string[];
 }
