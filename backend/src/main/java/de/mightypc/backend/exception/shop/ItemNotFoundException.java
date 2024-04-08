@@ -1,11 +1,7 @@
 package de.mightypc.backend.exception.shop;
 
-public class ItemNotFoundException extends RuntimeException{
+public class ItemNotFoundException extends RuntimeException {
     public ItemNotFoundException(String message) {
         super(message);
-    }
-
-    public ItemNotFoundException(String message, Throwable cause) {
-        super(message, cause);
     }
 }

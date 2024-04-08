@@ -34,7 +34,7 @@ public class SecurityConfig {
                     c.defaultSuccessUrl("http://localhost:5173", true);
                 }
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         }).logout(logout -> logout
                 .logoutUrl("/api/logout")

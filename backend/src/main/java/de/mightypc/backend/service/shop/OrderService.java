@@ -7,6 +7,7 @@ import de.mightypc.backend.model.shop.order.OrderStatus;
 import de.mightypc.backend.model.shop.user.User;
 import de.mightypc.backend.model.shop.order.OrderStatusRequest;
 import de.mightypc.backend.repository.shop.UserRepository;
+import de.mightypc.backend.service.shop.user.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,7 +75,7 @@ public class OrderService {
     public void updateStatus(String userId, String orderId, OrderStatusRequest statusRequest) {
         User user = userService.getUserById(userId);
 
-        Order order = this.getOrderById(userId,orderId);
+        Order order = this.getOrderById(userId, orderId);
 
         user.getOrders().remove(order);
 
@@ -94,4 +95,3 @@ public class OrderService {
         userRepository.save(user);
     }
 }
-

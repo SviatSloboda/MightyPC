@@ -1,7 +1,7 @@
 package de.mightypc.backend.model.pc;
 
-import de.mightypc.backend.model.pc.specs.Specs;
-import de.mightypc.backend.model.pc.specs.HardwareSpec;
+import de.mightypc.backend.model.hardware.HardwareSpec;
+import de.mightypc.backend.model.hardware.Specs;
 import org.springframework.data.annotation.Id;
 
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ public record Workstation(
         this(id, hardwareSpec, specs, cpuNumber, gpuNumber, energyConsumption, new ArrayList<>(Collections.emptyList()));
     }
 
-    public Workstation(HardwareSpec hardwareSpec, Specs specs, int cpuNumber, int gpuNumber, int energyConsumption){
+    public Workstation(HardwareSpec hardwareSpec, Specs specs, int cpuNumber, int gpuNumber, int energyConsumption) {
         this(UUID.randomUUID().toString(), hardwareSpec, specs, cpuNumber, gpuNumber, energyConsumption);
     }
 

@@ -1,7 +1,7 @@
 package de.mightypc.backend.model.pc;
 
-import de.mightypc.backend.model.pc.specs.Specs;
-import de.mightypc.backend.model.pc.specs.HardwareSpec;
+import de.mightypc.backend.model.hardware.HardwareSpec;
+import de.mightypc.backend.model.hardware.Specs;
 import org.springframework.data.annotation.Id;
 
 import java.util.ArrayList;

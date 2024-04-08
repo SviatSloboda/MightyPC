@@ -1,6 +1,7 @@
 package de.mightypc.backend.exception.shop;
 
 import de.mightypc.backend.exception.ErrorResponse;
+import de.mightypc.backend.exception.shop.user.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

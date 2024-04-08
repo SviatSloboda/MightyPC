@@ -1,8 +1,9 @@
 package de.mightypc.backend.model.pc.createpc;
 
-import de.mightypc.backend.model.pc.specs.HardwareSpec;
-import de.mightypc.backend.model.pc.specs.SpecsIds;
-import de.mightypc.backend.model.pc.specs.SpecsNames;
+import de.mightypc.backend.model.hardware.HardwareSpec;
+import de.mightypc.backend.model.hardware.SpecsIds;
+import de.mightypc.backend.model.hardware.SpecsNames;
+
 import org.springframework.data.annotation.Id;
 
 import java.util.List;

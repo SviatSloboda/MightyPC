@@ -1,9 +1,10 @@
 package de.mightypc.backend.service.pc.hardware;
 
 import de.mightypc.backend.exception.pc.HardwareNotFoundException;
-import de.mightypc.backend.model.pc.specs.HDD;
-import de.mightypc.backend.model.pc.specs.HardwareSpec;
-import de.mightypc.backend.repository.pc.hardware.HddRepository;
+import de.mightypc.backend.model.hardware.HDD;
+import de.mightypc.backend.model.hardware.HardwareSpec;
+import de.mightypc.backend.repository.hardware.HddRepository;
+import de.mightypc.backend.service.hardware.HddService;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

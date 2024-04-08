@@ -23,4 +23,3 @@ public class Order {
         this(UUID.randomUUID().toString(), items, completePrice, orderStatus);
     }
 }
-

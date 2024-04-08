@@ -2,7 +2,7 @@ package de.mightypc.backend.controller.pc;
 
 import de.mightypc.backend.model.pc.createpc.CreatePC;
 import de.mightypc.backend.model.pc.createpc.PcResponse;
-import de.mightypc.backend.service.pc.configurator.UserPcsService;
+import de.mightypc.backend.service.configurator.UserPcsService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -30,7 +30,7 @@ public class UserPcsController {
     }
 
     @GetMapping("/{pcId}")
-    public PcResponse getPcById(@PathVariable String userId, @PathVariable String pcId){
+    public PcResponse getPcById(@PathVariable String userId, @PathVariable String pcId) {
         return userPcsService.getPcById(userId, pcId);
     }
 

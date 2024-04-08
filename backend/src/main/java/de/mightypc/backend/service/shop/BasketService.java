@@ -4,6 +4,7 @@ import de.mightypc.backend.exception.shop.ItemNotFoundException;
 import de.mightypc.backend.model.shop.order.Item;
 import de.mightypc.backend.model.shop.user.User;
 import de.mightypc.backend.repository.shop.UserRepository;
+import de.mightypc.backend.service.shop.user.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -1,9 +1,10 @@
 package de.mightypc.backend.service.pc.hardware;
 
 import de.mightypc.backend.exception.pc.HardwareNotFoundException;
-import de.mightypc.backend.model.pc.specs.CPU;
-import de.mightypc.backend.model.pc.specs.HardwareSpec;
-import de.mightypc.backend.repository.pc.hardware.CpuRepository;
+import de.mightypc.backend.model.hardware.CPU;
+import de.mightypc.backend.model.hardware.HardwareSpec;
+import de.mightypc.backend.repository.hardware.CpuRepository;
+import de.mightypc.backend.service.hardware.CpuService;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -96,8 +97,10 @@ class CpuServiceTest extends BaseServiceTest<CPU, CpuService, CpuRepository> {
     @Override
     @Test
     void attachPhoto_shouldThrowHardwareNotFoundException_whenEntityDoesNotExistInRepository() {
+        // Arrange
         when(mockCpuRepository.findById("testId")).thenReturn(Optional.empty());
 
+        // Act & Assert
         assertThrows(HardwareNotFoundException.class, () -> cpuService.attachPhoto("testId", "TEST"));
         verify(mockCpuRepository).findById("testId");
     }

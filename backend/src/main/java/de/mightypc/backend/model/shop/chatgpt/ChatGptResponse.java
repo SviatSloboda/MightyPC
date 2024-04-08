@@ -6,6 +6,6 @@ public record ChatGptResponse(
         List<ChatGptChoice> choices
 ) {
     public String text() {
-        return choices.get(0).message().content();
+        return choices.getFirst().message().content();
     }
 }

@@ -1,8 +1,15 @@
 package de.mightypc.backend.service.pc;
 
-import de.mightypc.backend.model.pc.specs.Specs;
-import de.mightypc.backend.model.pc.specs.SpecsIds;
-import de.mightypc.backend.service.pc.hardware.*;
+import de.mightypc.backend.model.hardware.Specs;
+import de.mightypc.backend.model.hardware.SpecsIds;
+import de.mightypc.backend.service.hardware.CpuService;
+import de.mightypc.backend.service.hardware.GpuService;
+import de.mightypc.backend.service.hardware.HddService;
+import de.mightypc.backend.service.hardware.MotherboardService;
+import de.mightypc.backend.service.hardware.PcCaseService;
+import de.mightypc.backend.service.hardware.PowerSupplyService;
+import de.mightypc.backend.service.hardware.RamService;
+import de.mightypc.backend.service.hardware.SsdService;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;

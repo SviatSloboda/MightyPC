@@ -47,7 +47,7 @@ public class BasketController {
     }
 
     @GetMapping("/price")
-    public BigDecimal getEntirePrice(@PathVariable String userId){
+    public BigDecimal getEntirePrice(@PathVariable String userId) {
         return basketService.getEntirePrice(userId);
     }
 }
