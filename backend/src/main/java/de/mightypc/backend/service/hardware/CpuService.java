@@ -22,6 +22,11 @@ public class CpuService extends BaseService<CPU, CpuRepository> {
     }
 
     @Override
+    protected String getNameOfEntity(CPU entity) {
+        return entity.hardwareSpec().name();
+    }
+
+    @Override
     @Transactional
     public CPU attachPhoto(String id, String photoUrl) {
         CPU currCpu = getById(id);

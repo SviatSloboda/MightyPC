@@ -187,6 +187,7 @@ export default function PcCharacteristics() {
                 </div>
 
                 <p className="product-characteristics__description">{pc?.hardwareSpec.description}</p>
+                <p className="product-characteristics__description">Energy consumption: {pc?.energyConsumption}W</p>
 
                 <div className="pc-details">
                     <p className="pc-specification" data-label="Cpu:"><span>{pc?.specsNames.cpuName}</span></p>
@@ -201,6 +202,7 @@ export default function PcCharacteristics() {
                     </p>
                     <p className="pc-specification" data-label="Psu:"><span>{pc?.specsNames.powerSupplyName}</span>
                     </p>
+
                 </div>
             </div>)}
 

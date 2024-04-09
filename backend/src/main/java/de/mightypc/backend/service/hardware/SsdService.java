@@ -21,6 +21,11 @@ public class SsdService extends BaseService<SSD, SsdRepository> {
     }
 
     @Override
+    protected String getNameOfEntity(SSD entity) {
+        return entity.hardwareSpec().name();
+    }
+
+    @Override
     @Transactional
     public SSD attachPhoto(String id, String photoUrl) {
         SSD currSSD = getById(id);

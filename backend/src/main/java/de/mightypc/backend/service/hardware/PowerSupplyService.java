@@ -22,6 +22,11 @@ public class PowerSupplyService extends BaseService<PowerSupply, PowerSupplyRepo
     }
 
     @Override
+    protected String getNameOfEntity(PowerSupply entity) {
+        return entity.hardwareSpec().name();
+    }
+
+    @Override
     @Transactional
     public PowerSupply attachPhoto(String id, String photoUrl) {
         PowerSupply currPowerSupply = getById(id);

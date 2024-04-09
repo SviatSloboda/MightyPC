@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback, ChangeEvent, FormEvent} from 'react';
+import {useState, useEffect, useCallback, ChangeEvent, FormEvent} from 'react';
 import axios from 'axios';
 import {useAuth} from "../../contexts/AuthContext";
 import {HardwareSpec} from "../../model/pc/hardware/HardwareSpec";
@@ -10,7 +10,7 @@ import {login} from "../../contexts/authUtils.ts";
 import {ToastContainer, toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {useNavigate} from "react-router-dom";
-
+import {SpecsIdsForEnergyConsumption} from "../../model/pc/SpecsIdsForEnergyConsumption.tsx";
 
 interface ConfiguratorComponents {
     componentIdsAndNames: Array<Map<string, string>>;
@@ -21,7 +21,7 @@ interface SelectOption {
     displayValue: string;
 }
 
-const ConfiguratorPage: React.FC = () => {
+export default function ConfiguratorPage() {
     const [components, setComponents] = useState<SelectOption[][]>([]);
     const [hardwareSpec, setHardwareSpec] = useState<HardwareSpec>({name: '', description: '', price: '0', rating: 0});
     const [createSpecs, setCreateSpecs] = useState<SpecsIds>({
@@ -99,16 +99,13 @@ const ConfiguratorPage: React.FC = () => {
                 try {
                     const cpuSocketResponse = await axios.get<string>(`/api/hardware/cpu/socket/${createSpecs.cpuId}`);
                     const cpuSocket = cpuSocketResponse.data;
-                    const response = await axios.get<{ [key: string]: string }>(`/api/configurator/motherboard/socket/${cpuSocket}`);
+                    const response = await axios.get<{
+                        [key: string]: string
+                    }>(`/api/configurator/motherboard/socket/${cpuSocket}`);
                     const motherboardOptions: SelectOption[] = Object.entries(response.data).map(([id, name]) => ({
-                        id,
-                        displayValue: name,
+                        id, displayValue: name,
                     }));
-                    setComponents((prevComponents) =>
-                        prevComponents.map((componentCategory, index) =>
-                            Object.keys(createSpecs)[index] === 'motherboardId' ? motherboardOptions : componentCategory,
-                        ),
-                    );
+                    setComponents((prevComponents) => prevComponents.map((componentCategory, index) => Object.keys(createSpecs)[index] === 'motherboardId' ? motherboardOptions : componentCategory,),);
                 } catch (error) {
                     console.error('Failed to fetch motherboards:', error);
                 }
@@ -118,7 +115,36 @@ const ConfiguratorPage: React.FC = () => {
         fetchMotherboards();
     }, [createSpecs.cpuId]);
 
+    useEffect(() => {
+        const fetchPowerSupplies = async () => {
+            if (createSpecs.powerSupplyId) {
+                try {
+                    const payload: SpecsIdsForEnergyConsumption = {
+                        cpuId: createSpecs.cpuId,
+                        gpuId: createSpecs.gpuId,
+                        motherboardId: createSpecs.motherboardId,
+                        ramId: createSpecs.ramId,
+                        ssdId: createSpecs.hddId,
+                        hddId: createSpecs.hddId,
+                    }
 
+                    const response = await axios.post<{
+                        [key: string]: string
+                    }>(`/api/pc/configuration/calculate-energy-consumption`, payload);
+
+                    const powerSupplyOptions: SelectOption[] = Object.entries(response.data).map(([id, name]) => ({
+                        id, displayValue: name,
+                    }));
+
+                    setComponents((prevComponents) => prevComponents.map((componentCategory, index) => Object.keys(createSpecs)[index] === 'powerSupplyId' ? powerSupplyOptions : componentCategory,),);
+                } catch (error) {
+                    console.error('Failed to fetch power supplies!:', error);
+                }
+            }
+        };
+
+        fetchPowerSupplies();
+    }, [createSpecs.cpuId, createSpecs, createSpecs.hddId, hardwareSpec, user]);
 
     return (<>
         <div className="pc-configurator">
@@ -151,6 +177,4 @@ const ConfiguratorPage: React.FC = () => {
         <LoginModal isOpen={isLoginModalOpen} onLogin={login} onClose={hideLoginModal}/>
         <ToastContainer position="top-center"/>
     </>);
-};
-
-export default ConfiguratorPage;
+}

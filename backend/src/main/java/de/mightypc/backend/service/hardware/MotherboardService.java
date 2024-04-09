@@ -23,6 +23,11 @@ public class MotherboardService extends BaseService<Motherboard, MotherboardRepo
     }
 
     @Override
+    protected String getNameOfEntity(Motherboard entity) {
+        return entity.hardwareSpec().name();
+    }
+
+    @Override
     @Transactional
     public Motherboard attachPhoto(String id, String photoUrl) {
         Motherboard currMotherboard = getById(id);

@@ -22,6 +22,11 @@ public class HddService extends BaseService<HDD, HddRepository> {
     }
 
     @Override
+    protected String getNameOfEntity(HDD entity) {
+        return entity.hardwareSpec().name();
+    }
+
+    @Override
     @Transactional
     public HDD attachPhoto(String id, String photoUrl) {
         HDD currHdd = getById(id);

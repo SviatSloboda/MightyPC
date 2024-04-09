@@ -1,6 +1,8 @@
 package de.mightypc.backend.service.pc;
 
 import de.mightypc.backend.exception.pc.HardwareNotFoundException;
+import de.mightypc.backend.model.configurator.SpecsForEnergyConsumption;
+import de.mightypc.backend.model.configurator.SpecsIdsForEnergyConsumption;
 import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.model.hardware.Specs;
 import de.mightypc.backend.model.hardware.SpecsIds;
@@ -30,7 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
 @Service
 public class PcService extends PcBaseService<PC, PcRepository> {
     private final PcRepository pcRepository;
@@ -55,7 +56,18 @@ public class PcService extends PcBaseService<PC, PcRepository> {
 
         HardwareSpec hardwareSpec = new HardwareSpec(createPC.hardwareSpec().name(), createPC.hardwareSpec().description(), getTotalPrice(specs), createPC.hardwareSpec().rating());
 
-        return new PC(hardwareSpec, specs, calculateEnergyConsumptionOfPC(specs));
+        return new PC(hardwareSpec, specs,
+                calculateEnergyConsumptionOfPc(
+                        new SpecsForEnergyConsumption(
+                                specs.cpu(),
+                                specs.gpu(),
+                                specs.motherboard(),
+                                specs.ram(),
+                                specs.ssd(),
+                                specs.hdd()
+                        )
+                )
+        );
     }
 
     @Transactional
@@ -67,7 +79,17 @@ public class PcService extends PcBaseService<PC, PcRepository> {
 
             HardwareSpec hardwareSpec = new HardwareSpec(createPC.hardwareSpec().name(), createPC.hardwareSpec().description(), getTotalPrice(specs), createPC.hardwareSpec().rating());
 
-            PC pc = new PC(hardwareSpec, specs, calculateEnergyConsumptionOfPC(specs));
+            PC pc = new PC(hardwareSpec, specs,
+                    calculateEnergyConsumptionOfPc(
+                            new SpecsForEnergyConsumption(
+                                    specs.cpu(),
+                                    specs.gpu(),
+                                    specs.motherboard(),
+                                    specs.ram(),
+                                    specs.ssd(),
+                                    specs.hdd()
+                            )
+                    ));
             pcsToSave.add(pc);
         }
 
@@ -138,7 +160,17 @@ public class PcService extends PcBaseService<PC, PcRepository> {
                 pcResponse.hardwareSpec().rating()
         );
 
-        PC pc = new PC(pcResponse.id(), hardwareSpec, specs,calculateEnergyConsumptionOfPC(specs), pcResponse.photos());
+        PC pc = new PC(pcResponse.id(), hardwareSpec, specs,
+                calculateEnergyConsumptionOfPc(
+                        new SpecsForEnergyConsumption(
+                                specs.cpu(),
+                                specs.gpu(),
+                                specs.motherboard(),
+                                specs.ram(),
+                                specs.ssd(),
+                                specs.hdd()
+                        )
+                ), pcResponse.photos());
 
         pcRepository.save(pc);
     }
@@ -163,21 +195,26 @@ public class PcService extends PcBaseService<PC, PcRepository> {
     public Page<PcResponse> getAllByPage(Pageable pageable) {
         Page<PC> page = pcRepository.findAll(pageable);
 
-        if (page.isEmpty()) throw new HardwareNotFoundException("No Workstations found.");
+        if (page.isEmpty()) throw new HardwareNotFoundException("No Pcs found.");
 
         List<PcResponse> responses = page.getContent().stream().map(this::createPcResponse).toList();
 
         return new PageImpl<>(responses, pageable, page.getTotalElements());
     }
 
-    public int calculateEnergyConsumptionOfPC(Specs specs) {
+    public int calculateEnergyConsumptionWithConvertingSpecsIdsIntoSpecs(SpecsIdsForEnergyConsumption specsIdsForEnergyConsumption) {
+        SpecsForEnergyConsumption specsForEnergyConsumption = getSpecsForConfigurator(specsIdsForEnergyConsumption);
+
+        return calculateEnergyConsumptionOfPc(specsForEnergyConsumption);
+    }
+
+    private int calculateEnergyConsumptionOfPc(SpecsForEnergyConsumption specs) {
         int totalConsumption = specs.cpu().energyConsumption() +
                                specs.gpu().energyConsumption() +
                                specs.ssd().energyConsumption() +
                                specs.hdd().energyConsumption() +
                                specs.motherboard().energyConsumption() +
-                               specs.ram().energyConsumption() +
-                               specs.gpu().energyConsumption();
+                               specs.ram().energyConsumption();
 
         int remainder = totalConsumption % 50;
         if (remainder == 0) {

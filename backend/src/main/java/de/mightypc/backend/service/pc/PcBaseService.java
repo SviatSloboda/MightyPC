@@ -1,5 +1,7 @@
 package de.mightypc.backend.service.pc;
 
+import de.mightypc.backend.model.configurator.SpecsForEnergyConsumption;
+import de.mightypc.backend.model.configurator.SpecsIdsForEnergyConsumption;
 import de.mightypc.backend.model.hardware.Specs;
 import de.mightypc.backend.model.hardware.SpecsIds;
 import de.mightypc.backend.service.hardware.CpuService;
@@ -58,6 +60,21 @@ public abstract class PcBaseService<T, R extends MongoRepository<T, String>> {
                 hddService.getById(specsIds.hddId()),
                 powerSupplyService.getById(specsIds.powerSupplyId()),
                 pcCaseService.getById(specsIds.pcCaseId())
+        );
+    }
+
+    public SpecsForEnergyConsumption getSpecsForConfigurator(SpecsIdsForEnergyConsumption specsIdsForEnergyConsumption) {
+        if (specsIdsForEnergyConsumption == null) {
+            throw new IllegalArgumentException("specsIdsForEnergyConsumption cannot be null");
+        }
+
+        return new SpecsForEnergyConsumption(
+                cpuService.getById(specsIdsForEnergyConsumption.cpuId()),
+                gpuService.getById(specsIdsForEnergyConsumption.gpuId()),
+                motherboardService.getById(specsIdsForEnergyConsumption.motherboardId()),
+                ramService.getById(specsIdsForEnergyConsumption.ramId()),
+                ssdService.getById(specsIdsForEnergyConsumption.ssdId()),
+                hddService.getById(specsIdsForEnergyConsumption.hddId())
         );
     }
 

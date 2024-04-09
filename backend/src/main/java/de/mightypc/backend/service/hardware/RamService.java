@@ -21,6 +21,11 @@ public class RamService extends BaseService<RAM, RamRepository> {
     }
 
     @Override
+    protected String getNameOfEntity(RAM entity) {
+        return entity.hardwareSpec().name();
+    }
+
+    @Override
     @Transactional
     public RAM attachPhoto(String id, String photoUrl) {
         RAM currRAM = getById(id);

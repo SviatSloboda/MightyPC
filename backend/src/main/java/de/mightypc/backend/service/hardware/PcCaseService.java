@@ -21,6 +21,11 @@ public class PcCaseService extends BaseService<PcCase, PcCaseRepository> {
     }
 
     @Override
+    protected String getNameOfEntity(PcCase entity) {
+        return entity.hardwareSpec().name();
+    }
+
+    @Override
     @Transactional
     public PcCase attachPhoto(String id, String photoUrl) {
         PcCase currPcCase = getById(id);

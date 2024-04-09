@@ -20,6 +20,11 @@ public class GpuService extends BaseService<GPU, GpuRepository> {
         return entity.id();
     }
 
+    @Override
+    protected String getNameOfEntity(GPU entity) {
+        return entity.hardwareSpec().name();
+    }
+
     public GPU attachPhoto(String id, String photoUrl) {
         GPU currGpu = getById(id);
 

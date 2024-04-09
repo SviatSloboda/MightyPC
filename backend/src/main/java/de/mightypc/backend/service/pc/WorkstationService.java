@@ -62,7 +62,7 @@ public class WorkstationService extends PcBaseService<Workstation, WorkstationRe
                         specs,
                         createWorkstation.cpuNumber(),
                         createWorkstation.gpuNumber(),
-                        calculateEnergyConsumptionOfPC(createWorkstation.cpuNumber(), createWorkstation.gpuNumber(), specs)
+                        calculateEnergyConsumptionOfWorkstation(createWorkstation.cpuNumber(), createWorkstation.gpuNumber(), specs)
                 ));
     }
 
@@ -85,7 +85,7 @@ public class WorkstationService extends PcBaseService<Workstation, WorkstationRe
                     specs,
                     createWorkstation.cpuNumber(),
                     createWorkstation.gpuNumber(),
-                    calculateEnergyConsumptionOfPC(createWorkstation.cpuNumber(), createWorkstation.gpuNumber(), specs)
+                    calculateEnergyConsumptionOfWorkstation(createWorkstation.cpuNumber(), createWorkstation.gpuNumber(), specs)
             );
             workStationsToSave.add(workstation);
         }
@@ -189,15 +189,13 @@ public class WorkstationService extends PcBaseService<Workstation, WorkstationRe
         workstationRepository.save(workstation);
     }
 
-    public int calculateEnergyConsumptionOfPC(int cpuNumber, int gpuNumber, Specs specs) {
+    public int calculateEnergyConsumptionOfWorkstation(int cpuNumber, int gpuNumber, Specs specs) {
         int totalConsumption = (specs.cpu().energyConsumption() * cpuNumber) +
                                (specs.gpu().energyConsumption() * gpuNumber) +
                                specs.ssd().energyConsumption() +
                                specs.hdd().energyConsumption() +
                                specs.motherboard().energyConsumption() +
-                               specs.ram().energyConsumption() +
-                               specs.gpu().energyConsumption();
-
+                               specs.ram().energyConsumption();
         int remainder = totalConsumption % 50;
         if (remainder == 0) {
             return totalConsumption;

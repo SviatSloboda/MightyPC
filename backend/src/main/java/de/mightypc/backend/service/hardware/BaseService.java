@@ -61,7 +61,7 @@ public abstract class BaseService<T, R extends MongoRepository<T, String>> {
     }
 
     private String getNotFoundMessage(String id) {
-        return "Entity was not Found. Id of entity: " + id;
+        return "Entity: " + getNameOfEntity(getById(id)) + " was not found!!! Id of entity: " + id;
     }
 
     public abstract Map<String, String> getAllNamesWithPrices();
@@ -69,4 +69,6 @@ public abstract class BaseService<T, R extends MongoRepository<T, String>> {
     public abstract T attachPhoto(String id, String photoUrl);
 
     protected abstract String getId(T entity);
+
+    protected abstract String getNameOfEntity(T entity);
 }
