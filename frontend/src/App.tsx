@@ -71,7 +71,6 @@ export default function App() {
             <Route path="/try" element={<TryPage/>}/>
 
 
-
             <Route path="/basket" element={<BasketPage/>}/>
             <Route path="/order" element={<OrderPage/>}/>
             <Route path="/user" element={<ProfilePage/>}/>

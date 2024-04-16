@@ -77,8 +77,8 @@ export default function ProfilePage() {
 
             {isSuperUser() &&
                 <>
-                <h1 className="profile__email">You are super user! </h1>
-            </>}
+                    <h1 className="profile__email">You are super user! </h1>
+                </>}
 
         </div>
 

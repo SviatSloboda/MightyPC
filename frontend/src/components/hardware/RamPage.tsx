@@ -134,16 +134,6 @@ export default function RamPage() {
                 onAddToBasket={() => handleAddToBasket(ram)}
             />))}
         </div>
-
-        <div className="product-list">
-            {RAMs.map(ram => (<ProductBox
-                key={ram.id}
-                product={ram}
-                imgSrc={ram.ramPhotos && ram.ramPhotos.length > 0 ? ram.ramPhotos[0] : ramPhoto}
-                toCharacteristicsPage={() => navigate(`/hardware/ram/${ram.id}`)}
-                onAddToBasket={() => handleAddToBasket(ram)}
-            />))}
-        </div>
         <div className="product-list__pagination">
             {Array.from({length: totalPages}, (_, i) => (<button
                 key={i}

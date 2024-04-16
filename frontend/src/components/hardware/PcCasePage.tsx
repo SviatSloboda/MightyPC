@@ -123,15 +123,6 @@ export default function PcCasePage() {
             />))}
         </div>
 
-        <div className="product-list">
-            {PcCases.map(pcCase => (<ProductBox
-                key={pcCase.id}
-                product={pcCase}
-                imgSrc={pcCase.pcCasePhotos && pcCase.pcCasePhotos.length > 0 ? pcCase.pcCasePhotos[0] : pcCasePhoto}
-                toCharacteristicsPage={() => navigate(`/hardware/pc-case/${pcCase.id}`)}
-                onAddToBasket={() => handleAddToBasket(pcCase)}
-            />))}
-        </div>
         <div className="product-list__pagination">
             {Array.from({length: totalPages}, (_, i) => (<button
                 key={i}

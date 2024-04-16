@@ -1,13 +1,13 @@
-import { useCallback, useEffect, useState } from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import axios from 'axios';
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import pcPhoto from "../../assets/Pc.png";
-import { useAuth } from "../../contexts/AuthContext";
-import { Modal } from "react-bootstrap";
+import {useAuth} from "../../contexts/AuthContext";
+import {Modal} from "react-bootstrap";
 import ProductBox from "../hardware/utils/ProductBox";
 import useLoginModal from "../hardware/utils/useLoginModal";
 import LoginModal from "../hardware/utils/LoginModal";
-import { useModal } from "../hardware/utils/Modal";
+import {useModal} from "../hardware/utils/Modal";
 import {HardwareSpec} from "../../model/pc/hardware/HardwareSpec.tsx";
 import {SpecsIds} from "../../model/pc/SpecsIds.tsx";
 import {PC} from "../../model/pc/PC.tsx";
@@ -19,19 +19,19 @@ export default function PcsPage() {
     const [totalPages, setTotalPages] = useState(0);
     const pcsPerPage = 8;
     const [modalOpen, toggleModal] = useModal();
-    const [hardwareSpec, setHardwareSpec] = useState<HardwareSpec>({ name: '', description: '', price: '', rating: 0 });
+    const [hardwareSpec, setHardwareSpec] = useState<HardwareSpec>({name: '', description: '', price: '', rating: 0});
     const [createSpecs, setCreateSpecs] = useState<SpecsIds>({
         cpuId: '', gpuId: '', motherboardId: '', ramId: '', ssdId: '', hddId: '', powerSupplyId: '', pcCaseId: ''
     });
     const navigate = useNavigate();
-    const { user, isSuperUser } = useAuth();
-    const { isLoginModalOpen, showLoginModal, hideLoginModal } = useLoginModal();
+    const {user, isSuperUser} = useAuth();
+    const {isLoginModalOpen, showLoginModal, hideLoginModal} = useLoginModal();
 
     useEffect(() => {
         const fetchPCs = async () => {
             try {
                 const response = await axios.get(`/api/pc/page`, {
-                    params: { page: currentPage, size: pcsPerPage }
+                    params: {page: currentPage, size: pcsPerPage}
                 });
                 setPCs(response.data.content);
                 setTotalPages(response.data.totalPages);
@@ -111,7 +111,7 @@ export default function PcsPage() {
                             className="modal__input"
                             type="text"
                             value={hardwareSpec.name}
-                            onChange={(e) => setHardwareSpec({ ...hardwareSpec, name: e.target.value })}
+                            onChange={(e) => setHardwareSpec({...hardwareSpec, name: e.target.value})}
                             required
                         />
                     </div>
@@ -122,7 +122,7 @@ export default function PcsPage() {
                             className="modal__input"
                             type="text"
                             value={hardwareSpec.description}
-                            onChange={(e) => setHardwareSpec({ ...hardwareSpec, description: e.target.value })}
+                            onChange={(e) => setHardwareSpec({...hardwareSpec, description: e.target.value})}
                             required
                         />
                     </div>
@@ -133,7 +133,7 @@ export default function PcsPage() {
                             className="modal__input"
                             type="text"
                             value={hardwareSpec.price}
-                            onChange={(e) => setHardwareSpec({ ...hardwareSpec, price: e.target.value })}
+                            onChange={(e) => setHardwareSpec({...hardwareSpec, price: e.target.value})}
                             required
                         />
                     </div>
@@ -144,19 +144,20 @@ export default function PcsPage() {
                             className="modal__input"
                             type="number"
                             value={hardwareSpec.rating}
-                            onChange={(e) => setHardwareSpec({ ...hardwareSpec, rating: parseInt(e.target.value) })}
+                            onChange={(e) => setHardwareSpec({...hardwareSpec, rating: parseInt(e.target.value)})}
                             required
                         />
                     </div>
                     {Object.entries(createSpecs).map(([key, value]) => (
                         <div className="modal__form-group" key={key}>
-                            <label htmlFor={`modal-${key}`}>{key.charAt(0).toUpperCase() + key.slice(1).replace('Id', '')}:</label>
+                            <label
+                                htmlFor={`modal-${key}`}>{key.charAt(0).toUpperCase() + key.slice(1).replace('Id', '')}:</label>
                             <input
                                 id={`modal-${key}`}
                                 className="modal__input"
                                 type="text"
                                 value={value}
-                                onChange={(e) => setCreateSpecs({ ...createSpecs, [key]: e.target.value })}
+                                onChange={(e) => setCreateSpecs({...createSpecs, [key]: e.target.value})}
                                 required
                             />
                         </div>
@@ -174,14 +175,14 @@ export default function PcsPage() {
                         key={pc.id}
                         product={pc}
                         imgSrc={pc.photos && pc.photos.length > 0 ? pc.photos[0] : pcPhoto}
-                        toCharacteristicsPage={() => navigate(`/pc/${pc.id}`, { state: { isUserPc: false } })}
+                        toCharacteristicsPage={() => navigate(`/pc/${pc.id}`, {state: {isUserPc: false}})}
                         onAddToBasket={() => handleAddToBasket(pc)}
                     />
                 ))}
             </div>
 
             <div className="product-list__pagination">
-                {Array.from({ length: totalPages }, (_, i) => (
+                {Array.from({length: totalPages}, (_, i) => (
                     <button
                         key={i}
                         onClick={() => paginate(i + 1)}
@@ -192,7 +193,7 @@ export default function PcsPage() {
                 ))}
             </div>
 
-            <LoginModal isOpen={isLoginModalOpen} onLogin={login} onClose={hideLoginModal} />
+            <LoginModal isOpen={isLoginModalOpen} onLogin={login} onClose={hideLoginModal}/>
         </>
     );
 }

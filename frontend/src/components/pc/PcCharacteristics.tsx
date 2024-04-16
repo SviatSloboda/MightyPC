@@ -21,7 +21,6 @@ export default function PcCharacteristics() {
     const [updatedPrice, setUpdatedPrice] = useState('');
     const [updatedRating, setUpdatedRating] = useState(0);
 
-
     const [updatedCpuId, setUpdatedCpuId] = useState<string>("");
     const [updatedGpuId, setUpdatedGpuId] = useState<string>("");
     const [updatedMotherboardId, setUpdatedMotherboardId] = useState<string>("");

@@ -1329,6 +1329,7 @@ a.nav__link {
     background-color: #1a1a1a;
     color: #fff;
 }
+
 .order-info-modal .modal-backdrop.show {
     opacity: 0.5 !important;
     backdrop-filter: blur(10px) !important;

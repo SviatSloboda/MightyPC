@@ -124,9 +124,9 @@ export default function ConfiguratorPage() {
                         gpuId: createSpecs.gpuId,
                         motherboardId: createSpecs.motherboardId,
                         ramId: createSpecs.ramId,
-                        ssdId: createSpecs.hddId,
+                        ssdId: createSpecs.ssdId,
                         hddId: createSpecs.hddId,
-                    }
+                    };
 
                     const response = await axios.post<{
                         [key: string]: string
@@ -144,7 +144,7 @@ export default function ConfiguratorPage() {
         };
 
         fetchPowerSupplies();
-    }, [createSpecs.cpuId, createSpecs, createSpecs.hddId, hardwareSpec, user]);
+    }, [createSpecs.cpuId, createSpecs.gpuId, createSpecs.motherboardId, createSpecs.ramId, createSpecs.ssdId, createSpecs.hddId]);
 
     return (<>
         <div className="pc-configurator">

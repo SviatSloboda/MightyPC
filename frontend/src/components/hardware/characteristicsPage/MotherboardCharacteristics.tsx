@@ -79,11 +79,6 @@ export default function MotherboardCharacteristics() {
     };
 
 
-
-
-
-
-
     const handleDelete = () => {
         axios.delete(`/api/hardware/motherboard/${id}`)
             .then(() => {

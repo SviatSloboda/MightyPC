@@ -1,4 +1,4 @@
-export interface SpecsIdsForEnergyConsumption{
+export interface SpecsIdsForEnergyConsumption {
     cpuId: string,
     gpuId: string,
     motherboardId: string,

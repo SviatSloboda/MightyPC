@@ -187,6 +187,8 @@ export default function WorkstationCharacteristics() {
                 </div>
 
                 <p className="product-characteristics__description">{workstation?.hardwareSpec.description}</p>
+                <p className="product-characteristics__description">Energy
+                    consumption: {workstation?.energyConsumption}W</p>
 
                 <div className="pc-details">
                     <p className="pc-specification" data-label="Cpu:">

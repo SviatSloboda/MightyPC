@@ -14,5 +14,5 @@ public record SpecsForEnergyConsumption(
         RAM ram,
         SSD ssd,
         HDD hdd
-)  {
+) {
 }

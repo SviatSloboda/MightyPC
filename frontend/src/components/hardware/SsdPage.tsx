@@ -128,16 +128,6 @@ export default function SsdPage() {
             />))}
         </div>
 
-        <div className="product-list">
-            {SSDs.map(ssd => (<ProductBox
-                key={ssd.id}
-                product={ssd}
-                imgSrc={ssd.ssdPhotos && ssd.ssdPhotos.length > 0 ? ssd.ssdPhotos[0] : ssdPhoto}
-                toCharacteristicsPage={() => navigate(`/hardware/ssd/${ssd.id}`)}
-                onAddToBasket={() => handleAddToBasket(ssd)}
-
-            />))}
-        </div>
         <div className="product-list__pagination">
             {Array.from({length: totalPages}, (_, i) => (<button
                 key={i}

@@ -18,8 +18,8 @@ export default function TryPage() {
 
 
     return (<>
-            <h1 className={"notCompleted"}>{specsIds.powerSupplyId}</h1>
-            <h1 className={"notCompleted"}>{specsIds.powerSupplyId}</h1>
-            <button onClick={getValues}></button>
-        </>)
+        <h1 className={"notCompleted"}>{specsIds.powerSupplyId}</h1>
+        <h1 className={"notCompleted"}>{specsIds.powerSupplyId}</h1>
+        <button onClick={getValues}></button>
+    </>)
 }

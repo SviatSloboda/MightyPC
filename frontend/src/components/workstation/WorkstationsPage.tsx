@@ -1,13 +1,13 @@
-import { useCallback, useEffect, useState } from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import axios from 'axios';
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import workstationPhoto from "../../assets/Workstations.png";
-import { useAuth } from "../../contexts/AuthContext";
-import { Modal } from "react-bootstrap";
+import {useAuth} from "../../contexts/AuthContext";
+import {Modal} from "react-bootstrap";
 import ProductBox from "../hardware/utils/ProductBox";
 import useLoginModal from "../hardware/utils/useLoginModal";
 import LoginModal from "../hardware/utils/LoginModal";
-import { useModal } from "../hardware/utils/Modal";
+import {useModal} from "../hardware/utils/Modal";
 import {login} from "../../contexts/authUtils.ts";
 import {Workstation} from "../../model/pc/Workstation.tsx";
 import {HardwareSpec} from "../../model/pc/hardware/HardwareSpec.tsx";
@@ -19,21 +19,21 @@ export default function WorkstationsPage() {
     const [totalPages, setTotalPages] = useState(0);
     const workstationsPerPage = 8;
     const [modalOpen, toggleModal] = useModal();
-    const [hardwareSpec, setHardwareSpec] = useState<HardwareSpec>({ name: '', description: '', price: '', rating: 0 });
+    const [hardwareSpec, setHardwareSpec] = useState<HardwareSpec>({name: '', description: '', price: '', rating: 0});
     const [createSpecs, setCreateSpecs] = useState<SpecsIds>({
         cpuId: '', gpuId: '', motherboardId: '', ramId: '', ssdId: '', hddId: '', powerSupplyId: '', pcCaseId: ''
     });
     const [cpuNumber, setCpuNumber] = useState<number>(1);
     const [gpuNumber, setGpuNumber] = useState<number>(1);
     const navigate = useNavigate();
-    const { user, isSuperUser } = useAuth();
-    const { isLoginModalOpen, showLoginModal, hideLoginModal } = useLoginModal();
+    const {user, isSuperUser} = useAuth();
+    const {isLoginModalOpen, showLoginModal, hideLoginModal} = useLoginModal();
 
     useEffect(() => {
         const fetchWorkstations = async () => {
             try {
                 const response = await axios.get(`/api/workstation/page`, {
-                    params: { page: currentPage, size: workstationsPerPage }
+                    params: {page: currentPage, size: workstationsPerPage}
                 });
                 setWorkstations(response.data.content);
                 setTotalPages(response.data.totalPages);
@@ -208,7 +208,7 @@ export default function WorkstationsPage() {
             </div>
 
             <div className="product-list__pagination">
-                {Array.from({ length: totalPages }, (_, i) => (
+                {Array.from({length: totalPages}, (_, i) => (
                     <button
                         key={i}
                         onClick={() => paginate(i + 1)}
@@ -219,7 +219,7 @@ export default function WorkstationsPage() {
                 ))}
             </div>
 
-            <LoginModal isOpen={isLoginModalOpen} onLogin={login} onClose={hideLoginModal} />
+            <LoginModal isOpen={isLoginModalOpen} onLogin={login} onClose={hideLoginModal}/>
         </>
     );
 }
