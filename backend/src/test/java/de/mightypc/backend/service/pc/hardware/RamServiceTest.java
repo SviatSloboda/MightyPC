@@ -1,5 +1,6 @@
 package de.mightypc.backend.service.pc.hardware;
 
+import de.mightypc.backend.exception.pc.hardware.RamNotFoundException;
 import de.mightypc.backend.model.hardware.RAM;
 import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.RamRepository;
@@ -20,7 +21,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-class RamServiceTest extends BaseServiceTest<RAM, RamService, RamRepository> {
+class RamServiceTest extends BaseServiceTest<RAM, RamService, RamRepository, RamNotFoundException> {
     private final RamRepository mockRamRepository = mock(RamRepository.class);
     private final RAM testRam = new RAM(
             "testId",
@@ -58,7 +59,7 @@ class RamServiceTest extends BaseServiceTest<RAM, RamService, RamRepository> {
         when(mockRamRepository.save(expected)).thenReturn(expected);
 
         // Act && Assert
-        assertThrows(HardwareNotFoundException.class, () -> service.update(expected));
+        assertThrows(RamNotFoundException.class, () -> service.update(expected));
         verify(mockRamRepository).existsById("testId");
         verifyNoMoreInteractions(mockRamRepository);
     }
@@ -99,8 +100,13 @@ class RamServiceTest extends BaseServiceTest<RAM, RamService, RamRepository> {
     void attachPhoto_shouldThrowHardwareNotFoundException_whenEntityDoesNotExistInRepository() {
         when(mockRamRepository.findById("testId")).thenReturn(Optional.empty());
 
-        assertThrows(HardwareNotFoundException.class, () -> ramService.attachPhoto("testId", "TEST"));
+        assertThrows(RamNotFoundException.class, () -> ramService.attachPhoto("testId", "TEST"));
         verify(mockRamRepository).findById("testId");
+    }
+
+    @Override
+    protected RamNotFoundException getException() {
+        return new RamNotFoundException("there is no such ram!");
     }
 
     @Override

@@ -1,5 +1,6 @@
 package de.mightypc.backend.service.pc.hardware;
 
+import de.mightypc.backend.exception.pc.hardware.GpuNotFoundException;
 import de.mightypc.backend.model.hardware.GPU;
 import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.GpuRepository;
@@ -20,7 +21,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-class GpuServiceTest extends BaseServiceTest<GPU, GpuService, GpuRepository> {
+class GpuServiceTest extends BaseServiceTest<GPU, GpuService, GpuRepository, GpuNotFoundException> {
     private final GpuRepository mockGpuRepository = mock(GpuRepository.class);
     private final GPU testGpu = new GPU(
             "testId",
@@ -53,13 +54,13 @@ class GpuServiceTest extends BaseServiceTest<GPU, GpuService, GpuRepository> {
         // Arrange
         GPU expected = testGpu.withEnergyConsumption(999);
         when(mockGpuRepository.existsById("testId")).thenReturn(false);
-        when(mockGpuRepository.save(expected)).thenReturn(expected);
 
-        // Act && Assert
-        assertThrows(HardwareNotFoundException.class, () -> service.update(expected));
+        // Act & Assert
+        assertThrows(GpuNotFoundException.class, () -> service.update(expected));
         verify(mockGpuRepository).existsById("testId");
         verifyNoMoreInteractions(mockGpuRepository);
     }
+
 
     @Override
     @Test
@@ -97,8 +98,13 @@ class GpuServiceTest extends BaseServiceTest<GPU, GpuService, GpuRepository> {
     void attachPhoto_shouldThrowHardwareNotFoundException_whenEntityDoesNotExistInRepository() {
         when(mockGpuRepository.findById("testId")).thenReturn(Optional.empty());
 
-        assertThrows(HardwareNotFoundException.class, () -> gpuService.attachPhoto("testId", "TEST"));
+        assertThrows(GpuNotFoundException.class, () -> gpuService.attachPhoto("testId", "TEST"));
         verify(mockGpuRepository).findById("testId");
+    }
+
+    @Override
+    protected GpuNotFoundException getException() {
+        return new GpuNotFoundException("There is no such Gpu!");
     }
 
     @Override

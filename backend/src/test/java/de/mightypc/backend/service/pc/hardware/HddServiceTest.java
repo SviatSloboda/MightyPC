@@ -1,5 +1,6 @@
 package de.mightypc.backend.service.pc.hardware;
 
+import de.mightypc.backend.exception.pc.hardware.HddNotFoundException;
 import de.mightypc.backend.model.hardware.HDD;
 import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.HddRepository;
@@ -20,7 +21,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-class HddServiceTest extends BaseServiceTest<HDD, HddService, HddRepository> {
+class HddServiceTest extends BaseServiceTest<HDD, HddService, HddRepository, HddNotFoundException> {
     private final HddRepository mockHddRepository = mock(HddRepository.class);
     private final HDD testHdd = new HDD(
             "testId",
@@ -57,7 +58,7 @@ class HddServiceTest extends BaseServiceTest<HDD, HddService, HddRepository> {
         when(mockHddRepository.save(expected)).thenReturn(expected);
 
         // Act && Assert
-        assertThrows(HardwareNotFoundException.class, () -> service.update(expected));
+        assertThrows(HddNotFoundException.class, () -> service.update(expected));
         verify(mockHddRepository).existsById("testId");
         verifyNoMoreInteractions(mockHddRepository);
     }
@@ -98,8 +99,13 @@ class HddServiceTest extends BaseServiceTest<HDD, HddService, HddRepository> {
     void attachPhoto_shouldThrowHardwareNotFoundException_whenEntityDoesNotExistInRepository() {
         when(mockHddRepository.findById("testId")).thenReturn(Optional.empty());
 
-        assertThrows(HardwareNotFoundException.class, () -> hddService.attachPhoto("testId", "TEST"));
+        assertThrows(HddNotFoundException.class, () -> hddService.attachPhoto("testId", "TEST"));
         verify(mockHddRepository).findById("testId");
+    }
+
+    @Override
+    protected HddNotFoundException getException() {
+        return new HddNotFoundException("There is no such hdd with id: ");
     }
 
     @Override

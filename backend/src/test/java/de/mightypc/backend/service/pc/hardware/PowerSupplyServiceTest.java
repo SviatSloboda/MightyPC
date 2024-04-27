@@ -1,5 +1,6 @@
 package de.mightypc.backend.service.pc.hardware;
 
+import de.mightypc.backend.exception.pc.hardware.PowerSupplyNotFoundException;
 import de.mightypc.backend.model.hardware.PowerSupply;
 import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.PowerSupplyRepository;
@@ -22,7 +23,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-class PowerSupplyServiceTest extends BaseServiceTest<PowerSupply, PowerSupplyService, PowerSupplyRepository> {
+class PowerSupplyServiceTest extends BaseServiceTest<PowerSupply, PowerSupplyService, PowerSupplyRepository, PowerSupplyNotFoundException> {
     private final PowerSupplyRepository mockPowerSupplyRepository = mock(PowerSupplyRepository.class);
     private final PowerSupply testPowerSupply = new PowerSupply(
             "testId",
@@ -58,7 +59,7 @@ class PowerSupplyServiceTest extends BaseServiceTest<PowerSupply, PowerSupplySer
         when(mockPowerSupplyRepository.save(expected)).thenReturn(expected);
 
         // Act && Assert
-        assertThrows(HardwareNotFoundException.class, () -> service.update(expected));
+        assertThrows(PowerSupplyNotFoundException.class, () -> service.update(expected));
         verify(mockPowerSupplyRepository).existsById("testId");
         verifyNoMoreInteractions(mockPowerSupplyRepository);
     }
@@ -104,7 +105,7 @@ class PowerSupplyServiceTest extends BaseServiceTest<PowerSupply, PowerSupplySer
         when(mockPowerSupplyRepository.findById("testId")).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(HardwareNotFoundException.class, () -> powerSupplyService.attachPhoto("testId", "TEST"));
+        assertThrows(PowerSupplyNotFoundException.class, () -> powerSupplyService.attachPhoto("testId", "TEST"));
         verify(mockPowerSupplyRepository).findById("testId");
     }
 
@@ -142,10 +143,15 @@ class PowerSupplyServiceTest extends BaseServiceTest<PowerSupply, PowerSupplySer
         when(mockPowerSupplyRepository.findAll()).thenReturn(Collections.emptyList());
 
         // Act & Assert
-        assertThrows(HardwareNotFoundException.class,
+        assertThrows(PowerSupplyNotFoundException.class,
                 () -> powerSupplyService.getAllPowerSuppliesByEnergyConsumption(1000));
 
         verify(mockPowerSupplyRepository).findAll();
+    }
+
+    @Override
+    protected PowerSupplyNotFoundException getException() {
+        return new PowerSupplyNotFoundException("there is no such psu!");
     }
 
     @Override

@@ -51,7 +51,7 @@ public abstract class BaseServiceTest<T, S extends BaseService<T, R, E>, R exten
         when(repository.findAll()).thenReturn(List.of());
 
         // Act & Assert
-        assertThrows(HardwareNotFoundException.class, () -> service.getAll());
+        assertThrows(getException().getClass(), () -> service.getAll());
         verify(repository).findAll();
     }
 
@@ -75,7 +75,7 @@ public abstract class BaseServiceTest<T, S extends BaseService<T, R, E>, R exten
         when(repository.findById("testId")).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(HardwareNotFoundException.class, () -> service.getById("testId"));
+        assertThrows(getException().getClass(), () -> service.getById("testId"));
         verify(repository).findById("testId");
     }
 
@@ -113,7 +113,7 @@ public abstract class BaseServiceTest<T, S extends BaseService<T, R, E>, R exten
         when(repository.existsById("testId")).thenReturn(false);
 
         // Act & Assert
-        assertThrows(HardwareNotFoundException.class,
+        assertThrows(getException().getClass(),
                 () -> service.deleteById("testId"),
                 "Entity was not Found. Id of entity: testId");
         verify(repository).existsById("testId");
@@ -133,6 +133,8 @@ public abstract class BaseServiceTest<T, S extends BaseService<T, R, E>, R exten
         // Assert
         assertEquals(expectedPage, actualPage);
     }
+
+    protected abstract E getException();
 
     protected abstract R getMockRepository();
 

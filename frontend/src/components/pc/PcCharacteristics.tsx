@@ -177,6 +177,15 @@ export default function PcCharacteristics() {
         window.location.reload();
     }
 
+
+    const handleAdditionOfPrivateUserPcToAllPcs = () => {
+        axios.put<void>(`../api/user-pcs/${user?.id}/${pc?.id}/promote`)
+            .then(() => {
+                navigate("../pc")
+            })
+            .catch(console.error);
+    }
+
     return (<>
         <div className="product-characteristics">
             <div className="product-characteristics__slideshow-container">
@@ -318,6 +327,10 @@ export default function PcCharacteristics() {
             </div>)}
 
             <button className="upload-button item__delete" onClick={() => setIsModalOpen(true)}>Delete</button>
+
+            {isSuperUser() && <button className="upload-button item__delete"
+                                      onClick={() => handleAdditionOfPrivateUserPcToAllPcs()}>Publish
+            </button>}
 
             {isModalOpen && (<div className="modal-overlay">
                 <div className="modal">

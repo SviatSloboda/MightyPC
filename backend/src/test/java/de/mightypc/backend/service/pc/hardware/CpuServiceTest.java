@@ -1,5 +1,6 @@
 package de.mightypc.backend.service.pc.hardware;
 
+import de.mightypc.backend.exception.pc.hardware.CpuNotFoundException;
 import de.mightypc.backend.model.hardware.CPU;
 import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.CpuRepository;
@@ -20,7 +21,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-class CpuServiceTest extends BaseServiceTest<CPU, CpuService, CpuRepository> {
+class CpuServiceTest extends BaseServiceTest<CPU, CpuService, CpuRepository, CpuNotFoundException> {
     private final CpuRepository mockCpuRepository = mock(CpuRepository.class);
     private final CPU testCpu = new CPU(
             "testId",
@@ -57,8 +58,8 @@ class CpuServiceTest extends BaseServiceTest<CPU, CpuService, CpuRepository> {
         when(mockCpuRepository.save(expected)).thenReturn(expected);
 
         // Act && Assert
-        assertThrows(HardwareNotFoundException.class, () -> service.update(expected));
         verify(mockCpuRepository).existsById("testId");
+        assertThrows(CpuNotFoundException.class, () -> service.update(expected));
         verifyNoMoreInteractions(mockCpuRepository);
     }
 
@@ -100,7 +101,7 @@ class CpuServiceTest extends BaseServiceTest<CPU, CpuService, CpuRepository> {
         when(mockCpuRepository.findById("testId")).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(HardwareNotFoundException.class, () -> cpuService.attachPhoto("testId", "TEST"));
+        assertThrows(CpuNotFoundException.class, () -> cpuService.attachPhoto("testId", "TEST"));
         verify(mockCpuRepository).findById("testId");
     }
 
@@ -123,8 +124,13 @@ class CpuServiceTest extends BaseServiceTest<CPU, CpuService, CpuRepository> {
         when(mockCpuRepository.findById("testId")).thenReturn(Optional.empty());
 
         // Act && Assert
-        assertThrows(HardwareNotFoundException.class, () -> cpuService.getSocketOfCpuById("testId"));
+        assertThrows(CpuNotFoundException.class, () -> cpuService.getSocketOfCpuById("testId"));
         verify(mockCpuRepository).findById("testId");
+    }
+
+    @Override
+    protected CpuNotFoundException getException() {
+        return new CpuNotFoundException("There is no such Cpu with id: ");
     }
 
     @Override

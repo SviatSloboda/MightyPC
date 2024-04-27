@@ -1,5 +1,6 @@
 package de.mightypc.backend.service.pc.hardware;
 
+import de.mightypc.backend.exception.pc.hardware.PcCaseNotFoundException;
 import de.mightypc.backend.model.hardware.PcCase;
 import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.PcCaseRepository;
@@ -20,7 +21,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-class PcCaseServiceTest extends BaseServiceTest<PcCase, PcCaseService, PcCaseRepository> {
+class PcCaseServiceTest extends BaseServiceTest<PcCase, PcCaseService, PcCaseRepository, PcCaseNotFoundException> {
     private final PcCaseRepository mockPcCaseRepository = mock(PcCaseRepository.class);
     private final PcCase testPcCase = new PcCase(
             "testId",
@@ -56,7 +57,7 @@ class PcCaseServiceTest extends BaseServiceTest<PcCase, PcCaseService, PcCaseRep
         when(mockPcCaseRepository.save(expected)).thenReturn(expected);
 
         // Act && Assert
-        assertThrows(HardwareNotFoundException.class, () -> service.update(expected));
+        assertThrows(PcCaseNotFoundException.class, () -> service.update(expected));
         verify(mockPcCaseRepository).existsById("testId");
         verifyNoMoreInteractions(mockPcCaseRepository);
     }
@@ -97,8 +98,13 @@ class PcCaseServiceTest extends BaseServiceTest<PcCase, PcCaseService, PcCaseRep
     void attachPhoto_shouldThrowHardwareNotFoundException_whenEntityDoesNotExistInRepository() {
         when(mockPcCaseRepository.findById("testId")).thenReturn(Optional.empty());
 
-        assertThrows(HardwareNotFoundException.class, () -> pcCaseService.attachPhoto("testId", "TEST"));
+        assertThrows(PcCaseNotFoundException.class, () -> pcCaseService.attachPhoto("testId", "TEST"));
         verify(mockPcCaseRepository).findById("testId");
+    }
+
+    @Override
+    protected PcCaseNotFoundException getException() {
+        return new PcCaseNotFoundException("there is no such pcCase!");
     }
 
     @Override

@@ -18,7 +18,7 @@ public class RamService extends BaseService<RAM, RamRepository, RamNotFoundExcep
 
     @Override
     protected RamNotFoundException getException(String message) {
-        return null;
+        return new RamNotFoundException(message);
     }
 
     @Override

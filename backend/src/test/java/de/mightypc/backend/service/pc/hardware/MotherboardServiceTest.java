@@ -1,5 +1,7 @@
 package de.mightypc.backend.service.pc.hardware;
 
+import de.mightypc.backend.exception.pc.hardware.MotherboardNotFoundException;
+import de.mightypc.backend.exception.pc.hardware.SsdNotFoundException;
 import de.mightypc.backend.model.hardware.Motherboard;
 import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.MotherboardRepository;
@@ -21,7 +23,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-class MotherboardServiceTest extends BaseServiceTest<Motherboard, MotherboardService, MotherboardRepository> {
+class MotherboardServiceTest extends BaseServiceTest<Motherboard, MotherboardService, MotherboardRepository, MotherboardNotFoundException> {
     private final MotherboardRepository mockMotherboardRepository = mock(MotherboardRepository.class);
     private final Motherboard testMotherboard = new Motherboard(
             "testId",
@@ -58,7 +60,7 @@ class MotherboardServiceTest extends BaseServiceTest<Motherboard, MotherboardSer
         when(mockMotherboardRepository.save(expected)).thenReturn(expected);
 
         // Act && Assert
-        assertThrows(HardwareNotFoundException.class, () -> service.update(expected));
+        assertThrows(MotherboardNotFoundException.class, () -> service.update(expected));
         verify(mockMotherboardRepository).existsById("testId");
         verifyNoMoreInteractions(mockMotherboardRepository);
     }
@@ -99,7 +101,7 @@ class MotherboardServiceTest extends BaseServiceTest<Motherboard, MotherboardSer
     void attachPhoto_shouldThrowHardwareNotFoundException_whenEntityDoesNotExistInRepository() {
         when(mockMotherboardRepository.findById("testId")).thenReturn(Optional.empty());
 
-        assertThrows(HardwareNotFoundException.class, () -> motherboardService.attachPhoto("testId", "TEST"));
+        assertThrows(MotherboardNotFoundException.class, () -> motherboardService.attachPhoto("testId", "TEST"));
         verify(mockMotherboardRepository).findById("testId");
     }
 
@@ -130,6 +132,11 @@ class MotherboardServiceTest extends BaseServiceTest<Motherboard, MotherboardSer
         // Assert
         verify(mockMotherboardRepository).findAll();
         assertEquals(new HashMap<>(), actual);
+    }
+
+    @Override
+    protected MotherboardNotFoundException getException() {
+        return new MotherboardNotFoundException("no mam");
     }
 
     @Override
