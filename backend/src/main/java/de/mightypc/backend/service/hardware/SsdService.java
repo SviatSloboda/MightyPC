@@ -1,5 +1,6 @@
 package de.mightypc.backend.service.hardware;
 
+import de.mightypc.backend.exception.pc.hardware.SsdNotFoundException;
 import de.mightypc.backend.model.hardware.SSD;
 import de.mightypc.backend.repository.hardware.SsdRepository;
 import org.springframework.stereotype.Service;
@@ -10,9 +11,14 @@ import java.util.HashMap;
 import java.util.List;
 
 @Service
-public class SsdService extends BaseService<SSD, SsdRepository> {
+public class SsdService extends BaseService<SSD, SsdRepository, SsdNotFoundException> {
     public SsdService(SsdRepository ssdRepository) {
         super(ssdRepository);
+    }
+
+    @Override
+    protected SsdNotFoundException getException(String message) {
+        return new SsdNotFoundException(message);
     }
 
     @Override

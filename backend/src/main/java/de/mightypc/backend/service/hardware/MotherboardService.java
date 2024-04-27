@@ -1,5 +1,6 @@
 package de.mightypc.backend.service.hardware;
 
+import de.mightypc.backend.exception.pc.hardware.MotherboardNotFoundException;
 import de.mightypc.backend.model.hardware.Motherboard;
 import de.mightypc.backend.repository.hardware.MotherboardRepository;
 import org.springframework.stereotype.Service;
@@ -12,9 +13,14 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class MotherboardService extends BaseService<Motherboard, MotherboardRepository> {
+public class MotherboardService extends BaseService<Motherboard, MotherboardRepository, MotherboardNotFoundException> {
     public MotherboardService(MotherboardRepository motherboardRepository) {
         super(motherboardRepository);
+    }
+
+    @Override
+    protected MotherboardNotFoundException getException(String message) {
+        return new MotherboardNotFoundException(message);
     }
 
     @Override

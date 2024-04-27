@@ -1,6 +1,8 @@
 package de.mightypc.backend.exception.shop;
 
-public class ItemNotFoundException extends RuntimeException {
+import java.util.NoSuchElementException;
+
+public class ItemNotFoundException extends NoSuchElementException {
     public ItemNotFoundException(String message) {
         super(message);
     }

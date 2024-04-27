@@ -1,5 +1,6 @@
 package de.mightypc.backend.service.hardware;
 
+import de.mightypc.backend.exception.pc.hardware.GpuNotFoundException;
 import de.mightypc.backend.model.hardware.GPU;
 import de.mightypc.backend.repository.hardware.GpuRepository;
 import org.springframework.stereotype.Service;
@@ -10,9 +11,14 @@ import java.util.HashMap;
 import java.util.List;
 
 @Service
-public class GpuService extends BaseService<GPU, GpuRepository> {
+public class GpuService extends BaseService<GPU, GpuRepository, GpuNotFoundException> {
     public GpuService(GpuRepository repository) {
         super(repository);
+    }
+
+    @Override
+    protected GpuNotFoundException getException(String message) {
+        return new GpuNotFoundException(message);
     }
 
     @Override

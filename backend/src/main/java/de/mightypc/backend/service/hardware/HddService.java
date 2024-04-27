@@ -1,5 +1,6 @@
 package de.mightypc.backend.service.hardware;
 
+import de.mightypc.backend.exception.pc.hardware.HddNotFoundException;
 import de.mightypc.backend.model.hardware.HDD;
 import de.mightypc.backend.repository.hardware.HddRepository;
 
@@ -9,11 +10,17 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
-public class HddService extends BaseService<HDD, HddRepository> {
+public class HddService extends BaseService<HDD, HddRepository, HddNotFoundException> {
     public HddService(HddRepository hddRepository) {
         super(hddRepository);
+    }
+
+    @Override
+    protected HddNotFoundException getException(String message) {
+        return new HddNotFoundException(message);
     }
 
     @Override

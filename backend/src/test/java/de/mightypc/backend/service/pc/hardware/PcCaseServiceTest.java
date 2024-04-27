@@ -1,6 +1,5 @@
 package de.mightypc.backend.service.pc.hardware;
 
-import de.mightypc.backend.exception.pc.HardwareNotFoundException;
 import de.mightypc.backend.model.hardware.PcCase;
 import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.PcCaseRepository;

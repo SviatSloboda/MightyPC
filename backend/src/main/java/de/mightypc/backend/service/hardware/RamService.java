@@ -1,5 +1,6 @@
 package de.mightypc.backend.service.hardware;
 
+import de.mightypc.backend.exception.pc.hardware.RamNotFoundException;
 import de.mightypc.backend.model.hardware.RAM;
 import de.mightypc.backend.repository.hardware.RamRepository;
 import org.springframework.stereotype.Service;
@@ -10,9 +11,14 @@ import java.util.HashMap;
 import java.util.List;
 
 @Service
-public class RamService extends BaseService<RAM, RamRepository> {
+public class RamService extends BaseService<RAM, RamRepository, RamNotFoundException> {
     public RamService(RamRepository ramRepository) {
         super(ramRepository);
+    }
+
+    @Override
+    protected RamNotFoundException getException(String message) {
+        return null;
     }
 
     @Override

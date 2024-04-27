@@ -15,7 +15,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     @Value("${app.enviroment}")
-    private String environment;
+    private static String environment = "dev";
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -36,13 +36,7 @@ public class SecurityConfig {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }).logout(logout -> logout
-                .logoutUrl("/api/logout")
-                .logoutSuccessHandler((request, response, authentication) -> response.setStatus(HttpServletResponse.SC_OK))
-                .deleteCookies("JSESSIONID")
-                .invalidateHttpSession(true)
-                .clearAuthentication(true)
-                .permitAll());
+        }).logout(logout -> logout.logoutUrl("/api/logout").logoutSuccessHandler((request, response, authentication) -> response.setStatus(HttpServletResponse.SC_OK)).deleteCookies("JSESSIONID").invalidateHttpSession(true).clearAuthentication(true).permitAll());
         return http.build();
     }
 }
