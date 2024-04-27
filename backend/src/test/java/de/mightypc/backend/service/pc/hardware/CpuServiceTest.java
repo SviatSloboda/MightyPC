@@ -105,7 +105,7 @@ class CpuServiceTest extends BaseServiceTest<CPU, CpuService, CpuRepository> {
     }
 
     @Test
-    void getSocketOfCpuById_shouldGiveCorrectSocket(){
+    void getSocketOfCpuById_shouldGiveCorrectSocket() {
         // Arrange
         when(mockCpuRepository.findById("testId")).thenReturn(Optional.of(testCpu));
 
@@ -118,7 +118,7 @@ class CpuServiceTest extends BaseServiceTest<CPU, CpuService, CpuRepository> {
     }
 
     @Test
-    void getSocketOfCpuById_shouldThrowHardwareNotFoundException_whenCpuDoesNotExistInRepository(){
+    void getSocketOfCpuById_shouldThrowHardwareNotFoundException_whenCpuDoesNotExistInRepository() {
         // Arrange
         when(mockCpuRepository.findById("testId")).thenReturn(Optional.empty());
 

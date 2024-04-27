@@ -27,7 +27,7 @@ import PcCharacteristics from "./components/pc/PcCharacteristics.tsx";
 import WorkstationsPage from "./components/workstation/WorkstationsPage.tsx";
 import WorkstationsCharacteristicsPage from "./components/workstation/WorkstationCharacteristicsPage.tsx";
 import ConfiguratorPage from "./components/configurator/ConfiguratorPage.tsx";
-import UserPcsPage from "./components/pc/UserPcsPage.tsx";
+import UserPcsPage from "./components/configurator/UserPcsPage.tsx";
 import TryPage from "./components/configurator/TryPage.tsx";
 
 export default function App() {

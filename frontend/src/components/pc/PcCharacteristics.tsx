@@ -46,7 +46,7 @@ export default function PcCharacteristics() {
         const fetchPcData = async () => {
             if (id) {
                 try {
-                    let url: string = `/api/pc/${id}`;
+                    let url = `/api/pc/${id}`;
                     if (isUserPc && user) {
                         url = `/api/user-pcs/${user.id}/${id}`;
                     }
@@ -74,7 +74,7 @@ export default function PcCharacteristics() {
             }
         };
         fetchPcData();
-    }, [id, isUpdateModalOpen]);
+    }, [id, isUpdateModalOpen, isUserPc, user]);
 
 
     const plusSlides = (n: number) => {
@@ -96,11 +96,20 @@ export default function PcCharacteristics() {
     };
 
     const handleDelete = () => {
-        axios.delete(`/api/pc/${id}`)
-            .then(() => {
-                navigate('../pc');
-            })
-            .catch(console.error);
+        if (isUserPc) {
+            axios.delete(`../api/user-pcs/${user?.id}/${pc?.id}`)
+                .then(() => {
+                    navigate('../user-pcs');
+                })
+                .catch(console.error);
+
+        } else {
+            axios.delete(`/api/pc/${id}`)
+                .then(() => {
+                    navigate('../pc');
+                })
+                .catch(console.error);
+        }
     };
 
     const handleUpdate = () => {
@@ -118,12 +127,22 @@ export default function PcCharacteristics() {
                 pcCaseId: updatedPcCaseId
             }, photos: pc?.photos
         };
-        axios.put(`/api/pc`, payload)
-            .then(response => {
-                setPc(response.data);
-                setIsUpdateModalOpen(false);
-            })
-            .catch(console.error);
+
+        if (isUserPc) {
+            axios.put("../api/user-pcs/" + user?.id, payload)
+                .then(response => {
+                    setPc(response.data);
+                    setIsUpdateModalOpen(false);
+                })
+                .catch(console.error);
+        } else {
+            axios.put(`/api/pc`, payload)
+                .then(response => {
+                    setPc(response.data);
+                    setIsUpdateModalOpen(false);
+                })
+                .catch(console.error);
+        }
     };
 
     const handleAddToBasket = () => {
@@ -131,6 +150,7 @@ export default function PcCharacteristics() {
             showLoginModal();
             return;
         }
+
         const payload = {
             id: pc?.id,
             type: "pc",
@@ -146,6 +166,16 @@ export default function PcCharacteristics() {
             })
             .catch(console.error);
     };
+
+    const handleCloseUpdateModalAndReloadPage = () => {
+        setIsUpdateModalOpen(false);
+        window.location.reload();
+    }
+
+    const handleUpdateModalAndReloadPage = () => {
+        setIsModalOpen(false);
+        window.location.reload();
+    }
 
     return (<>
         <div className="product-characteristics">
@@ -210,7 +240,7 @@ export default function PcCharacteristics() {
         <LoginModal isOpen={isLoginModalOpen} onLogin={handleLogin} onClose={hideLoginModal}/>
 
         {(isSuperUser() || isUserPc) && (<>
-            <Photo savePhoto={savePhoto}/>
+            {!isUserPc && <Photo savePhoto={savePhoto}/>}
             <button className="upload-button item__delete" onClick={() => setIsUpdateModalOpen(true)}>Update
             </button>
 
@@ -280,7 +310,7 @@ export default function PcCharacteristics() {
                     <div className="modal__footer">
                         <button className="modal__save-btn" onClick={handleUpdate}>Save Changes</button>
                         <button className="modal__close-btn"
-                                onClick={() => setIsUpdateModalOpen(false)}>Cancel
+                                onClick={() => handleCloseUpdateModalAndReloadPage()}>Cancel
                         </button>
                     </div>
 
@@ -297,7 +327,7 @@ export default function PcCharacteristics() {
                                 onClick={handleDelete}>Delete
                         </button>
                         <button className="default-button modal__delete-button"
-                                onClick={() => setIsModalOpen(false)}>Close
+                                onClick={() => handleUpdateModalAndReloadPage()}>Close
                         </button>
                     </div>
                 </div>

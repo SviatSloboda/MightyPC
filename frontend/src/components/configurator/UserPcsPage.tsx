@@ -3,15 +3,15 @@ import axios from 'axios';
 import {useNavigate} from "react-router-dom";
 import pcPhoto from "../../assets/Pc.png";
 import nothingImage from "../../assets/noPC.png";
-import {useAuth} from "../../contexts/AuthContext";
-import useLoginModal from "../hardware/utils/useLoginModal";
-import LoginModal from "../hardware/utils/LoginModal";
-import {PC} from "../../model/pc/PC";
+import {useAuth} from "../../contexts/AuthContext.tsx";
+import useLoginModal from "../hardware/utils/useLoginModal.ts";
+import LoginModal from "../hardware/utils/LoginModal.tsx";
+import {PC} from "../../model/pc/PC.tsx";
 import {login} from "../../contexts/authUtils.ts";
 import UserProductBox from "../hardware/utils/UserProductBox.tsx";
 
 export default function UserPcsPage() {
-    const [PCs, setPCs] = useState<PC[]>([]);
+    const [Pcs, setPcs] = useState<PC[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const pcsPerPage = 8;
@@ -20,17 +20,32 @@ export default function UserPcsPage() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchPCs = async () => {
-            const response = await axios.get(`/api/user-pcs/${user?.id}/page`, {
-                params: {
-                    page: currentPage,
-                    size: pcsPerPage
-                }
-            });
-            setPCs(response.data.content);
-            setTotalPages(response.data.totalPages);
+        const fetchPcs = async () => {
+            if (!user) {
+                await new Promise((resolve) => {
+                    const checkUser = setInterval(() => {
+                        const currentUser = user;
+                        if (currentUser) {
+                            clearInterval(checkUser);
+                            resolve(currentUser);
+                        }
+                    }, 2);
+                });
+            }
+            const userId = user?.id;
+            if (userId) {
+                const response = await axios.get(`/api/user-pcs/${userId}/page`, {
+                    params: {
+                        page: currentPage,
+                        size: pcsPerPage
+                    }
+                });
+                setPcs(response.data.content);
+                setTotalPages(response.data.totalPages);
+            }
         };
-        fetchPCs();
+
+        fetchPcs();
     }, [currentPage]);
 
     const paginate = useCallback((pageNumber: number) => setCurrentPage(pageNumber - 1), []);
@@ -53,15 +68,15 @@ export default function UserPcsPage() {
 
     return (
         <>
-            {PCs.length === 0 ? (
+            {Pcs.length === 0 ? (
                 <div className="basket-empty">
-                    <img className={"basket-empty__image"} src={nothingImage} alt="No PCs found"/>
+                    <img className={"basket-empty__image"} src={nothingImage} alt="No Pcs found"/>
                     <p className={"basket-empty__message"}>You have not configured your own PC yet!</p>
                 </div>
             ) : (
                 <>
                     <div className="product-list">
-                        {PCs.map(pc => (
+                        {Pcs.map(pc => (
                             <UserProductBox
                                 key={pc.id}
                                 product={pc}

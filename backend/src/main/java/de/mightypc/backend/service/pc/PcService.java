@@ -128,7 +128,7 @@ public class PcService extends PcBaseService<PC, PcRepository> {
                 pc.photos());
     }
 
-    private BigDecimal getTotalPrice(Specs specs) {
+    public BigDecimal getTotalPrice(Specs specs) {
         BigDecimal totalPrice = BigDecimal.ZERO;
 
         totalPrice = totalPrice.add(specs.cpu().hardwareSpec().price());
@@ -213,7 +213,7 @@ public class PcService extends PcBaseService<PC, PcRepository> {
         return calculateEnergyConsumptionOfPc(specsForEnergyConsumption);
     }
 
-    private int calculateEnergyConsumptionOfPc(SpecsForEnergyConsumption specs) {
+    public int calculateEnergyConsumptionOfPc(SpecsForEnergyConsumption specs) {
         int totalConsumption = specs.cpu().energyConsumption() +
                                specs.gpu().energyConsumption() +
                                specs.ssd().energyConsumption() +
