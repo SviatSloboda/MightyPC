@@ -1,4 +1,4 @@
-package de.mightypc.backend.controller.pc;
+package de.mightypc.backend.controller.configurator;
 
 import de.mightypc.backend.model.pc.createpc.CreatePC;
 import de.mightypc.backend.model.pc.createpc.PcResponse;
@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -37,6 +38,16 @@ public class UserPcsController {
     @DeleteMapping("/{pcId}")
     public void deletePcById(@PathVariable String userId, @PathVariable String pcId) {
         userPcsService.deletePc(userId, pcId);
+    }
+
+    @PutMapping
+    public void update(@PathVariable String userId, @RequestBody PcResponse pcResponse) {
+        userPcsService.update(userId, pcResponse);
+    }
+
+    @GetMapping("/{pcId}/promote")
+    public void addPrivateUserPcToAllPcs(@PathVariable String userId, @PathVariable String pcId) {
+        userPcsService.addPrivateUserPcToAllPcs(userId, pcId);
     }
 
     @PostMapping

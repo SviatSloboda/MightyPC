@@ -1,6 +1,9 @@
 package de.mightypc.backend.service.configurator;
 
 import de.mightypc.backend.exception.pc.UserPcNotFoundException;
+import de.mightypc.backend.model.configurator.SpecsForEnergyConsumption;
+import de.mightypc.backend.model.hardware.HardwareSpec;
+import de.mightypc.backend.model.hardware.Specs;
 import de.mightypc.backend.model.pc.PC;
 import de.mightypc.backend.model.pc.createpc.CreatePC;
 import de.mightypc.backend.model.pc.createpc.PcResponse;
@@ -106,5 +109,42 @@ public class UserPcsService {
                 .orElseThrow(() -> new UserPcNotFoundException("There is no such PC!!!"));
 
         return pcService.createPcResponse(userPc);
+    }
+
+    @Transactional
+    public void update(String userId, PcResponse pcResponse) {
+        User user = userService.getUserById(userId);
+
+        Specs specs = pcService.getSpecs(pcResponse.specsIds());
+
+        HardwareSpec hardwareSpec = new HardwareSpec(
+                pcResponse.hardwareSpec().name(),
+                pcResponse.hardwareSpec().description(),
+                pcService.getTotalPrice(specs),
+                pcResponse.hardwareSpec().rating()
+        );
+
+        PC userPcToSave = new PC(pcResponse.id(), hardwareSpec, specs,
+                pcService.calculateEnergyConsumptionOfPc(
+                        new SpecsForEnergyConsumption(
+                                specs.cpu(),
+                                specs.gpu(),
+                                specs.motherboard(),
+                                specs.ram(),
+                                specs.ssd(),
+                                specs.hdd()
+                        )
+                ), pcResponse.photos());
+
+        PC pcToDelete = user.getPcs().stream()
+                .filter(pc -> pc.id().equals(pcResponse.id()))
+                .findAny()
+                .orElseThrow(() -> new UserPcNotFoundException("There is no such user's pc for deletion with id:" + pcResponse.id()));
+
+        user.getPcs().remove(pcToDelete);
+        userRepository.save(user);
+
+        user.getPcs().add(userPcToSave);
+        userRepository.save(user);
     }
 }
