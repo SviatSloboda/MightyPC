@@ -45,7 +45,7 @@ public class UserPcsController {
         userPcsService.update(userId, pcResponse);
     }
 
-    @GetMapping("/{pcId}/promote")
+    @PutMapping("/{pcId}/promote")
     public void addPrivateUserPcToAllPcs(@PathVariable String userId, @PathVariable String pcId) {
         userPcsService.addPrivateUserPcToAllPcs(userId, pcId);
     }

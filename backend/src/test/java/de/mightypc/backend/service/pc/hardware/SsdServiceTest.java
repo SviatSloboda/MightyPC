@@ -1,5 +1,6 @@
 package de.mightypc.backend.service.pc.hardware;
 
+import de.mightypc.backend.exception.pc.hardware.SsdNotFoundException;
 import de.mightypc.backend.model.hardware.SSD;
 import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.SsdRepository;
@@ -10,6 +11,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,7 +22,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-class SsdServiceTest extends BaseServiceTest<SSD, SsdService, SsdRepository> {
+class SsdServiceTest extends BaseServiceTest<SSD, SsdService, SsdRepository, SsdNotFoundException> {
     private final SsdRepository mockSsdRepository = mock(SsdRepository.class);
     private final SSD testSsd = new SSD(
             "testId",
@@ -57,7 +59,7 @@ class SsdServiceTest extends BaseServiceTest<SSD, SsdService, SsdRepository> {
         when(mockSsdRepository.save(expected)).thenReturn(expected);
 
         // Act && Assert
-        assertThrows(HardwareNotFoundException.class, () -> service.update(expected));
+        assertThrows(SsdNotFoundException.class, () -> service.update(expected));
         verify(mockSsdRepository).existsById("testId");
         verifyNoMoreInteractions(mockSsdRepository);
     }
@@ -98,8 +100,13 @@ class SsdServiceTest extends BaseServiceTest<SSD, SsdService, SsdRepository> {
     void attachPhoto_shouldThrowHardwareNotFoundException_whenEntityDoesNotExistInRepository() {
         when(mockSsdRepository.findById("testId")).thenReturn(Optional.empty());
 
-        assertThrows(HardwareNotFoundException.class, () -> ssdService.attachPhoto("testId", "TEST"));
+        assertThrows(SsdNotFoundException.class, () -> ssdService.attachPhoto("testId", "TEST"));
         verify(mockSsdRepository).findById("testId");
+    }
+
+    @Override
+    protected SsdNotFoundException getException() {
+        return new SsdNotFoundException("there is no such ssd!");
     }
 
     @Override
