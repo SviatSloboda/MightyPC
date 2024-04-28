@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -227,5 +228,79 @@ public class PcService extends PcBaseService<PC, PcRepository> {
         }
 
         return totalConsumption + 50 - remainder;
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PC> getAllWithSortingOfPriceDescAsPages(Pageable pageable) {
+        return new PageImpl<>(getAllWithSortingOfPriceDesc(), pageable, 8);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PC> getAllWithSortingOfPriceAscAsPages(Pageable pageable) {
+        return new PageImpl<>(getAllWithSortingOfPriceAsc(), pageable, 8);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PC> getAllWithSortingOfRatingDescAsPages(Pageable pageable) {
+        return new PageImpl<>(getAllWithSortingOfRatingDesc(), pageable, 8);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PC> getAllWithSortingOfRatingAscAsPages(Pageable pageable) {
+        return new PageImpl<>(getAllWithSortingOfRatingAsc(), pageable, 8);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PC> getAllWithFilteringByPriceAsPages(Pageable pageable, int lowestPrice, int highestPrice) {
+        return new PageImpl<>(getAllWithFilteringByPrice(lowestPrice, highestPrice), pageable, 8);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PC> getAllWithFilteringByEnergyConsumptionAsPages(Pageable pageable, int lowestEnergyConsumption, int highestEnergyConsumption) {
+        return new PageImpl<>(getAllWithFilteringByEnergyConsumption(lowestEnergyConsumption, highestEnergyConsumption), pageable, 8);
+    }
+
+    private List<PC> getAllWithSortingOfPriceDesc() {
+        return getAll()
+                .stream()
+                .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().price()))
+                .toList()
+                .reversed();
+    }
+
+    private List<PC> getAllWithSortingOfPriceAsc() {
+        return getAll()
+                .stream()
+                .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().price()))
+                .toList();
+    }
+
+    private List<PC> getAllWithSortingOfRatingDesc() {
+        return getAll()
+                .stream()
+                .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().rating()))
+                .toList();
+    }
+
+    private List<PC> getAllWithSortingOfRatingAsc() {
+        return getAll()
+                .stream()
+                .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().rating()))
+                .toList()
+                .reversed();
+    }
+
+    private List<PC> getAllWithFilteringByPrice(int lowestPrice, int highestPrice) {
+        return getAll().stream()
+                .filter(cpu -> cpu.hardwareSpec().price().intValue() >= lowestPrice
+                               && cpu.hardwareSpec().price().intValue() <= highestPrice)
+                .toList();
+    }
+
+    private List<PC> getAllWithFilteringByEnergyConsumption(int lowestEnergyConsumption, int highestEnergyConsumption) {
+        return getAll().stream()
+                .filter(cpu -> cpu.energyConsumption() >= lowestEnergyConsumption
+                               && cpu.energyConsumption() <= highestEnergyConsumption)
+                .toList();
     }
 }

@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -215,5 +216,80 @@ public class WorkstationService extends PcBaseService<Workstation, WorkstationRe
                 .toList();
 
         return new PageImpl<>(responses, pageable, page.getTotalElements());
+    }
+
+
+    @Transactional(readOnly = true)
+    public Page<Workstation> getAllWithSortingOfPriceDescAsPages(Pageable pageable) {
+        return new PageImpl<>(getAllWithSortingOfPriceDesc(), pageable, 8);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Workstation> getAllWithSortingOfPriceAscAsPages(Pageable pageable) {
+        return new PageImpl<>(getAllWithSortingOfPriceAsc(), pageable, 8);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Workstation> getAllWithSortingOfRatingDescAsPages(Pageable pageable) {
+        return new PageImpl<>(getAllWithSortingOfRatingDesc(), pageable, 8);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Workstation> getAllWithSortingOfRatingAscAsPages(Pageable pageable) {
+        return new PageImpl<>(getAllWithSortingOfRatingAsc(), pageable, 8);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Workstation> getAllWithFilteringByPriceAsPages(Pageable pageable, int lowestPrice, int highestPrice) {
+        return new PageImpl<>(getAllWithFilteringByPrice(lowestPrice, highestPrice), pageable, 8);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Workstation> getAllWithFilteringByEnergyConsumptionAsPages(Pageable pageable, int lowestEnergyConsumption, int highestEnergyConsumption) {
+        return new PageImpl<>(getAllWithFilteringByEnergyConsumption(lowestEnergyConsumption, highestEnergyConsumption), pageable, 8);
+    }
+
+    private List<Workstation> getAllWithSortingOfPriceDesc() {
+        return getAll()
+                .stream()
+                .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().price()))
+                .toList()
+                .reversed();
+    }
+
+    private List<Workstation> getAllWithSortingOfPriceAsc() {
+        return getAll()
+                .stream()
+                .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().price()))
+                .toList();
+    }
+
+    private List<Workstation> getAllWithSortingOfRatingDesc() {
+        return getAll()
+                .stream()
+                .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().rating()))
+                .toList();
+    }
+
+    private List<Workstation> getAllWithSortingOfRatingAsc() {
+        return getAll()
+                .stream()
+                .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().rating()))
+                .toList()
+                .reversed();
+    }
+
+    private List<Workstation> getAllWithFilteringByPrice(int lowestPrice, int highestPrice) {
+        return getAll().stream()
+                .filter(cpu -> cpu.hardwareSpec().price().intValue() >= lowestPrice
+                               && cpu.hardwareSpec().price().intValue() <= highestPrice)
+                .toList();
+    }
+
+    private List<Workstation> getAllWithFilteringByEnergyConsumption(int lowestEnergyConsumption, int highestEnergyConsumption) {
+        return getAll().stream()
+                .filter(cpu -> cpu.energyConsumption() >= lowestEnergyConsumption
+                               && cpu.energyConsumption() <= highestEnergyConsumption)
+                .toList();
     }
 }

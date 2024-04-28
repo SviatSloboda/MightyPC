@@ -7,15 +7,7 @@ import de.mightypc.backend.service.pc.WorkstationService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -58,5 +50,42 @@ public class WorkstationController {
     @PutMapping
     public void update(@RequestBody WorkstationResponse workstationResponse) {
         service.update(workstationResponse);
+    }
+
+    @GetMapping("/sort/price")
+    public Page<Workstation> getSortedWorkstationsByPrice(Pageable pageable, @RequestParam(value = "type", defaultValue = "desc") String type) {
+        if (type.equals("desc")) {
+            return service.getAllWithSortingOfPriceDescAsPages(pageable);
+        } else if (type.equals("asc")) {
+            return service.getAllWithSortingOfPriceAscAsPages(pageable);
+        } else {
+            throw new IllegalStateException("Not matching value! Accepted only desc and asc!!!");
+        }
+    }
+
+    @GetMapping("/sort/rating")
+    public Page<Workstation> getSortedWorkstationsByRating(Pageable pageable, @RequestParam(value = "type", defaultValue = "desc") String type) {
+        if (type.equals("desc")) {
+            return service.getAllWithSortingOfRatingDescAsPages(pageable);
+        } else if (type.equals("asc")) {
+            return service.getAllWithSortingOfRatingAscAsPages(pageable);
+        } else {
+            throw new IllegalStateException("Not matching value! Accepted only desc and asc!!!");
+        }
+    }
+
+    @GetMapping("/filter/price")
+    public Page<Workstation> getFilteredWorkstationsByPrice(Pageable pageable,
+                                            @RequestParam(value = "lowest", defaultValue = "0") int lowestPrice,
+                                            @RequestParam(value = "highest", defaultValue = "999999") int highestPrice
+    ) {
+        return service.getAllWithFilteringByPriceAsPages(pageable, lowestPrice, highestPrice);
+    }
+
+    @GetMapping("/filter/energy-consumption")
+    public Page<Workstation> getFilteredWorkstationsByEnergyConsumption(Pageable pageable,
+                                                        @RequestParam(value = "lowest", defaultValue = "0") int lowestEnergyConsumption,
+                                                        @RequestParam(value = "highest", defaultValue = "999999") int highestEnergyConsumption) {
+        return service.getAllWithFilteringByEnergyConsumptionAsPages(pageable, lowestEnergyConsumption, highestEnergyConsumption);
     }
 }

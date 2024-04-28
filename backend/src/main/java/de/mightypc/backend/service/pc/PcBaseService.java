@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 public abstract class PcBaseService<T, R extends MongoRepository<T, String>> {
@@ -84,5 +85,9 @@ public abstract class PcBaseService<T, R extends MongoRepository<T, String>> {
         T entity = repository.findById(id).orElseThrow(() -> new NoSuchElementException(getNotFoundMessage(id)));
 
         repository.delete(entity);
+    }
+
+    public List<T> getAll() {
+        return repository.findAll();
     }
 }
