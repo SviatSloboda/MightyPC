@@ -1,6 +1,5 @@
 package de.mightypc.backend.controller.configurator;
 
-import de.mightypc.backend.controller.hardware.PowerSupplyController;
 import de.mightypc.backend.model.configurator.ConfiguratorComponents;
 import de.mightypc.backend.model.hardware.SpecsIds;
 import de.mightypc.backend.service.configurator.ChatGptService;

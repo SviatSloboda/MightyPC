@@ -54,7 +54,6 @@ public class OrderService {
         userRepository.save(user);
     }
 
-    @Transactional(readOnly = true)
     public Order getOrderById(String userId, String id) {
         User user = userService.getUserById(userId);
 
@@ -75,7 +74,7 @@ public class OrderService {
     public void updateStatus(String userId, String orderId, OrderStatusRequest statusRequest) {
         User user = userService.getUserById(userId);
 
-        Order order = this.getOrderById(userId, orderId);
+        Order order = getOrderById(userId, orderId);
 
         user.getOrders().remove(order);
 
