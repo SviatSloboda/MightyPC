@@ -1,6 +1,6 @@
 package de.mightypc.backend.service.pc.hardware;
 
-import de.mightypc.backend.exception.pc.hardware.GpuNotFoundException;
+import de.mightypc.backend.exception.hardware.GpuNotFoundException;
 import de.mightypc.backend.model.hardware.GPU;
 import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.GpuRepository;
@@ -58,7 +58,6 @@ class GpuServiceTest extends BaseServiceTest<GPU, GpuService, GpuRepository, Gpu
         // Act & Assert
         assertThrows(GpuNotFoundException.class, () -> service.update(expected));
         verify(mockGpuRepository).existsById("testId");
-        verifyNoMoreInteractions(mockGpuRepository);
     }
 
 

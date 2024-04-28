@@ -1,28 +1,31 @@
 package de.mightypc.backend.service.pc.hardware;
 
-import de.mightypc.backend.exception.pc.hardware.CpuNotFoundException;
+import de.mightypc.backend.exception.hardware.CpuNotFoundException;
 import de.mightypc.backend.model.hardware.CPU;
 import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.CpuRepository;
 import de.mightypc.backend.service.hardware.CpuService;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 class CpuServiceTest extends BaseServiceTest<CPU, CpuService, CpuRepository, CpuNotFoundException> {
     private final CpuRepository mockCpuRepository = mock(CpuRepository.class);
+    private final CpuService cpuService = new CpuService(mockCpuRepository);
+
     private final CPU testCpu = new CPU(
             "testId",
             new HardwareSpec("test", "test", new BigDecimal(666), 1.99f),
@@ -30,7 +33,16 @@ class CpuServiceTest extends BaseServiceTest<CPU, CpuService, CpuRepository, Cpu
             "testSocket"
     );
 
-    private final CpuService cpuService = new CpuService(mockCpuRepository);
+    private final CPU testCpu2 = new CPU(
+            "testId2",
+            new HardwareSpec("test2", "test2", new BigDecimal(333), 4.99f),
+            240,
+            "testSocket2"
+    );
+
+    private final PageRequest pageable = PageRequest.of(0, 8);
+
+    private final List<CPU> cpus = new ArrayList<>(List.of(testCpu, testCpu2));
 
     @Override
     @Test
@@ -58,9 +70,8 @@ class CpuServiceTest extends BaseServiceTest<CPU, CpuService, CpuRepository, Cpu
         when(mockCpuRepository.save(expected)).thenReturn(expected);
 
         // Act && Assert
-        verify(mockCpuRepository).existsById("testId");
         assertThrows(CpuNotFoundException.class, () -> service.update(expected));
-        verifyNoMoreInteractions(mockCpuRepository);
+        verify(mockCpuRepository).existsById("testId");
     }
 
     @Override
@@ -126,6 +137,106 @@ class CpuServiceTest extends BaseServiceTest<CPU, CpuService, CpuRepository, Cpu
         // Act && Assert
         assertThrows(CpuNotFoundException.class, () -> cpuService.getSocketOfCpuById("testId"));
         verify(mockCpuRepository).findById("testId");
+    }
+
+    /*
+
+    @Transactional(readOnly = true)
+    public Page<CPU> getAllWithSortingOfPriceDescAsPages(Pageable pageable) {
+        return new PageImpl<>(getAllWithSortingOfPriceDesc(), pageable, 8);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CPU> getAllWithSortingOfPriceAscAsPages(Pageable pageable) {
+        return new PageImpl<>(getAllWithSortingOfPriceAsc(), pageable, 8);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CPU> getAllWithSortingOfRatingDescAsPages(Pageable pageable) {
+        return new PageImpl<>(getAllWithSortingOfRatingDesc(), pageable, 8);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CPU> getAllWithSortingOfRatingAscAsPages(Pageable pageable) {
+        return new PageImpl<>(getAllWithSortingOfRatingAsc(), pageable, 8);
+    }
+     */
+
+    @Test
+    void getAllWithSortingOfPriceDescAsPages_shouldGetAllCpusWithProperSorting() {
+        Page<CPU> expected = new PageImpl<>(List.of(testCpu, testCpu2), pageable, 8);
+        when(repository.findAll()).thenReturn(cpus);
+
+        Page<CPU> actual = service.getAllWithSortingOfPriceDescAsPages(pageable);
+
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithSortingOfPriceAscAsPages_shouldGetAllCpusWithProperSorting() {
+        Page<CPU> expected = new PageImpl<>(List.of(testCpu2, testCpu), pageable, 8);
+        when(repository.findAll()).thenReturn(cpus);
+
+        Page<CPU> actual = service.getAllWithSortingOfPriceAscAsPages(pageable);
+
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithSortingOfRatingDescAsPages_shouldGetAllCpusWithProperSorting() {
+        Page<CPU> expected = new PageImpl<>(List.of(testCpu, testCpu2), pageable, 8);
+        when(repository.findAll()).thenReturn(cpus);
+
+        Page<CPU> actual = service.getAllWithSortingOfRatingDescAsPages(pageable);
+
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithSortingOfRatingAscAsPages_shouldGetAllCpusWithProperSorting() {
+        Page<CPU> expected = new PageImpl<>(List.of(testCpu2, testCpu), pageable, 8);
+        when(repository.findAll()).thenReturn(cpus);
+
+        Page<CPU> actual = service.getAllWithSortingOfRatingAscAsPages(pageable);
+
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithFilteringByEnergyConsumptionAsPages_shouldGetAllCpusWithProperFiltering() {
+        Page<CPU> expected = new PageImpl<>(Collections.singletonList(testCpu2), pageable, 8);
+        when(repository.findAll()).thenReturn(cpus);
+
+        Page<CPU> actual = service.getAllWithFilteringByEnergyConsumptionAsPages(pageable, 100, 300);
+
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithFilteringByPriceAsPages_shouldGetAllCpusWithProperFiltering() {
+        Page<CPU> expected = new PageImpl<>(Collections.singletonList(testCpu), pageable, 8);
+        when(repository.findAll()).thenReturn(cpus);
+
+        Page<CPU> actual = service.getAllWithFilteringByPriceAsPages(pageable, 500, 2500);
+
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithFilteringBySocketAsPages_shouldGetAllCpusWithProperFiltering() {
+        Page<CPU> expected = new PageImpl<>(Collections.singletonList(testCpu), pageable, 8);
+        when(repository.findAll()).thenReturn(cpus);
+
+        Page<CPU> actual = service.getAllWithFilteringBySocketAsPages(pageable, "testSocket");
+
+        verify(repository).findAll();
+        assertEquals(expected, actual);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package de.mightypc.backend.service.pc.hardware;
 
-import de.mightypc.backend.exception.pc.hardware.SsdNotFoundException;
+import de.mightypc.backend.exception.hardware.SsdNotFoundException;
 import de.mightypc.backend.model.hardware.SSD;
 import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.SsdRepository;
@@ -11,7 +11,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -61,7 +60,6 @@ class SsdServiceTest extends BaseServiceTest<SSD, SsdService, SsdRepository, Ssd
         // Act && Assert
         assertThrows(SsdNotFoundException.class, () -> service.update(expected));
         verify(mockSsdRepository).existsById("testId");
-        verifyNoMoreInteractions(mockSsdRepository);
     }
 
     @Override

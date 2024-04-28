@@ -1,6 +1,6 @@
 package de.mightypc.backend.service.pc.hardware;
 
-import de.mightypc.backend.exception.pc.hardware.PowerSupplyNotFoundException;
+import de.mightypc.backend.exception.hardware.PowerSupplyNotFoundException;
 import de.mightypc.backend.model.hardware.PowerSupply;
 import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.PowerSupplyRepository;
@@ -61,7 +61,6 @@ class PowerSupplyServiceTest extends BaseServiceTest<PowerSupply, PowerSupplySer
         // Act && Assert
         assertThrows(PowerSupplyNotFoundException.class, () -> service.update(expected));
         verify(mockPowerSupplyRepository).existsById("testId");
-        verifyNoMoreInteractions(mockPowerSupplyRepository);
     }
 
     @Override

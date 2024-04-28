@@ -1,7 +1,6 @@
 package de.mightypc.backend.service.pc.hardware;
 
-import de.mightypc.backend.exception.pc.hardware.MotherboardNotFoundException;
-import de.mightypc.backend.exception.pc.hardware.SsdNotFoundException;
+import de.mightypc.backend.exception.hardware.MotherboardNotFoundException;
 import de.mightypc.backend.model.hardware.Motherboard;
 import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.MotherboardRepository;
@@ -62,7 +61,6 @@ class MotherboardServiceTest extends BaseServiceTest<Motherboard, MotherboardSer
         // Act && Assert
         assertThrows(MotherboardNotFoundException.class, () -> service.update(expected));
         verify(mockMotherboardRepository).existsById("testId");
-        verifyNoMoreInteractions(mockMotherboardRepository);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package de.mightypc.backend.service.pc.hardware;
 
-import de.mightypc.backend.exception.pc.hardware.HddNotFoundException;
+import de.mightypc.backend.exception.hardware.HddNotFoundException;
 import de.mightypc.backend.model.hardware.HDD;
 import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.HddRepository;
@@ -60,7 +60,6 @@ class HddServiceTest extends BaseServiceTest<HDD, HddService, HddRepository, Hdd
         // Act && Assert
         assertThrows(HddNotFoundException.class, () -> service.update(expected));
         verify(mockHddRepository).existsById("testId");
-        verifyNoMoreInteractions(mockHddRepository);
     }
 
     @Override

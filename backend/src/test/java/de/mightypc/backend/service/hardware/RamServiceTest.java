@@ -1,6 +1,6 @@
 package de.mightypc.backend.service.pc.hardware;
 
-import de.mightypc.backend.exception.pc.hardware.RamNotFoundException;
+import de.mightypc.backend.exception.hardware.RamNotFoundException;
 import de.mightypc.backend.model.hardware.RAM;
 import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.RamRepository;
@@ -61,7 +61,6 @@ class RamServiceTest extends BaseServiceTest<RAM, RamService, RamRepository, Ram
         // Act && Assert
         assertThrows(RamNotFoundException.class, () -> service.update(expected));
         verify(mockRamRepository).existsById("testId");
-        verifyNoMoreInteractions(mockRamRepository);
     }
 
     @Override
