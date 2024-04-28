@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 import java.util.Map;
 
-public abstract class BaseController<T, S extends BaseService<T, ?>> {
+public abstract class BaseController<T, S extends BaseService<T, ?, ?>> {
     S service;
 
     protected BaseController(S service) {

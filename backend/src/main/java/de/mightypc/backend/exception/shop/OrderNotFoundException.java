@@ -1,6 +1,8 @@
 package de.mightypc.backend.exception.shop;
 
-public class OrderNotFoundException extends RuntimeException {
+import java.util.NoSuchElementException;
+
+public class OrderNotFoundException extends NoSuchElementException {
     public OrderNotFoundException(String message) {
         super(message);
     }

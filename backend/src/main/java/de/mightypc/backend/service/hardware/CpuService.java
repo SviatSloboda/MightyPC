@@ -1,5 +1,6 @@
 package de.mightypc.backend.service.hardware;
 
+import de.mightypc.backend.exception.pc.hardware.CpuNotFoundException;
 import de.mightypc.backend.model.hardware.CPU;
 import de.mightypc.backend.repository.hardware.CpuRepository;
 import org.springframework.stereotype.Service;
@@ -11,9 +12,14 @@ import java.util.HashMap;
 import java.util.List;
 
 @Service
-public class CpuService extends BaseService<CPU, CpuRepository> {
+public class CpuService extends BaseService<CPU, CpuRepository, CpuNotFoundException> {
     public CpuService(CpuRepository repository) {
         super(repository);
+    }
+
+    @Override
+    protected CpuNotFoundException getException(String message) {
+        return new CpuNotFoundException(message);
     }
 
     @Override

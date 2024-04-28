@@ -1,5 +1,6 @@
 package de.mightypc.backend.service.hardware;
 
+import de.mightypc.backend.exception.pc.hardware.PowerSupplyNotFoundException;
 import de.mightypc.backend.model.hardware.PowerSupply;
 import de.mightypc.backend.repository.hardware.PowerSupplyRepository;
 import org.springframework.stereotype.Service;
@@ -11,9 +12,14 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class PowerSupplyService extends BaseService<PowerSupply, PowerSupplyRepository> {
+public class PowerSupplyService extends BaseService<PowerSupply, PowerSupplyRepository, PowerSupplyNotFoundException> {
     public PowerSupplyService(PowerSupplyRepository powerSupplyRepository) {
         super(powerSupplyRepository);
+    }
+
+    @Override
+    protected PowerSupplyNotFoundException getException(String message) {
+        return new PowerSupplyNotFoundException(message);
     }
 
     @Override

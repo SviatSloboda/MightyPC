@@ -1,6 +1,6 @@
 package de.mightypc.backend.service.configurator;
 
-import de.mightypc.backend.exception.pc.HardwareNotFoundException;
+import de.mightypc.backend.exception.pc.UserPcNotFoundException;
 import de.mightypc.backend.model.pc.PC;
 import de.mightypc.backend.model.pc.createpc.CreatePC;
 import de.mightypc.backend.model.pc.createpc.PcResponse;
@@ -47,13 +47,25 @@ public class UserPcsService {
         userRepository.save(user);
     }
 
+    @Transactional
+    public void addPrivateUserPcToAllPcs(String userId, String userPcId) {
+        User user = userService.getUserById(userId);
+
+        PC pcToSave = user.getPcs().stream()
+                .filter(pc -> pc.id().equals(userPcId))
+                .findAny()
+                .orElseThrow(() -> new UserPcNotFoundException("There is no such user PC with id: " + userPcId));
+
+        pcService.save(pcToSave);
+    }
+
     private PC getPcOfUserById(String userId, String pcId) {
         User user = userService.getUserById(userId);
 
         return user.getPcs().stream()
                 .filter(pc -> pc.id().equals(pcId))
                 .findAny()
-                .orElseThrow(() -> new HardwareNotFoundException("There is no such pc!"));
+                .orElseThrow(() -> new UserPcNotFoundException("There is no such pc!"));
     }
 
     @Transactional
@@ -91,7 +103,7 @@ public class UserPcsService {
         PC userPc = userService.getUserById(userId).getPcs().stream()
                 .filter(pc -> pc.id().equals(pcId))
                 .findAny()
-                .orElseThrow(() -> new HardwareNotFoundException("There is no such PC!!!"));
+                .orElseThrow(() -> new UserPcNotFoundException("There is no such PC!!!"));
 
         return pcService.createPcResponse(userPc);
     }

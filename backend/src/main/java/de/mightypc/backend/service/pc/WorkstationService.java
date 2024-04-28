@@ -1,6 +1,6 @@
 package de.mightypc.backend.service.pc;
 
-import de.mightypc.backend.exception.pc.HardwareNotFoundException;
+import de.mightypc.backend.exception.pc.WorkstationNotFoundException;
 import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.model.hardware.Specs;
 import de.mightypc.backend.model.hardware.SpecsIds;
@@ -160,7 +160,7 @@ public class WorkstationService extends PcBaseService<Workstation, WorkstationRe
 
     @Transactional(readOnly = true)
     public WorkstationResponse getById(String id) {
-        Workstation workstation = workstationRepository.findById(id).orElseThrow(() -> new HardwareNotFoundException(getNotFoundMessage(id)));
+        Workstation workstation = workstationRepository.findById(id).orElseThrow(() -> new WorkstationNotFoundException(getNotFoundMessage(id)));
 
         return createPcResponse(workstation);
     }
@@ -208,7 +208,7 @@ public class WorkstationService extends PcBaseService<Workstation, WorkstationRe
     public Page<WorkstationResponse> getAllByPage(Pageable pageable) {
         Page<Workstation> page = workstationRepository.findAll(pageable);
 
-        if (page.isEmpty()) throw new HardwareNotFoundException("No Workstations found.");
+        if (page.isEmpty()) throw new WorkstationNotFoundException("No Workstations found.");
 
         List<WorkstationResponse> responses = page.getContent().stream()
                 .map(this::createPcResponse)

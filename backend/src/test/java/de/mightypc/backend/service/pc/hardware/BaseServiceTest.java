@@ -1,6 +1,5 @@
 package de.mightypc.backend.service.pc.hardware;
 
-import de.mightypc.backend.exception.pc.HardwareNotFoundException;
 import de.mightypc.backend.service.hardware.BaseService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +10,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.times;
 
-public abstract class BaseServiceTest<T, S extends BaseService<T, R>, R extends MongoRepository<T, String>> {
+public abstract class BaseServiceTest<T, S extends BaseService<T, R, E>, R extends MongoRepository<T, String>, E extends NoSuchElementException> {
     protected R repository;
     protected S service;
 

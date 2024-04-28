@@ -41,10 +41,12 @@ public class ConfiguratorController {
         return motherboardService.getMotherboardsBySocket(cpuSocket);
     }
 
+
     @PostMapping("/gpt")
     public SpecsIds createPcWithChatGpt(@RequestBody String[] userPreferences) {
         return chatGptService.createChatGptRecommendation(userPreferences[0], userPreferences[1]);
     }
+
 
     @PostMapping("/power-supply/energyConsumption/{energyConsumption}")
     public Map<String, String> getAllPowerSuppliesByEnergyConsumption(@PathVariable int energyConsumption) {

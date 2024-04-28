@@ -14,7 +14,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleHardwareNotFoundException(Exception ex) {
-        ErrorResponse globalException = new ErrorResponse(ex.getMessage(), ex.getCause(), HttpStatus.BAD_REQUEST, ZonedDateTime.now());
+        ErrorResponse globalException = new ErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST, ZonedDateTime.now());
 
         return new ResponseEntity<>(globalException, HttpStatus.BAD_REQUEST);
     }

@@ -1,6 +1,5 @@
 package de.mightypc.backend.service.hardware;
 
-import de.mightypc.backend.exception.pc.HardwareNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -8,9 +7,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
-public abstract class BaseService<T, R extends MongoRepository<T, String>> {
+public abstract class BaseService<T, R extends MongoRepository<T, String>, E extends NoSuchElementException> {
     protected R repository;
+    protected E exception;
 
     protected BaseService(R repository) {
         this.repository = repository;
@@ -19,13 +20,13 @@ public abstract class BaseService<T, R extends MongoRepository<T, String>> {
     public List<T> getAll() {
         List<T> entities = repository.findAll();
 
-        if (entities.isEmpty()) throw new HardwareNotFoundException("No entities were retrieved");
+        if (entities.isEmpty()) throw getException("No entities were retrieved");
 
         return entities;
     }
 
     public T getById(String id) {
-        return repository.findById(id).orElseThrow(() -> new HardwareNotFoundException((getNotFoundMessage(id))));
+        return repository.findById(id).orElseThrow(() -> getException("There is no such entity with id: " + id));
     }
 
     @Transactional
@@ -33,7 +34,7 @@ public abstract class BaseService<T, R extends MongoRepository<T, String>> {
         String entityId = getId(entity);
 
         if (!repository.existsById(entityId)) {
-            throw new HardwareNotFoundException((getNotFoundMessage(entityId)));
+            throw getException((getNotFoundMessage(entityId)));
         }
 
         return repository.save(entity);
@@ -47,7 +48,7 @@ public abstract class BaseService<T, R extends MongoRepository<T, String>> {
     @Transactional
     public boolean deleteById(String id) {
         if (!repository.existsById(id)) {
-            throw new HardwareNotFoundException((getNotFoundMessage(id)));
+            throw getException((getNotFoundMessage(id)));
         }
 
         repository.deleteById(id);
@@ -63,6 +64,8 @@ public abstract class BaseService<T, R extends MongoRepository<T, String>> {
     private String getNotFoundMessage(String id) {
         return "Entity: " + getNameOfEntity(getById(id)) + " was not found!!! Id of entity: " + id;
     }
+
+    protected abstract E getException(String message);
 
     public abstract Map<String, String> getAllNamesWithPrices();
 

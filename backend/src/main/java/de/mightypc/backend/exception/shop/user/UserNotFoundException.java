@@ -1,6 +1,8 @@
 package de.mightypc.backend.exception.shop.user;
 
-public class UserNotFoundException extends RuntimeException {
+import java.util.NoSuchElementException;
+
+public class UserNotFoundException extends NoSuchElementException {
     public UserNotFoundException(String message) {
         super(message);
     }

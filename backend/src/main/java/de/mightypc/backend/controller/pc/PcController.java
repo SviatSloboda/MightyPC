@@ -1,8 +1,6 @@
 package de.mightypc.backend.controller.pc;
 
 import de.mightypc.backend.model.configurator.SpecsIdsForEnergyConsumption;
-import de.mightypc.backend.model.hardware.Specs;
-import de.mightypc.backend.model.hardware.SpecsIds;
 import de.mightypc.backend.model.pc.PC;
 import de.mightypc.backend.model.pc.createpc.CreatePC;
 import de.mightypc.backend.model.pc.createpc.PcResponse;
@@ -39,7 +37,7 @@ public class PcController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public PC save(@RequestBody CreatePC createPC) {
-        return service.save(createPC);
+        return service.saveNewPc(createPC);
     }
 
     @PostMapping("/all")

@@ -1,5 +1,6 @@
 package de.mightypc.backend.service.hardware;
 
+import de.mightypc.backend.exception.pc.hardware.PcCaseNotFoundException;
 import de.mightypc.backend.model.hardware.PcCase;
 import de.mightypc.backend.repository.hardware.PcCaseRepository;
 import org.springframework.stereotype.Service;
@@ -10,9 +11,14 @@ import java.util.HashMap;
 import java.util.List;
 
 @Service
-public class PcCaseService extends BaseService<PcCase, PcCaseRepository> {
+public class PcCaseService extends BaseService<PcCase, PcCaseRepository, PcCaseNotFoundException> {
     public PcCaseService(PcCaseRepository repository) {
         super(repository);
+    }
+
+    @Override
+    protected PcCaseNotFoundException getException(String message) {
+        return new PcCaseNotFoundException(message);
     }
 
     @Override

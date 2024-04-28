@@ -1,6 +1,6 @@
 package de.mightypc.backend.service.pc;
 
-import de.mightypc.backend.exception.pc.HardwareNotFoundException;
+import de.mightypc.backend.exception.pc.PcNotFoundException;
 import de.mightypc.backend.model.configurator.SpecsForEnergyConsumption;
 import de.mightypc.backend.model.configurator.SpecsIdsForEnergyConsumption;
 import de.mightypc.backend.model.hardware.HardwareSpec;
@@ -47,8 +47,13 @@ public class PcService extends PcBaseService<PC, PcRepository> {
     }
 
     @Transactional
-    public PC save(CreatePC createPC) {
+    public PC saveNewPc(CreatePC createPC) {
         return pcRepository.save(createPc(createPC));
+    }
+
+    @Transactional
+    public void save(PC pcToSave) {
+        repository.save(pcToSave);
     }
 
     public PC createPc(CreatePC createPC) {
@@ -144,7 +149,7 @@ public class PcService extends PcBaseService<PC, PcRepository> {
 
     @Transactional(readOnly = true)
     public PcResponse getById(String id) {
-        PC pc = pcRepository.findById(id).orElseThrow(() -> new HardwareNotFoundException(getNotFoundMessage(id)));
+        PC pc = pcRepository.findById(id).orElseThrow(() -> new PcNotFoundException(getNotFoundMessage(id)));
 
         return createPcResponse(pc);
     }
@@ -195,7 +200,7 @@ public class PcService extends PcBaseService<PC, PcRepository> {
     public Page<PcResponse> getAllByPage(Pageable pageable) {
         Page<PC> page = pcRepository.findAll(pageable);
 
-        if (page.isEmpty()) throw new HardwareNotFoundException("No Pcs found.");
+        if (page.isEmpty()) throw new PcNotFoundException("No Pcs found.");
 
         List<PcResponse> responses = page.getContent().stream().map(this::createPcResponse).toList();
 
