@@ -29,7 +29,6 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class WorkstationService extends PcBaseService<Workstation, WorkstationRepository> {
@@ -94,7 +93,7 @@ public class WorkstationService extends PcBaseService<Workstation, WorkstationRe
         workstationRepository.saveAll(workStationsToSave);
     }
 
-    private WorkstationResponse createPcResponse(Workstation workstation) {
+    private WorkstationResponse createWorkstationResponse(Workstation workstation) {
         return new WorkstationResponse(
                 workstation.id(),
                 workstation.hardwareSpec(),
@@ -145,25 +144,27 @@ public class WorkstationService extends PcBaseService<Workstation, WorkstationRe
 
     @Transactional
     public void attachPhoto(String id, String photoUrl) {
-        Optional<Workstation> workstation = workstationRepository.findById(id);
-        if (workstation.isPresent()) {
-            Workstation currWorkstation = workstation.get();
-            List<String> photos = workstation.get().photos();
+        Workstation workstation = getById(id);
+        List<String> photos = workstation.photos();
 
-            if (photos == null) {
-                photos = new ArrayList<>();
-            }
-
-            photos.addFirst(photoUrl);
-            workstationRepository.save(currWorkstation.withPhotos(photos));
+        if (photos == null) {
+            photos = new ArrayList<>();
         }
+
+        photos.addFirst(photoUrl);
+
+        workstationRepository.save(workstation.withPhotos(photos));
+    }
+
+    private Workstation getById(String id) {
+        return workstationRepository.findById(id).orElseThrow(() -> new WorkstationNotFoundException("There is no such workstation with id: " + id));
     }
 
     @Transactional(readOnly = true)
-    public WorkstationResponse getById(String id) {
+    public WorkstationResponse getWorkstationResponseByIdOfWorkstation(String id) {
         Workstation workstation = workstationRepository.findById(id).orElseThrow(() -> new WorkstationNotFoundException(getNotFoundMessage(id)));
 
-        return createPcResponse(workstation);
+        return createWorkstationResponse(workstation);
     }
 
     @Transactional
@@ -190,14 +191,16 @@ public class WorkstationService extends PcBaseService<Workstation, WorkstationRe
         workstationRepository.save(workstation);
     }
 
-    public int calculateEnergyConsumptionOfWorkstation(int cpuNumber, int gpuNumber, Specs specs) {
+    private int calculateEnergyConsumptionOfWorkstation(int cpuNumber, int gpuNumber, Specs specs) {
         int totalConsumption = (specs.cpu().energyConsumption() * cpuNumber) +
                                (specs.gpu().energyConsumption() * gpuNumber) +
                                specs.ssd().energyConsumption() +
                                specs.hdd().energyConsumption() +
                                specs.motherboard().energyConsumption() +
                                specs.ram().energyConsumption();
+
         int remainder = totalConsumption % 50;
+
         if (remainder == 0) {
             return totalConsumption;
         }
@@ -212,7 +215,7 @@ public class WorkstationService extends PcBaseService<Workstation, WorkstationRe
         if (page.isEmpty()) throw new WorkstationNotFoundException("No Workstations found.");
 
         List<WorkstationResponse> responses = page.getContent().stream()
-                .map(this::createPcResponse)
+                .map(this::createWorkstationResponse)
                 .toList();
 
         return new PageImpl<>(responses, pageable, page.getTotalElements());

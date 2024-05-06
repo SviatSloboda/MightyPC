@@ -31,7 +31,6 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PcService extends PcBaseService<PC, PcRepository> {
@@ -149,7 +148,7 @@ public class PcService extends PcBaseService<PC, PcRepository> {
 
 
     @Transactional(readOnly = true)
-    public PcResponse getById(String id) {
+    public PcResponse getPcResponseByIdOfPc(String id) {
         PC pc = pcRepository.findById(id).orElseThrow(() -> new PcNotFoundException(getNotFoundMessage(id)));
 
         return createPcResponse(pc);
@@ -183,18 +182,20 @@ public class PcService extends PcBaseService<PC, PcRepository> {
 
     @Transactional
     public void attachPhoto(String id, String photoUrl) {
-        Optional<PC> pc = pcRepository.findById(id);
-        if (pc.isPresent()) {
-            PC currPc = pc.get();
-            List<String> photos = pc.get().photos();
+        PC pc = getById(id);
+        List<String> photos = pc.photos();
 
-            if (photos == null) {
-                photos = new ArrayList<>();
-            }
-
-            photos.addFirst(photoUrl);
-            pcRepository.save(currPc.withPhotos(photos));
+        if (photos == null) {
+            photos = new ArrayList<>();
         }
+
+        photos.addFirst(photoUrl);
+
+        pcRepository.save(pc.withPhotos(photos));
+    }
+
+    private PC getById(String id) {
+        return repository.findById(id).orElseThrow(() -> new PcNotFoundException(getNotFoundMessage(id)));
     }
 
     @Transactional(readOnly = true)

@@ -27,12 +27,12 @@ public class BasketController {
 
     @GetMapping
     public List<Item> getAllItemsOfUser(@PathVariable String userId) {
-        return basketService.getAllItemsOfUser(userId);
+        return basketService.getAllItemsOfUserByUserId(userId);
     }
 
     @DeleteMapping("/{itemId}")
     public void deleteItemById(@PathVariable String userId, @PathVariable String itemId) {
-        basketService.deleteItem(userId, itemId);
+        basketService.deleteItemByUserIdAndItemId(userId, itemId);
     }
 
     @PostMapping
@@ -48,6 +48,6 @@ public class BasketController {
 
     @GetMapping("/price")
     public BigDecimal getEntirePrice(@PathVariable String userId) {
-        return basketService.getEntirePrice(userId);
+        return basketService.getEntirePriceOfBasketByUserId(userId);
     }
 }

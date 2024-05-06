@@ -1,6 +1,6 @@
 package de.mightypc.backend.service.hardware;
 
-import de.mightypc.backend.exception.pc.hardware.SsdNotFoundException;
+import de.mightypc.backend.exception.hardware.SsdNotFoundException;
 import de.mightypc.backend.model.hardware.SSD;
 import de.mightypc.backend.repository.hardware.SsdRepository;
 import org.springframework.data.domain.Page;

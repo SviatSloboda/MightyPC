@@ -1,6 +1,6 @@
 package de.mightypc.backend.service.hardware;
 
-import de.mightypc.backend.exception.pc.hardware.PowerSupplyNotFoundException;
+import de.mightypc.backend.exception.hardware.PowerSupplyNotFoundException;
 import de.mightypc.backend.model.hardware.PowerSupply;
 import de.mightypc.backend.repository.hardware.PowerSupplyRepository;
 import org.springframework.data.domain.Page;

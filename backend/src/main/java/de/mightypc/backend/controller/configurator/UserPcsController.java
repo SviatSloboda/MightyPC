@@ -27,12 +27,12 @@ public class UserPcsController {
 
     @GetMapping("/page")
     public Page<PcResponse> getAllByPage(@PathVariable String userId, Pageable pageable) {
-        return userPcsService.getAllByPage(userId, pageable);
+        return userPcsService.getAllPcsAsListOfPcResponseByUserId(userId, pageable);
     }
 
     @GetMapping("/{pcId}")
     public PcResponse getPcById(@PathVariable String userId, @PathVariable String pcId) {
-        return userPcsService.getPcById(userId, pcId);
+        return userPcsService.getPcByUserIdAndPcIdAsPcResponse(userId, pcId);
     }
 
     @DeleteMapping("/{pcId}")

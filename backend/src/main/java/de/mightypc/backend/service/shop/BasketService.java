@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -23,8 +22,7 @@ public class BasketService {
         this.userRepository = userRepository;
     }
 
-    @Transactional(readOnly = true)
-    public List<Item> getAllItemsOfUser(String userId) {
+    public List<Item> getAllItemsOfUserByUserId(String userId) {
         User user = userService.getUserById(userId);
 
         return user.getBasket();
@@ -34,8 +32,8 @@ public class BasketService {
     public void saveItem(String userId, Item item) {
         User user = userService.getUserById(userId);
 
-        if (user.getBasket() == null) {
-            user.setBasket(new ArrayList<>(Collections.singletonList(item)));
+        if (user.getBasket() == null || user.getBasket().isEmpty()) {
+            user.setBasket(new ArrayList<>(List.of(item)));
         } else {
             List<Item> basket = user.getBasket();
             basket.add(item);
@@ -44,24 +42,25 @@ public class BasketService {
         userRepository.save(user);
     }
 
-    private Item getItemById(String userId, String itemId) {
-        User user = userService.getUserById(userId);
-
+    private Item getItemById(User user, String itemId) {
         return user.getBasket().stream()
                 .filter(item -> item.id().equals(itemId))
                 .findAny()
                 .orElseThrow(() -> new ItemNotFoundException("There is no such item!"));
     }
 
-    @Transactional
-    public void deleteItem(String userId, String itemId) {
-        User user = userService.getUserById(userId);
-
-        Item item = getItemById(userId, itemId);
+    private void deleteItem(User user, String itemId) {
+        Item item = getItemById(user, itemId);
 
         user.getBasket().remove(item);
 
         userRepository.save(user);
+    }
+
+    public void deleteItemByUserIdAndItemId(String userId, String itemId){
+        User user = userService.getUserById(userId);
+
+        deleteItem(user, itemId);
     }
 
     @Transactional
@@ -73,9 +72,7 @@ public class BasketService {
         userRepository.save(user);
     }
 
-    @Transactional(readOnly = true)
-    public BigDecimal getEntirePrice(String userId) {
-        User user = userService.getUserById(userId);
+    public BigDecimal getEntirePriceOfBasketByUser(User user) {
         BigDecimal price = BigDecimal.ZERO;
 
         List<Item> items = user.getBasket();
@@ -87,5 +84,11 @@ public class BasketService {
         }
 
         return price;
+    }
+
+    public BigDecimal getEntirePriceOfBasketByUserId(String userId) {
+        User user = userService.getUserById(userId);
+
+        return getEntirePriceOfBasketByUser(user);
     }
 }

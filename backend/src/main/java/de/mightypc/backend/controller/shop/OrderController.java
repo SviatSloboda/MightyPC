@@ -40,12 +40,12 @@ public class OrderController {
 
     @GetMapping("/{orderId}")
     public Order getOrderById(@PathVariable String userId, @PathVariable String orderId) {
-        return orderService.getOrderById(userId, orderId);
+        return orderService.getOrderByUserIdAndOrderId(userId, orderId);
     }
 
     @GetMapping
     public List<Order> getAllOrders(@PathVariable String userId) {
-        return orderService.getAllOrders(userId);
+        return orderService.getAllOrdersByUserId(userId);
     }
 
     @PutMapping("/{orderId}")

@@ -54,17 +54,12 @@ public class UserPcsService {
     public void addPrivateUserPcToAllPcs(String userId, String userPcId) {
         User user = userService.getUserById(userId);
 
-        PC pcToSave = user.getPcs().stream()
-                .filter(pc -> pc.id().equals(userPcId))
-                .findAny()
-                .orElseThrow(() -> new UserPcNotFoundException("There is no such user PC with id: " + userPcId));
+        PC pcToSave = getPcOfUserById(user, userPcId);
 
         pcService.save(pcToSave);
     }
 
-    private PC getPcOfUserById(String userId, String pcId) {
-        User user = userService.getUserById(userId);
-
+    private PC getPcOfUserById(User user, String pcId) {
         return user.getPcs().stream()
                 .filter(pc -> pc.id().equals(pcId))
                 .findAny()
@@ -75,7 +70,7 @@ public class UserPcsService {
     public void deletePc(String userId, String pcId) {
         User user = userService.getUserById(userId);
 
-        PC pc = getPcOfUserById(userId, pcId);
+        PC pc = getPcOfUserById(user, pcId);
 
         user.getPcs().remove(pc);
 
@@ -92,7 +87,7 @@ public class UserPcsService {
     }
 
     @Transactional(readOnly = true)
-    public Page<PcResponse> getAllByPage(String userId, Pageable pageable) {
+    public Page<PcResponse> getAllPcsAsListOfPcResponseByUserId(String userId, Pageable pageable) {
         List<PC> userPCs = userService.getUserById(userId).getPcs();
 
         List<PcResponse> responses = userPCs.stream()
@@ -102,7 +97,7 @@ public class UserPcsService {
         return new PageImpl<>(responses, pageable, userPCs.size());
     }
 
-    public PcResponse getPcById(String userId, String pcId) {
+    public PcResponse getPcByUserIdAndPcIdAsPcResponse(String userId, String pcId) {
         PC userPc = userService.getUserById(userId).getPcs().stream()
                 .filter(pc -> pc.id().equals(pcId))
                 .findAny()

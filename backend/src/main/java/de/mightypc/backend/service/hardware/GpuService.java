@@ -1,6 +1,6 @@
 package de.mightypc.backend.service.hardware;
 
-import de.mightypc.backend.exception.pc.hardware.GpuNotFoundException;
+import de.mightypc.backend.exception.hardware.GpuNotFoundException;
 import de.mightypc.backend.model.hardware.GPU;
 import de.mightypc.backend.repository.hardware.GpuRepository;
 import org.springframework.data.domain.Page;

@@ -1,9 +1,9 @@
 package de.mightypc.backend.exception;
 
+import de.mightypc.backend.exception.hardware.*;
 import de.mightypc.backend.exception.pc.PcNotFoundException;
 import de.mightypc.backend.exception.pc.UserPcNotFoundException;
 import de.mightypc.backend.exception.pc.WorkstationNotFoundException;
-import de.mightypc.backend.exception.pc.hardware.*;
 import de.mightypc.backend.exception.shop.ItemNotFoundException;
 import de.mightypc.backend.exception.shop.OrderNotFoundException;
 import org.springframework.http.HttpStatus;

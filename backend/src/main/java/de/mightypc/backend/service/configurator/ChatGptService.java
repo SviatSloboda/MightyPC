@@ -1,8 +1,8 @@
 package de.mightypc.backend.service.configurator;
 
 import de.mightypc.backend.model.hardware.SpecsIds;
-import de.mightypc.backend.model.shop.chatgpt.ChatGptRequest;
-import de.mightypc.backend.model.shop.chatgpt.ChatGptResponse;
+import de.mightypc.backend.model.configurator.chatgpt.ChatGptRequest;
+import de.mightypc.backend.model.configurator.chatgpt.ChatGptResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -52,8 +52,6 @@ public class ChatGptService {
 
         if (response == null || response.text() == null || response.text().isEmpty())
             throw new IllegalStateException("String from chatGpt can't be empty of null");
-
-        System.out.println(configuratorService.getAllComponentsIdsAndNamesWithPrices());
 
         String[] res = response.text().trim().replace(",", "").split(" ");
 

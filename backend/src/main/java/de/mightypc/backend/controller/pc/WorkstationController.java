@@ -39,7 +39,7 @@ public class WorkstationController {
 
     @GetMapping("/{id}")
     public WorkstationResponse getById(@PathVariable String id) {
-        return service.getById(id);
+        return service.getWorkstationResponseByIdOfWorkstation(id);
     }
 
     @DeleteMapping("/{id}")

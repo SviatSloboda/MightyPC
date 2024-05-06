@@ -1,4 +1,4 @@
-package de.mightypc.backend.exception.pc.hardware;
+package de.mightypc.backend.exception.hardware;
 
 import java.util.NoSuchElementException;
 

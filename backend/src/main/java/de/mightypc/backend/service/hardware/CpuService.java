@@ -1,6 +1,6 @@
 package de.mightypc.backend.service.hardware;
 
-import de.mightypc.backend.exception.pc.hardware.CpuNotFoundException;
+import de.mightypc.backend.exception.hardware.CpuNotFoundException;
 import de.mightypc.backend.model.hardware.CPU;
 import de.mightypc.backend.repository.hardware.CpuRepository;
 import org.springframework.data.domain.Page;

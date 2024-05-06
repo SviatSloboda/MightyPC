@@ -1,6 +1,6 @@
 package de.mightypc.backend.service.hardware;
 
-import de.mightypc.backend.exception.pc.hardware.MotherboardNotFoundException;
+import de.mightypc.backend.exception.hardware.MotherboardNotFoundException;
 import de.mightypc.backend.model.hardware.Motherboard;
 import de.mightypc.backend.repository.hardware.MotherboardRepository;
 import org.springframework.data.domain.Page;

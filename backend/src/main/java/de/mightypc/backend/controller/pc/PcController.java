@@ -45,7 +45,7 @@ public class PcController {
 
     @GetMapping("/{id}")
     public PcResponse getById(@PathVariable String id) {
-        return service.getById(id);
+        return service.getPcResponseByIdOfPc(id);
     }
 
     @DeleteMapping("/{id}")

@@ -1,7 +1,10 @@
-package de.mightypc.backend.model.shop.chatgpt;
+package de.mightypc.backend.model.configurator.chatgpt;
+
+import lombok.With;
 
 import java.util.List;
 
+@With
 public record ChatGptResponse(
         List<ChatGptChoice> choices
 ) {

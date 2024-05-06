@@ -1,4 +1,4 @@
-package de.mightypc.backend.model.shop.chatgpt;
+package de.mightypc.backend.model.configurator.chatgpt;
 
 import java.util.Collections;
 import java.util.List;

@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -32,10 +31,10 @@ public class OrderService {
         User user = userService.getUserById(userId);
 
         List<Order> currOrders = user.getOrders();
-        Order order = new Order(items, basketService.getEntirePrice(userId), OrderStatus.PENDING);
+        Order order = new Order(items, basketService.getEntirePriceOfBasketByUser(user), OrderStatus.PENDING);
 
-        if (currOrders.isEmpty()) {
-            user.setOrders(new ArrayList<>(Collections.singletonList(order)));
+        if (currOrders == null || currOrders.isEmpty()) {
+            user.setOrders(new ArrayList<>(List.of(order)));
         } else {
             user.getOrders().add(order);
         }
@@ -47,24 +46,28 @@ public class OrderService {
     public void removeOrder(String userId, String orderId) {
         User user = userService.getUserById(userId);
 
-        Order orderToRemove = getOrderById(userId, orderId);
+        Order orderToRemove = getOrderByUserAndOrderId(user, orderId);
 
         user.getOrders().remove(orderToRemove);
 
         userRepository.save(user);
     }
 
-    public Order getOrderById(String userId, String id) {
-        User user = userService.getUserById(userId);
-
+    private Order getOrderByUserAndOrderId(User user, String orderId) {
         return user.getOrders().stream()
-                .filter(order -> order.getId().equals(id))
+                .filter(order -> order.getId().equals(orderId))
                 .findAny()
                 .orElseThrow(() -> new OrderNotFoundException("There is no such order!"));
     }
 
-    @Transactional(readOnly = true)
-    public List<Order> getAllOrders(String userId) {
+    @Transactional
+    public Order getOrderByUserIdAndOrderId(String userId, String orderId) {
+        User user = userService.getUserById(userId);
+
+        return getOrderByUserAndOrderId(user, orderId);
+    }
+
+    public List<Order> getAllOrdersByUserId(String userId) {
         User user = userService.getUserById(userId);
 
         return user.getOrders();
@@ -74,7 +77,7 @@ public class OrderService {
     public void updateStatus(String userId, String orderId, OrderStatusRequest statusRequest) {
         User user = userService.getUserById(userId);
 
-        Order order = getOrderById(userId, orderId);
+        Order order = getOrderByUserAndOrderId(user, orderId);
 
         user.getOrders().remove(order);
 

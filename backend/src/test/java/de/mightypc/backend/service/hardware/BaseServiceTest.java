@@ -1,4 +1,4 @@
-package de.mightypc.backend.service.pc.hardware;
+package de.mightypc.backend.service.hardware;
 
 import de.mightypc.backend.service.hardware.BaseService;
 import org.junit.jupiter.api.BeforeEach;

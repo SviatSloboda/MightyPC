@@ -12,8 +12,8 @@ import de.mightypc.backend.service.hardware.RamService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class ConfiguratorService {
@@ -38,7 +38,7 @@ public class ConfiguratorService {
     }
 
     public ConfiguratorComponents getAllComponentsIdsAndNamesWithPrices() {
-        List<Map<String, String>> allComponentsIdsAndNames = new ArrayList<>();
+        List<LinkedHashMap<String, String>> allComponentsIdsAndNames = new ArrayList<>();
 
         allComponentsIdsAndNames.add(cpuService.getAllNamesWithPrices());
         allComponentsIdsAndNames.add(gpuService.getAllNamesWithPrices());

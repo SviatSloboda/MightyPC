@@ -2,6 +2,7 @@ package de.mightypc.backend.model.pc;
 
 import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.model.hardware.Specs;
+import lombok.With;
 import org.springframework.data.annotation.Id;
 
 import java.util.ArrayList;
@@ -9,8 +10,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+@With
 public record PC(
-        @Id String id,
+        @Id
+        String id,
         HardwareSpec hardwareSpec,
         Specs specs,
         int energyConsumption,
@@ -22,9 +25,5 @@ public record PC(
 
     public PC(HardwareSpec hardwareSpec, Specs specs, int energyConsumption) {
         this(UUID.randomUUID().toString(), hardwareSpec, specs, energyConsumption);
-    }
-
-    public PC withPhotos(List<String> allPhotos) {
-        return new PC(id(), hardwareSpec(), specs(), energyConsumption(), allPhotos);
     }
 }

@@ -1,9 +1,9 @@
 package de.mightypc.backend.model.configurator;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 public record ConfiguratorComponents(
-        List<Map<String, String>> componentIdsAndNames
+        List<LinkedHashMap<String, String>> componentIdsAndNames
 ) {
 }

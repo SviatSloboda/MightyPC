@@ -1,14 +1,17 @@
-package de.mightypc.backend.service.pc.hardware;
+package de.mightypc.backend.service.hardware;
 
 import de.mightypc.backend.exception.hardware.MotherboardNotFoundException;
 import de.mightypc.backend.model.hardware.Motherboard;
 import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.MotherboardRepository;
-import de.mightypc.backend.service.hardware.MotherboardService;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,10 +23,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 class MotherboardServiceTest extends BaseServiceTest<Motherboard, MotherboardService, MotherboardRepository, MotherboardNotFoundException> {
     private final MotherboardRepository mockMotherboardRepository = mock(MotherboardRepository.class);
+    private final MotherboardService motherboardService = new MotherboardService(mockMotherboardRepository);
+
     private final Motherboard testMotherboard = new Motherboard(
             "testId",
             new HardwareSpec("test", "test", new BigDecimal(666), 1.99f),
@@ -31,7 +35,16 @@ class MotherboardServiceTest extends BaseServiceTest<Motherboard, MotherboardSer
             "afd4"
     );
 
-    private final MotherboardService motherboardService = new MotherboardService(mockMotherboardRepository);
+    private final Motherboard testMotherboard2 = new Motherboard(
+            "testId2",
+            new HardwareSpec("test", "test", new BigDecimal(333), 4.99f),
+            230,
+            "lol"
+    );
+
+    private final PageRequest pageable = PageRequest.of(0, 8);
+
+    private final List<Motherboard> motherboards = new ArrayList<>(List.of(testMotherboard, testMotherboard2));
 
     @Override
     @Test
@@ -130,6 +143,114 @@ class MotherboardServiceTest extends BaseServiceTest<Motherboard, MotherboardSer
         // Assert
         verify(mockMotherboardRepository).findAll();
         assertEquals(new HashMap<>(), actual);
+    }
+
+
+    @Test
+    void getNameOfEntity_shouldReturnCorrectNameOfEntity() {
+        // Arrange & Act
+        String actual = service.getNameOfEntity(testMotherboard);
+
+        // Assert
+        assertEquals(testMotherboard.hardwareSpec().name(), actual);
+    }
+
+    @Test
+    void getAllWithSortingOfPriceDescAsPages_shouldGetAllMotherboardsWithProperSorting() {
+        // Arrange
+        Page<Motherboard> expected = new PageImpl<>(List.of(testMotherboard, testMotherboard2), pageable, 8);
+        when(repository.findAll()).thenReturn(motherboards);
+
+        // Act
+        Page<Motherboard> actual = service.getAllWithSortingOfPriceDescAsPages(pageable);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithSortingOfPriceAscAsPages_shouldGetAllMotherboardsWithProperSorting() {
+        // Arrange
+        Page<Motherboard> expected = new PageImpl<>(List.of(testMotherboard2, testMotherboard), pageable, 8);
+        when(repository.findAll()).thenReturn(motherboards);
+
+        // Act
+        Page<Motherboard> actual = service.getAllWithSortingOfPriceAscAsPages(pageable);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithSortingOfRatingDescAsPages_shouldGetAllMotherboardsWithProperSorting() {
+        // Arrange
+        Page<Motherboard> expected = new PageImpl<>(List.of(testMotherboard, testMotherboard2), pageable, 8);
+        when(repository.findAll()).thenReturn(motherboards);
+
+        // Act
+        Page<Motherboard> actual = service.getAllWithSortingOfRatingDescAsPages(pageable);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithSortingOfRatingAscAsPages_shouldGetAllMotherboardsWithProperSorting() {
+        // Arrange
+        Page<Motherboard> expected = new PageImpl<>(List.of(testMotherboard2, testMotherboard), pageable, 8);
+        when(repository.findAll()).thenReturn(motherboards);
+
+        // Act
+        Page<Motherboard> actual = service.getAllWithSortingOfRatingAscAsPages(pageable);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithFilteringByEnergyConsumptionAsPages_shouldGetAllMotherboardsWithProperFiltering() {
+        // Arrange
+        Page<Motherboard> expected = new PageImpl<>(Collections.singletonList(testMotherboard2), pageable, 8);
+        when(repository.findAll()).thenReturn(motherboards);
+
+        // Act
+        Page<Motherboard> actual = service.getAllWithFilteringByEnergyConsumptionAsPages(pageable, 100, 300);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithFilteringByPriceAsPages_shouldGetAllMotherboardsWithProperFiltering() {
+        // Arrange
+        Page<Motherboard> expected = new PageImpl<>(Collections.singletonList(testMotherboard), pageable, 8);
+        when(repository.findAll()).thenReturn(motherboards);
+
+        // Act
+        Page<Motherboard> actual = service.getAllWithFilteringByPriceAsPages(pageable, 500, 2500);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithFilteringBySocketAsPages_shouldGetAllMotherboardsWithProperFiltering() {
+        // Arrange
+        Page<Motherboard> expected = new PageImpl<>(Collections.singletonList(testMotherboard), pageable, 8);
+        when(repository.findAll()).thenReturn(motherboards);
+
+        // Act
+        Page<Motherboard> actual = service.getAllWithFilteringBySocketAsPages(pageable, "afd4");
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
     }
 
     @Override
