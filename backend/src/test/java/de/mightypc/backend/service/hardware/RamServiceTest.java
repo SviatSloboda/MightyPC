@@ -162,7 +162,7 @@ class RamServiceTest extends BaseServiceTest<RAM, RamService, RamRepository, Ram
     @Test
     void getAllWithSortingOfRatingDescAsPages_shouldGetAllRamsWithProperSorting() {
         // Arrange
-        Page<RAM> expected = new PageImpl<>(List.of(testRam, testRam2), pageable, 8);
+        Page<RAM> expected = new PageImpl<>(List.of(testRam2, testRam), pageable, 8);
         when(repository.findAll()).thenReturn(rams);
 
         // Act
@@ -176,7 +176,7 @@ class RamServiceTest extends BaseServiceTest<RAM, RamService, RamRepository, Ram
     @Test
     void getAllWithSortingOfRatingAscAsPages_shouldGetAllRamsWithProperSorting() {
         // Arrange
-        Page<RAM> expected = new PageImpl<>(List.of(testRam2, testRam), pageable, 8);
+        Page<RAM> expected = new PageImpl<>(List.of(testRam, testRam2), pageable, 8);
         when(repository.findAll()).thenReturn(rams);
 
         // Act

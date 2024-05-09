@@ -143,7 +143,7 @@ public class WorkstationService extends PcBaseService<Workstation, WorkstationRe
     }
 
     @Transactional
-    public void attachPhoto(String id, String photoUrl) {
+    public Workstation attachPhoto(String id, String photoUrl) {
         Workstation workstation = getById(id);
         List<String> photos = workstation.photos();
 
@@ -153,7 +153,7 @@ public class WorkstationService extends PcBaseService<Workstation, WorkstationRe
 
         photos.addFirst(photoUrl);
 
-        workstationRepository.save(workstation.withPhotos(photos));
+        return workstationRepository.save(workstation.withPhotos(photos));
     }
 
     private Workstation getById(String id) {
@@ -271,15 +271,15 @@ public class WorkstationService extends PcBaseService<Workstation, WorkstationRe
         return getAll()
                 .stream()
                 .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().rating()))
-                .toList();
+                .toList()
+                .reversed();
     }
 
     private List<Workstation> getAllWithSortingOfRatingAsc() {
         return getAll()
                 .stream()
                 .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().rating()))
-                .toList()
-                .reversed();
+                .toList();
     }
 
     private List<Workstation> getAllWithFilteringByPrice(int lowestPrice, int highestPrice) {

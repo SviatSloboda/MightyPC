@@ -181,7 +181,7 @@ public class PcService extends PcBaseService<PC, PcRepository> {
     }
 
     @Transactional
-    public void attachPhoto(String id, String photoUrl) {
+    public PC attachPhoto(String id, String photoUrl) {
         PC pc = getById(id);
         List<String> photos = pc.photos();
 
@@ -191,7 +191,7 @@ public class PcService extends PcBaseService<PC, PcRepository> {
 
         photos.addFirst(photoUrl);
 
-        pcRepository.save(pc.withPhotos(photos));
+        return pcRepository.save(pc.withPhotos(photos));
     }
 
     private PC getById(String id) {
@@ -280,15 +280,15 @@ public class PcService extends PcBaseService<PC, PcRepository> {
         return getAll()
                 .stream()
                 .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().rating()))
-                .toList();
+                .toList()
+                .reversed();
     }
 
     private List<PC> getAllWithSortingOfRatingAsc() {
         return getAll()
                 .stream()
                 .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().rating()))
-                .toList()
-                .reversed();
+                .toList();
     }
 
     private List<PC> getAllWithFilteringByPrice(int lowestPrice, int highestPrice) {

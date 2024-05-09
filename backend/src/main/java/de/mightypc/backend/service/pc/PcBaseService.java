@@ -1,5 +1,6 @@
 package de.mightypc.backend.service.pc;
 
+import de.mightypc.backend.exception.pc.PcNotFoundException;
 import de.mightypc.backend.model.configurator.SpecsForEnergyConsumption;
 import de.mightypc.backend.model.configurator.SpecsIdsForEnergyConsumption;
 import de.mightypc.backend.model.hardware.Specs;
@@ -88,6 +89,12 @@ public abstract class PcBaseService<T, R extends MongoRepository<T, String>> {
     }
 
     public List<T> getAll() {
-        return repository.findAll();
+        List<T> entities = repository.findAll();
+
+        if(entities.isEmpty()) {
+            throw new PcNotFoundException("No entities found!");
+        }
+
+        return entities;
     }
 }

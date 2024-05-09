@@ -55,6 +55,7 @@ public class MotherboardService extends BaseService<Motherboard, MotherboardRepo
 
         List<Motherboard> motherboards = getAll().stream()
                 .filter(motherboard -> motherboard.socket().equalsIgnoreCase(motherboardSocket))
+                .sorted(Comparator.comparingDouble(motherboard -> motherboard.hardwareSpec().price().doubleValue()))
                 .toList();
 
         for (Motherboard motherboard : motherboards) {
@@ -132,15 +133,15 @@ public class MotherboardService extends BaseService<Motherboard, MotherboardRepo
         return getAll()
                 .stream()
                 .sorted(Comparator.comparing(motherboard -> motherboard.hardwareSpec().rating()))
-                .toList();
+                .toList()
+                .reversed();
     }
 
     private List<Motherboard> getAllWithSortingOfRatingAsc() {
         return getAll()
                 .stream()
                 .sorted(Comparator.comparing(motherboard -> motherboard.hardwareSpec().rating()))
-                .toList()
-                .reversed();
+                .toList();
     }
 
     private List<Motherboard> getAllWithFilteringByPrice(int lowestPrice, int highestPrice) {

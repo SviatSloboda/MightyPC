@@ -148,7 +148,7 @@ class PcCaseServiceTest extends BaseServiceTest<PcCase, PcCaseService, PcCaseRep
     @Test
     void getAllWithSortingOfRatingDescAsPages_shouldGetAllPcCasesWithProperSorting() {
         // Arrange
-        Page<PcCase> expected = new PageImpl<>(List.of(testPcCase, testPcCase2), pageable, 8);
+        Page<PcCase> expected = new PageImpl<>(List.of(testPcCase2, testPcCase), pageable, 8);
         when(repository.findAll()).thenReturn(pcCases);
 
         // Act
@@ -162,7 +162,7 @@ class PcCaseServiceTest extends BaseServiceTest<PcCase, PcCaseService, PcCaseRep
     @Test
     void getAllWithSortingOfRatingAscAsPages_shouldGetAllPcCasesWithProperSorting() {
         // Arrange
-        Page<PcCase> expected = new PageImpl<>(List.of(testPcCase2, testPcCase), pageable, 8);
+        Page<PcCase> expected = new PageImpl<>(List.of(testPcCase, testPcCase2), pageable, 8);
         when(repository.findAll()).thenReturn(pcCases);
 
         // Act

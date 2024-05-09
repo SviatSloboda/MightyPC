@@ -93,7 +93,7 @@ public class RamController extends BaseController<RAM, RamService> {
     }
 
     @GetMapping("/filter/type")
-    public Page<RAM> getFilteredRamsBySocket(Pageable pageable, @RequestParam(value = "type", defaultValue = "DDR4") String type) {
+    public Page<RAM> getFilteredRamsByType(Pageable pageable, @RequestParam(value = "type", defaultValue = "DDR4") String type) {
         return service.getAllWithFilteringByTypeAsPages(pageable, type);
     }
 

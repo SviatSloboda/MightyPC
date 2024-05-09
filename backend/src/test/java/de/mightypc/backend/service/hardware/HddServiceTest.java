@@ -160,7 +160,7 @@ class HddServiceTest extends BaseServiceTest<HDD, HddService, HddRepository, Hdd
     @Test
     void getAllWithSortingOfRatingDescAsPages_shouldGetAllHddsWithProperSorting() {
         // Arrange
-        Page<HDD> expected = new PageImpl<>(List.of(testHdd, testHdd2), pageable, 8);
+        Page<HDD> expected = new PageImpl<>(List.of(testHdd2, testHdd), pageable, 8);
         when(repository.findAll()).thenReturn(hdds);
 
         // Act
@@ -174,7 +174,7 @@ class HddServiceTest extends BaseServiceTest<HDD, HddService, HddRepository, Hdd
     @Test
     void getAllWithSortingOfRatingAscAsPages_shouldGetAllHddsWithProperSorting() {
         // Arrange
-        Page<HDD> expected = new PageImpl<>(List.of(testHdd2, testHdd), pageable, 8);
+        Page<HDD> expected = new PageImpl<>(List.of(testHdd, testHdd2), pageable, 8);
         when(repository.findAll()).thenReturn(hdds);
 
         // Act

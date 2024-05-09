@@ -121,15 +121,15 @@ public class CpuService extends BaseService<CPU, CpuRepository, CpuNotFoundExcep
         return getAll()
                 .stream()
                 .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().rating()))
-                .toList();
+                .toList()
+                .reversed();
     }
 
     private List<CPU> getAllWithSortingOfRatingAsc() {
         return getAll()
                 .stream()
                 .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().rating()))
-                .toList()
-                .reversed();
+                .toList();
     }
 
     private List<CPU> getAllWithFilteringByPrice(int lowestPrice, int highestPrice) {

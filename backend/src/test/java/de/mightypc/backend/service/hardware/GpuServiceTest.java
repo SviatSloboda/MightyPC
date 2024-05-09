@@ -161,7 +161,7 @@ class GpuServiceTest extends BaseServiceTest<GPU, GpuService, GpuRepository, Gpu
     @Test
     void getAllWithSortingOfRatingDescAsPages_shouldGetAllGpusWithProperSorting() {
         // Arrange
-        Page<GPU> expected = new PageImpl<>(List.of(testGpu, testGpu2), pageable, 8);
+        Page<GPU> expected = new PageImpl<>(List.of(testGpu2, testGpu), pageable, 8);
         when(repository.findAll()).thenReturn(gpus);
 
         // Act
@@ -175,7 +175,7 @@ class GpuServiceTest extends BaseServiceTest<GPU, GpuService, GpuRepository, Gpu
     @Test
     void getAllWithSortingOfRatingAscAsPages_shouldGetAllGpusWithProperSorting() {
         // Arrange
-        Page<GPU> expected = new PageImpl<>(List.of(testGpu2, testGpu), pageable, 8);
+        Page<GPU> expected = new PageImpl<>(List.of(testGpu, testGpu2), pageable, 8);
         when(repository.findAll()).thenReturn(gpus);
 
         // Act

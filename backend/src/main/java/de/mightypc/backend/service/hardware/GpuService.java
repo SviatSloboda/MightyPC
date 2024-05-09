@@ -109,15 +109,15 @@ public class GpuService extends BaseService<GPU, GpuRepository, GpuNotFoundExcep
         return getAll()
                 .stream()
                 .sorted(Comparator.comparing(gpu -> gpu.hardwareSpec().rating()))
-                .toList();
+                .toList()
+                .reversed();
     }
 
     private List<GPU> getAllWithSortingOfRatingAsc() {
         return getAll()
                 .stream()
                 .sorted(Comparator.comparing(gpu -> gpu.hardwareSpec().rating()))
-                .toList()
-                .reversed();
+                .toList();
     }
 
     private List<GPU> getAllWithFilteringByPrice(int lowestPrice, int highestPrice) {

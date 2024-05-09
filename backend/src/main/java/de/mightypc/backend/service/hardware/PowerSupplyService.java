@@ -66,11 +66,12 @@ public class PowerSupplyService extends BaseService<PowerSupply, PowerSupplyRepo
 
     @Transactional(readOnly = true)
     public Map<String, String> getAllPowerSuppliesByEnergyConsumption(int energyConsumption) {
-        HashMap<String, String> powerSuppliesWithIdsAndNames = new HashMap<>();
+        LinkedHashMap<String, String> powerSuppliesWithIdsAndNames = new LinkedHashMap<>();
         List<PowerSupply> allPowerSupplies = getAll();
 
         List<PowerSupply> suitablePowerSupplies = allPowerSupplies.stream()
                 .filter(powerSupply -> powerSupply.power() >= energyConsumption)
+                .sorted(Comparator.comparingDouble(powerSupply -> powerSupply.hardwareSpec().price().doubleValue()))
                 .toList();
 
         for (PowerSupply powerSupply : suitablePowerSupplies) {
@@ -129,15 +130,15 @@ public class PowerSupplyService extends BaseService<PowerSupply, PowerSupplyRepo
         return getAll()
                 .stream()
                 .sorted(Comparator.comparing(powerSupply -> powerSupply.hardwareSpec().rating()))
-                .toList();
+                .toList()
+                .reversed();
     }
 
     private List<PowerSupply> getAllWithSortingOfRatingAsc() {
         return getAll()
                 .stream()
                 .sorted(Comparator.comparing(powerSupply -> powerSupply.hardwareSpec().rating()))
-                .toList()
-                .reversed();
+                .toList();
     }
 
     private List<PowerSupply> getAllWithFilteringByPrice(int lowestPrice, int highestPrice) {

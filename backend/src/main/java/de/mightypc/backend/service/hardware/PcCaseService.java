@@ -106,15 +106,15 @@ public class PcCaseService extends BaseService<PcCase, PcCaseRepository, PcCaseN
         return getAll()
                 .stream()
                 .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().rating()))
-                .toList();
+                .toList()
+                .reversed();
     }
 
     private List<PcCase> getAllWithSortingOfRatingAsc() {
         return getAll()
                 .stream()
                 .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().rating()))
-                .toList()
-                .reversed();
+                .toList();
     }
 
     private List<PcCase> getAllWithFilteringByPrice(int lowestPrice, int highestPrice) {

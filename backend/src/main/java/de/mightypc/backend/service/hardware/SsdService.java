@@ -116,15 +116,15 @@ public class SsdService extends BaseService<SSD, SsdRepository, SsdNotFoundExcep
         return getAll()
                 .stream()
                 .sorted(Comparator.comparing(ssd -> ssd.hardwareSpec().rating()))
-                .toList();
+                .toList()
+                .reversed();
     }
 
     private List<SSD> getAllWithSortingOfRatingAsc() {
         return getAll()
                 .stream()
                 .sorted(Comparator.comparing(ssd -> ssd.hardwareSpec().rating()))
-                .toList()
-                .reversed();
+                .toList();
     }
 
     private List<SSD> getAllWithFilteringByPrice(int lowestPrice, int highestPrice) {

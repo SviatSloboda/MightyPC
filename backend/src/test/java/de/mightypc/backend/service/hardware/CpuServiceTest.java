@@ -181,7 +181,7 @@ class CpuServiceTest extends BaseServiceTest<CPU, CpuService, CpuRepository, Cpu
     @Test
     void getAllWithSortingOfRatingDescAsPages_shouldGetAllCpusWithProperSorting() {
         // Arrange
-        Page<CPU> expected = new PageImpl<>(List.of(testCpu, testCpu2), pageable, 8);
+        Page<CPU> expected = new PageImpl<>(List.of(testCpu2, testCpu), pageable, 8);
         when(repository.findAll()).thenReturn(cpus);
 
         // Act
@@ -195,7 +195,7 @@ class CpuServiceTest extends BaseServiceTest<CPU, CpuService, CpuRepository, Cpu
     @Test
     void getAllWithSortingOfRatingAscAsPages_shouldGetAllCpusWithProperSorting() {
         // Arrange
-        Page<CPU> expected = new PageImpl<>(List.of(testCpu2, testCpu), pageable, 8);
+        Page<CPU> expected = new PageImpl<>(List.of(testCpu, testCpu2), pageable, 8);
         when(repository.findAll()).thenReturn(cpus);
 
         // Act

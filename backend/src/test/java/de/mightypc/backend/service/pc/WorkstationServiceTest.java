@@ -202,7 +202,7 @@ class WorkstationServiceTest {
     @Test
     void getAllWithSortingOfRatingDescAsPages_shouldGetAllGpusWithProperSorting() {
         // Arrange
-        Page<Workstation> expected = new PageImpl<>(List.of(testWorkstation, testWorkstation2), pageable, 8);
+        Page<Workstation> expected = new PageImpl<>(List.of(testWorkstation2, testWorkstation), pageable, 8);
         when(workstationRepository.findAll()).thenReturn(workstations);
 
         // Act
@@ -216,7 +216,7 @@ class WorkstationServiceTest {
     @Test
     void getAllWithSortingOfRatingAscAsPages_shouldGetAllGpusWithProperSorting() {
         // Arrange
-        Page<Workstation> expected = new PageImpl<>(List.of(testWorkstation2, testWorkstation), pageable, 8);
+        Page<Workstation> expected = new PageImpl<>(List.of(testWorkstation, testWorkstation2), pageable, 8);
         when(workstationRepository.findAll()).thenReturn(workstations);
 
         // Act

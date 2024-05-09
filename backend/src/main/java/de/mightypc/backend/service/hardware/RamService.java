@@ -121,15 +121,15 @@ public class RamService extends BaseService<RAM, RamRepository, RamNotFoundExcep
         return getAll()
                 .stream()
                 .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().rating()))
-                .toList();
+                .toList()
+                .reversed();
     }
 
     private List<RAM> getAllWithSortingOfRatingAsc() {
         return getAll()
                 .stream()
                 .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().rating()))
-                .toList()
-                .reversed();
+                .toList();
     }
 
     private List<RAM> getAllWithFilteringByPrice(int lowestPrice, int highestPrice) {

@@ -1,4 +1,4 @@
-package de.mightypc.backend.controller.shop.user;
+package de.mightypc.backend.controller.upload;
 
 import de.mightypc.backend.service.CloudinaryService;
 import de.mightypc.backend.service.shop.user.UserService;

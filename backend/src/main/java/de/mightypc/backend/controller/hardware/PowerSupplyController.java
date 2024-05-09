@@ -85,9 +85,9 @@ public class PowerSupplyController extends BaseController<PowerSupply, PowerSupp
     }
 
     @GetMapping("/filter/power")
-    public Page<PowerSupply> getFilteredPowerSuppliesByCapacity(Pageable pageable,
-                                                                @RequestParam(value = "lowest", defaultValue = "0") int minimalPower,
-                                                                @RequestParam(value = "highest", defaultValue = "999999") int maximalPower) {
+    public Page<PowerSupply> getFilteredPowerSuppliesByPower(Pageable pageable,
+                                                             @RequestParam(value = "lowest", defaultValue = "0") int minimalPower,
+                                                             @RequestParam(value = "highest", defaultValue = "999999") int maximalPower) {
         return service.getAllWithFilteringByPowerAsPages(pageable, minimalPower, maximalPower);
     }
 }

@@ -200,7 +200,7 @@ class PowerSupplyServiceTest extends BaseServiceTest<PowerSupply, PowerSupplySer
     @Test
     void getAllWithSortingOfRatingDescAsPages_shouldGetAllPowerSuppliesWithProperSorting() {
         // Arrange
-        Page<PowerSupply> expected = new PageImpl<>(List.of(testPowerSupply, testPowerSupply2), pageable, 8);
+        Page<PowerSupply> expected = new PageImpl<>(List.of(testPowerSupply2, testPowerSupply), pageable, 8);
         when(repository.findAll()).thenReturn(powerSupplies);
 
         // Act
@@ -214,7 +214,7 @@ class PowerSupplyServiceTest extends BaseServiceTest<PowerSupply, PowerSupplySer
     @Test
     void getAllWithSortingOfRatingAscAsPages_shouldGetAllPowerSuppliesWithProperSorting() {
         // Arrange
-        Page<PowerSupply> expected = new PageImpl<>(List.of(testPowerSupply2, testPowerSupply), pageable, 8);
+        Page<PowerSupply> expected = new PageImpl<>(List.of(testPowerSupply, testPowerSupply2), pageable, 8);
         when(repository.findAll()).thenReturn(powerSupplies);
 
         // Act

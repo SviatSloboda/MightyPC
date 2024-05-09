@@ -75,13 +75,12 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webflux</artifactId>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>mockwebserver</artifactId>
+            <version>4.9.1</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
-
     <build>
         <finalName>app</finalName>
 

@@ -186,7 +186,7 @@ class MotherboardServiceTest extends BaseServiceTest<Motherboard, MotherboardSer
     @Test
     void getAllWithSortingOfRatingDescAsPages_shouldGetAllMotherboardsWithProperSorting() {
         // Arrange
-        Page<Motherboard> expected = new PageImpl<>(List.of(testMotherboard, testMotherboard2), pageable, 8);
+        Page<Motherboard> expected = new PageImpl<>(List.of(testMotherboard2, testMotherboard), pageable, 8);
         when(repository.findAll()).thenReturn(motherboards);
 
         // Act
@@ -200,7 +200,7 @@ class MotherboardServiceTest extends BaseServiceTest<Motherboard, MotherboardSer
     @Test
     void getAllWithSortingOfRatingAscAsPages_shouldGetAllMotherboardsWithProperSorting() {
         // Arrange
-        Page<Motherboard> expected = new PageImpl<>(List.of(testMotherboard2, testMotherboard), pageable, 8);
+        Page<Motherboard> expected = new PageImpl<>(List.of(testMotherboard, testMotherboard2), pageable, 8);
         when(repository.findAll()).thenReturn(motherboards);
 
         // Act

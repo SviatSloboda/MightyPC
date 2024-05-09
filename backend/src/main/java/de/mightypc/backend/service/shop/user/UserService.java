@@ -58,12 +58,12 @@ public class UserService {
         return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("There is no such user"));
     }
 
-    public void attachPhoto(String userId, String photoUrl) {
+    public User attachPhoto(String userId, String photoUrl) {
         User user = getUserById(userId);
 
         user.setUserPhoto(photoUrl);
 
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
     public void deleteImage(String userId) {

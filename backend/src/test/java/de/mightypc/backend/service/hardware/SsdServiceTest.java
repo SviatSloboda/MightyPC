@@ -160,7 +160,7 @@ class SsdServiceTest extends BaseServiceTest<SSD, SsdService, SsdRepository, Ssd
     @Test
     void getAllWithSortingOfRatingDescAsPages_shouldGetAllSsdsWithProperSorting() {
         // Arrange
-        Page<SSD> expected = new PageImpl<>(List.of(testSsd, testSsd2), pageable, 8);
+        Page<SSD> expected = new PageImpl<>(List.of(testSsd2, testSsd), pageable, 8);
         when(repository.findAll()).thenReturn(ssds);
 
         // Act
@@ -174,7 +174,7 @@ class SsdServiceTest extends BaseServiceTest<SSD, SsdService, SsdRepository, Ssd
     @Test
     void getAllWithSortingOfRatingAscAsPages_shouldGetAllSsdsWithProperSorting() {
         // Arrange
-        Page<SSD> expected = new PageImpl<>(List.of(testSsd2, testSsd), pageable, 8);
+        Page<SSD> expected = new PageImpl<>(List.of(testSsd, testSsd2), pageable, 8);
         when(repository.findAll()).thenReturn(ssds);
 
         // Act

@@ -117,15 +117,15 @@ public class HddService extends BaseService<HDD, HddRepository, HddNotFoundExcep
         return getAll()
                 .stream()
                 .sorted(Comparator.comparing(hdd -> hdd.hardwareSpec().rating()))
-                .toList();
+                .toList()
+                .reversed();
     }
 
     private List<HDD> getAllWithSortingOfRatingAsc() {
         return getAll()
                 .stream()
                 .sorted(Comparator.comparing(hdd -> hdd.hardwareSpec().rating()))
-                .toList()
-                .reversed();
+                .toList();
     }
 
     private List<HDD> getAllWithFilteringByPrice(int lowestPrice, int highestPrice) {
