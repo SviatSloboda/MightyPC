@@ -1,161 +1,154 @@
 package de.mightypc.backend.service.hardware;
 
-import de.mightypc.backend.exception.HardwareNotFoundException;
+import de.mightypc.backend.service.hardware.BaseService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.exceptions.base.MockitoException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.times;
 
-class BaseServiceTest {
-
-    @Mock
-    private MongoRepository<Object, String> repository;
-
-    private BaseService<Object, MongoRepository<Object, String>> baseService;
+public abstract class BaseServiceTest<T, S extends BaseService<T, R, E>, R extends MongoRepository<T, String>, E extends NoSuchElementException> {
+    protected R repository;
+    protected S service;
 
     @BeforeEach
-    void setUp() {
-        try {
-            MockitoAnnotations.openMocks(this);
-            baseService = new BaseService<>(repository) {
-                @Override
-                protected String getId(Object entity) {
-                    return "1";
-                }
-            };
-        } catch (MockitoException e) {
-            e.getUnfilteredStackTrace();
-        }
+    void setup() {
+        repository = getMockRepository();
+        service = getService(repository);
     }
 
     @Test
-    void getAll_ReturnsAllEntities() {
+    void getAllEntities_shouldReturnAllEntities() {
         // Arrange
-        List<Object> expected = new ArrayList<>(List.of(new Object()));
+        List<T> expected = new ArrayList<>(List.of(getEntity()));
         when(repository.findAll()).thenReturn(expected);
 
         // Act
-        List<Object> actual = baseService.getAll();
+        List<T> actual = service.getAll();
 
         // Assert
-        assertEquals(expected, actual, "getAll should return all entities");
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllEntities_shouldThrowHardwareNotFoundException_whenNoEntitiesWereFound() {
+        // Arrange
+        when(repository.findAll()).thenReturn(List.of());
+
+        // Act & Assert
+        assertThrows(getException().getClass(), () -> service.getAll());
         verify(repository).findAll();
     }
 
-
     @Test
-    void getAll_ReturnsEmptyListWhenNoEntities() {
+    void getById_shouldReturnEntity() {
         // Arrange
-        List<Object> expected = new ArrayList<>();
-        when(repository.findAll()).thenReturn(expected);
-
-        // Act & Assert
-        assertThrows(HardwareNotFoundException.class, baseService::getAll);
-    }
-
-    @Test
-    void getById_ReturnsEntityWhenExists() {
-        //Arrange
-        Object expected = new Object();
-        when(repository.findById("1")).thenReturn(Optional.of(expected));
-
-        //Act
-        Object actual = baseService.getById("1");
-
-        //Assert
-        assertEquals(expected, actual, "getById should return the entity when it exists");
-        verify(repository).findById("1");
-    }
-
-    @Test
-    void getById_ThrowsExceptionWhenEntityDoesNotExist() {
-        //Arrange
-        when(repository.findById("1")).thenReturn(Optional.empty());
-
-        //Act & Assert
-        assertThrows(HardwareNotFoundException.class, () -> baseService.getById("1"),
-                "getById should throw HardwareNotFoundException when the entity does not exist");
-        verify(repository).findById("1");
-    }
-
-    @Test
-    void save_ReturnsSavedEntity() {
-        // Arrange
-        Object expected = new Object();
-        when(repository.save(expected)).thenReturn(expected);
+        T entity = getEntity();
+        when(repository.findById("testId")).thenReturn(Optional.of(entity));
 
         // Act
-        Object actual = baseService.save(expected);
+        T actual = service.getById("testId");
 
         // Assert
-        assertEquals(expected, actual, "save should return the saved entity");
-        verify(repository).save(expected);
+        verify(repository).findById("testId");
+        assertEquals(entity, actual);
     }
 
     @Test
-    void update_ReturnsUpdatedEntityWhenEntityExists() {
+    void getById_shouldThrowHardwareNotFoundException_whenEntityWasNotFound() {
         // Arrange
-        Object expected = new Object();
-        when(repository.existsById("1")).thenReturn(true);
-        when(repository.save(expected)).thenReturn(expected);
-
-        // Act
-        Object actual = baseService.update(expected);
-
-        // Assert
-        assertEquals(expected, actual, "update should return the updated entity");
-        verify(repository).save(expected);
-        verify(repository).existsById("1");
-    }
-
-    @Test
-    void update_ThrowsExceptionWhenEntityDoesNotExist() {
-        // Arrange
-        Object expected = new Object();
-        when(repository.existsById("1")).thenReturn(false);
+        when(repository.findById("testId")).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(HardwareNotFoundException.class, () -> baseService.update(expected),
-                "update should throw HardwareNotFoundException when the entity does not exist");
-        verify(repository).existsById("1");
+        assertThrows(getException().getClass(), () -> service.getById("testId"));
+        verify(repository).findById("testId");
     }
 
     @Test
-    void deleteById_DeletesEntityWhenExists() {
+    void save_shouldSaveEntityAndReturnThisEntity() {
         // Arrange
-        String id = "1";
-        when(repository.existsById(id)).thenReturn(true).thenReturn(false);
+        T entity = getEntity();
+        when(repository.save(entity)).thenReturn(entity);
 
         // Act
-        boolean result = baseService.deleteById(id);
+        T actual = service.save(entity);
 
         // Assert
-        assertTrue(result, "deleteById should return true when the entity exists and is deleted");
-        verify(repository).deleteById(id);
-        verify(repository, times(2)).existsById(id);
+        verify(repository).save(entity);
+        assertEquals(entity, actual);
     }
 
     @Test
-    void deleteById_ThrowsHardwareNotFoundExceptionWhenEntityDoesNotExist() {
+    void deleteById_shouldDeleteAndReturnTrue() {
         // Arrange
-        String id = "1";
-        when(repository.existsById(id)).thenReturn(false);
+        when(repository.existsById("testId")).thenReturn(true).thenReturn(false);
+
+        // Act
+        boolean actual = service.deleteById("testId");
+
+        // Assert
+        verify(repository, times(2)).existsById("testId");
+        verify(repository).deleteById("testId");
+        assertTrue(actual);
+    }
+
+    @Test
+    void deleteById_shouldThrowHardwareNotFoundException_whenEntityDoesNotExist() {
+        // Arrange
+        when(repository.existsById("testId")).thenReturn(false);
 
         // Act & Assert
-        assertThrows(HardwareNotFoundException.class, () -> baseService.deleteById(id), "Expected HardwareNotFoundException when entity does not exist");
-        verify(repository).existsById(id);
+        assertThrows(getException().getClass(),
+                () -> service.deleteById("testId"),
+                "Entity was not Found. Id of entity: testId");
+        verify(repository).existsById("testId");
     }
+
+    @Test
+    void getAllByPage_shouldReturnPageWithEntities() {
+        // Arrange
+        PageRequest pageable = PageRequest.of(0, 1);
+        T entity = getEntity();
+        Page<T> expectedPage = new PageImpl<>(List.of(entity), pageable, 1);
+        when(repository.findAll(pageable)).thenReturn(expectedPage);
+
+        // Act
+        Page<T> actualPage = service.getAllByPage(pageable);
+
+        // Assert
+        assertEquals(expectedPage, actualPage);
+    }
+
+    protected abstract E getException();
+
+    protected abstract R getMockRepository();
+
+    protected abstract S getService(R repository);
+
+    protected abstract T getEntity();
+
+    abstract void update_shouldUpdateEntityAndReturnIt();
+
+    abstract void update_shouldThrowHardwareNotFoundException_whenEntityDoesNotExistInRepository();
+
+    abstract void getAllNamesWithPrices_shouldReturnMapOfNamesWithPrices();
+
+    abstract void attachPhoto_shouldAttachPhotoCorrectly();
+
+    abstract void attachPhoto_shouldThrowHardwareNotFoundException_whenEntityDoesNotExistInRepository();
 }

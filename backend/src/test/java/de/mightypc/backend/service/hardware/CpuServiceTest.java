@@ -1,192 +1,270 @@
 package de.mightypc.backend.service.hardware;
 
-import de.mightypc.backend.exception.HardwareNotFoundException;
-import de.mightypc.backend.model.specs.CPU;
-import de.mightypc.backend.model.specs.HardwareSpec;
+import de.mightypc.backend.exception.hardware.CpuNotFoundException;
+import de.mightypc.backend.model.hardware.CPU;
+import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.CpuRepository;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.times;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
-class CpuServiceTest {
-    private final CpuRepository cpuRepository = mock(CpuRepository.class);
-    private final CpuService cpuService = new CpuService(cpuRepository);
+class CpuServiceTest extends BaseServiceTest<CPU, CpuService, CpuRepository, CpuNotFoundException> {
+    private final CpuRepository mockCpuRepository = mock(CpuRepository.class);
+    private final CpuService cpuService = new CpuService(mockCpuRepository);
 
-    private static CPU getCpu() {
-        return new CPU("1", new HardwareSpec(
-                "test",
-                "test",
-                new BigDecimal("1"),
-                1.01f),
-                9500,
-                125
-        );
-    }
+    private final CPU testCpu = new CPU(
+            "testId",
+            new HardwareSpec("test", "test", new BigDecimal(666), 1.99f),
+            23,
+            "testSocket"
+    );
 
+    private final CPU testCpu2 = new CPU(
+            "testId2",
+            new HardwareSpec("test2", "test2", new BigDecimal(333), 4.99f),
+            240,
+            "testSocket2"
+    );
+
+    private final PageRequest pageable = PageRequest.of(0, 8);
+
+    private final List<CPU> cpus = new ArrayList<>(List.of(testCpu, testCpu2));
+
+    @Override
     @Test
-    void getAll_ReturnsAllCpus() {
+    void update_shouldUpdateEntityAndReturnIt() {
         // Arrange
-        List<CPU> expected = new ArrayList<>(List.of(getCpu()));
-        when(cpuRepository.findAll()).thenReturn(expected);
+        CPU expected = testCpu.withEnergyConsumption(999);
+
+        when(mockCpuRepository.existsById("testId")).thenReturn(true);
+        when(mockCpuRepository.save(expected)).thenReturn(expected);
 
         // Act
-        List<CPU> actual = cpuService.getAll();
+        CPU actual = service.update(expected);
 
         // Assert
-        assertEquals(expected, actual, "getAll should return all CPUs");
-        verify(cpuRepository).findAll();
+        verify(mockCpuRepository).save(expected);
+        assertEquals(expected, actual);
     }
 
+    @Override
     @Test
-    void getAll_ReturnsEmptyListWhenNoCpus() {
+    void update_shouldThrowHardwareNotFoundException_whenEntityDoesNotExistInRepository() {
         // Arrange
-        List<CPU> expected = new ArrayList<>();
-        when(cpuRepository.findAll()).thenReturn(expected);
+        CPU expected = testCpu.withEnergyConsumption(999);
+        when(mockCpuRepository.existsById("testId")).thenReturn(false);
+        when(mockCpuRepository.save(expected)).thenReturn(expected);
+
+        // Act && Assert
+        assertThrows(CpuNotFoundException.class, () -> service.update(expected));
+        verify(mockCpuRepository).existsById("testId");
+    }
+
+    @Override
+    @Test
+    void getAllNamesWithPrices_shouldReturnMapOfNamesWithPrices() {
+        // Arrange
+        HashMap<String, String> expected = new HashMap<>();
+        expected.put("testId", "test ($666)");
+        when(mockCpuRepository.findAll()).thenReturn(List.of(testCpu));
+
+        // Act
+        HashMap<String, String> actual = service.getAllNamesWithPrices();
+
+        // Assert
+        assertEquals(expected, actual);
+        verify(mockCpuRepository).findAll();
+    }
+
+    @Override
+    @Test
+    void attachPhoto_shouldAttachPhotoCorrectly() {
+        // Arrange
+        CPU expected = testCpu.withPhotos(List.of("Test"));
+
+        when(mockCpuRepository.findById("testId")).thenReturn(Optional.of(testCpu));
+        when(mockCpuRepository.save(testCpu.withCpuPhotos(new ArrayList<>(List.of("Test"))))).thenReturn(expected);
+
+        // Act
+        CPU actualCpu = cpuService.attachPhoto("testId", "Test");
+
+        // Assert
+        assertEquals(actualCpu.cpuPhotos(), expected.cpuPhotos());
+        verify(mockCpuRepository).findById("testId");
+        verify(mockCpuRepository).save(testCpu.withCpuPhotos(new ArrayList<>(List.of("Test"))));
+    }
+
+    @Override
+    @Test
+    void attachPhoto_shouldThrowHardwareNotFoundException_whenEntityDoesNotExistInRepository() {
+        // Arrange
+        when(mockCpuRepository.findById("testId")).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(HardwareNotFoundException.class, cpuService::getAll);
+        assertThrows(CpuNotFoundException.class, () -> cpuService.attachPhoto("testId", "TEST"));
+        verify(mockCpuRepository).findById("testId");
     }
 
     @Test
-    void getById_ReturnsCpuWhenExists() {
-        //Arrange
-        CPU expected = getCpu();
-        when(cpuRepository.findById("1")).thenReturn(Optional.of(expected));
-
-        //Act
-        CPU actual = cpuService.getById("1");
-
-        //Assert
-        assertEquals(expected, actual, "getById should return the CPU when it exists");
-        verify(cpuRepository).findById("1");
-    }
-
-    @Test
-    void getById_ThrowsExceptionWhenCpuDoesNotExist() {
-        //Arrange
-        when(cpuRepository.findById("1")).thenReturn(Optional.empty());
-
-        //Act & Assert
-        assertThrows(HardwareNotFoundException.class, () -> cpuService.getById("1"),
-                "getById should throw HardwareNotFoundException when the CPU does not exist");
-        verify(cpuRepository).findById("1");
-    }
-
-    @Test
-    void save_ReturnsSavedCpu() {
+    void getSocketOfCpuById_shouldGiveCorrectSocket() {
         // Arrange
-        CPU expected = getCpu();
-        when(cpuRepository.save(expected)).thenReturn(expected);
+        when(mockCpuRepository.findById("testId")).thenReturn(Optional.of(testCpu));
 
         // Act
-        CPU actual = cpuService.save(expected);
+        String actual = cpuService.getSocketOfCpuById("testId");
 
         // Assert
-        assertEquals(expected, actual, "save should return the saved CPU");
-        verify(cpuRepository).save(expected);
+        verify(mockCpuRepository).findById("testId");
+        assertEquals(testCpu.socket(), actual);
     }
 
     @Test
-    void update_ReturnsUpdatedCpuWhenCpuExists() {
+    void getSocketOfCpuById_shouldThrowHardwareNotFoundException_whenCpuDoesNotExistInRepository() {
         // Arrange
-        CPU expected = getCpu();
-        when(cpuRepository.existsById("1")).thenReturn(true);
-        when(cpuRepository.save(expected)).thenReturn(expected);
+        when(mockCpuRepository.findById("testId")).thenReturn(Optional.empty());
+
+        // Act && Assert
+        assertThrows(CpuNotFoundException.class, () -> cpuService.getSocketOfCpuById("testId"));
+        verify(mockCpuRepository).findById("testId");
+    }
+
+    @Test
+    void getNameOfEntity_shouldReturnCorrectNameOfEntity() {
+        // Arrange & Act
+        String actual = service.getNameOfEntity(testCpu);
+
+        // Assert
+        assertEquals(testCpu.hardwareSpec().name(), actual);
+    }
+
+    @Test
+    void getAllWithSortingOfPriceDescAsPages_shouldGetAllCpusWithProperSorting() {
+        // Arrange
+        Page<CPU> expected = new PageImpl<>(List.of(testCpu, testCpu2), pageable, 8);
+        when(repository.findAll()).thenReturn(cpus);
 
         // Act
-        CPU actual = cpuService.update(expected);
+        Page<CPU> actual = service.getAllWithSortingOfPriceDescAsPages(pageable);
 
         // Assert
-        assertEquals(expected, actual, "update should return the updated CPU");
-        verify(cpuRepository).save(expected);
-        verify(cpuRepository).existsById("1");
+        verify(repository).findAll();
+        assertEquals(expected, actual);
     }
 
     @Test
-    void update_ThrowsExceptionWhenCpuDoesNotExist() {
+    void getAllWithSortingOfPriceAscAsPages_shouldGetAllCpusWithProperSorting() {
         // Arrange
-        CPU expected = getCpu();
-        when(cpuRepository.existsById("1")).thenReturn(false);
-
-        // Act & Assert
-        assertThrows(HardwareNotFoundException.class, () -> cpuService.update(expected),
-                "update should throw HardwareNotFoundException when the CPU does not exist");
-        verify(cpuRepository).existsById("1");
-    }
-
-    @Test
-    void deleteById_DeletesCpuWhenExists() {
-        // Arrange
-        String id = "1";
-        when(cpuRepository.existsById(id)).thenReturn(true).thenReturn(false);
+        Page<CPU> expected = new PageImpl<>(List.of(testCpu2, testCpu), pageable, 8);
+        when(repository.findAll()).thenReturn(cpus);
 
         // Act
-        boolean result = cpuService.deleteById(id);
+        Page<CPU> actual = service.getAllWithSortingOfPriceAscAsPages(pageable);
 
         // Assert
-        assertTrue(result, "deleteById should return true when the CPU exists and is deleted");
-        verify(cpuRepository).deleteById(id);
-        verify(cpuRepository, times(2)).existsById(id);
+        verify(repository).findAll();
+        assertEquals(expected, actual);
     }
 
     @Test
-    void deleteById_ThrowsHardwareNotFoundExceptionWhenCpuDoesNotExist() {
+    void getAllWithSortingOfRatingDescAsPages_shouldGetAllCpusWithProperSorting() {
         // Arrange
-        String id = "1";
-        when(cpuRepository.existsById(id)).thenReturn(false);
-
-        // Act & Assert
-        assertThrows(HardwareNotFoundException.class, () -> cpuService.deleteById(id), "Expected HardwareNotFoundException when CPU does not exist");
-        verify(cpuRepository).existsById(id);
-    }
-
-    @Test
-    void attachPhoto_WhenCpuExists_ThenPhotoIsAttached() {
-        // Arrange
-        String cpuId = "1";
-        String photoUrl = "https://example.com/photo.jpg";
-        CPU cpuBeforeUpdate = new CPU("1", new HardwareSpec("test", "test", new BigDecimal("1"), 1.01f), 9500, 125, new ArrayList<>());
-        Optional<CPU> optionalCpuBeforeUpdate = Optional.of(cpuBeforeUpdate);
-
-        List<String> photosWithNewUrl = new ArrayList<>();
-        photosWithNewUrl.add(photoUrl);
-        CPU cpuAfterUpdate = new CPU("1", new HardwareSpec("test", "test", new BigDecimal("1"), 1.01f), 9500, 125, photosWithNewUrl);
-
-        when(cpuRepository.findById(cpuId)).thenReturn(optionalCpuBeforeUpdate);
-        when(cpuRepository.save(any(CPU.class))).thenReturn(cpuAfterUpdate);
+        Page<CPU> expected = new PageImpl<>(List.of(testCpu2, testCpu), pageable, 8);
+        when(repository.findAll()).thenReturn(cpus);
 
         // Act
-        cpuService.attachPhoto(cpuId, photoUrl);
+        Page<CPU> actual = service.getAllWithSortingOfRatingDescAsPages(pageable);
 
         // Assert
-        verify(cpuRepository).findById(cpuId);
-        verify(cpuRepository).save(cpuAfterUpdate);
+        verify(repository).findAll();
+        assertEquals(expected, actual);
     }
 
-
     @Test
-    void attachPhoto_WhenCpuDoesNotExist_ThenNoActionTaken() {
+    void getAllWithSortingOfRatingAscAsPages_shouldGetAllCpusWithProperSorting() {
         // Arrange
-        String cpuId = "nonExistingId";
-        String photoUrl = "https://example.com/photo.jpg";
-        when(cpuRepository.findById(cpuId)).thenReturn(Optional.empty());
+        Page<CPU> expected = new PageImpl<>(List.of(testCpu, testCpu2), pageable, 8);
+        when(repository.findAll()).thenReturn(cpus);
 
         // Act
-        cpuService.attachPhoto(cpuId, photoUrl);
+        Page<CPU> actual = service.getAllWithSortingOfRatingAscAsPages(pageable);
 
         // Assert
-        verify(cpuRepository).findById(cpuId);
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithFilteringByEnergyConsumptionAsPages_shouldGetAllCpusWithProperFiltering() {
+        // Arrange
+        Page<CPU> expected = new PageImpl<>(Collections.singletonList(testCpu2), pageable, 8);
+        when(repository.findAll()).thenReturn(cpus);
+
+        // Act
+        Page<CPU> actual = service.getAllWithFilteringByEnergyConsumptionAsPages(pageable, 100, 300);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithFilteringByPriceAsPages_shouldGetAllCpusWithProperFiltering() {
+        // Arrange
+        Page<CPU> expected = new PageImpl<>(Collections.singletonList(testCpu), pageable, 8);
+        when(repository.findAll()).thenReturn(cpus);
+
+        // Act
+        Page<CPU> actual = service.getAllWithFilteringByPriceAsPages(pageable, 500, 2500);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithFilteringBySocketAsPages_shouldGetAllCpusWithProperFiltering() {
+        // Arrange
+        Page<CPU> expected = new PageImpl<>(Collections.singletonList(testCpu), pageable, 8);
+        when(repository.findAll()).thenReturn(cpus);
+
+        // Act
+        Page<CPU> actual = service.getAllWithFilteringBySocketAsPages(pageable, "testSocket");
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Override
+    protected CpuNotFoundException getException() {
+        return new CpuNotFoundException("There is no such Cpu with id: ");
+    }
+
+    @Override
+    protected CpuRepository getMockRepository() {
+        return mockCpuRepository;
+    }
+
+    @Override
+    protected CpuService getService(CpuRepository repository) {
+        return new CpuService(repository);
+    }
+
+    @Override
+    protected CPU getEntity() {
+        return testCpu;
     }
 }

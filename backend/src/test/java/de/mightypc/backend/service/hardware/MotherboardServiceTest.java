@@ -1,192 +1,275 @@
 package de.mightypc.backend.service.hardware;
 
-import de.mightypc.backend.exception.HardwareNotFoundException;
-import de.mightypc.backend.model.specs.Motherboard;
-import de.mightypc.backend.model.specs.HardwareSpec;
+import de.mightypc.backend.exception.hardware.MotherboardNotFoundException;
+import de.mightypc.backend.model.hardware.Motherboard;
+import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.MotherboardRepository;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.times;
+
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
-class MotherboardServiceTest {
-    private final MotherboardRepository motherboardRepository = mock(MotherboardRepository.class);
-    private final MotherboardService motherboardService = new MotherboardService(motherboardRepository);
+class MotherboardServiceTest extends BaseServiceTest<Motherboard, MotherboardService, MotherboardRepository, MotherboardNotFoundException> {
+    private final MotherboardRepository mockMotherboardRepository = mock(MotherboardRepository.class);
+    private final MotherboardService motherboardService = new MotherboardService(mockMotherboardRepository);
 
-    private static Motherboard getMotherboard() {
-        return new Motherboard("1", new HardwareSpec(
-                "test",
-                "test",
-                new BigDecimal("1"),
-                1.01f),
-                9500,
-                new String[]{},
-                new String[]{}
-        );
-    }
+    private final Motherboard testMotherboard = new Motherboard(
+            "testId",
+            new HardwareSpec("test", "test", new BigDecimal(666), 1.99f),
+            23,
+            "afd4"
+    );
 
+    private final Motherboard testMotherboard2 = new Motherboard(
+            "testId2",
+            new HardwareSpec("test", "test", new BigDecimal(333), 4.99f),
+            230,
+            "lol"
+    );
+
+    private final PageRequest pageable = PageRequest.of(0, 8);
+
+    private final List<Motherboard> motherboards = new ArrayList<>(List.of(testMotherboard, testMotherboard2));
+
+    @Override
     @Test
-    void getAll_ReturnsAllMotherboards() {
+    void update_shouldUpdateEntityAndReturnIt() {
         // Arrange
-        List<Motherboard> expected = new ArrayList<>(List.of(getMotherboard()));
-        when(motherboardRepository.findAll()).thenReturn(expected);
+        Motherboard expected = testMotherboard.withEnergyConsumption(999);
+
+        when(mockMotherboardRepository.existsById("testId")).thenReturn(true);
+        when(mockMotherboardRepository.save(expected)).thenReturn(expected);
 
         // Act
-        List<Motherboard> actual = motherboardService.getAll();
+        Motherboard actual = service.update(expected);
 
         // Assert
-        assertEquals(expected, actual, "getAll should return all Motherboards");
-        verify(motherboardRepository).findAll();
+        verify(mockMotherboardRepository).save(expected);
+        assertEquals(expected, actual);
     }
 
+    @Override
     @Test
-    void getAll_ReturnsEmptyListWhenNoMotherboards() {
+    void update_shouldThrowHardwareNotFoundException_whenEntityDoesNotExistInRepository() {
         // Arrange
-        List<Motherboard> expected = new ArrayList<>();
-        when(motherboardRepository.findAll()).thenReturn(expected);
+        Motherboard expected = testMotherboard.withEnergyConsumption(999);
+        when(mockMotherboardRepository.existsById("testId")).thenReturn(false);
+        when(mockMotherboardRepository.save(expected)).thenReturn(expected);
 
-        // Act & Assert
-        assertThrows(HardwareNotFoundException.class, motherboardService::getAll);
+        // Act && Assert
+        assertThrows(MotherboardNotFoundException.class, () -> service.update(expected));
+        verify(mockMotherboardRepository).existsById("testId");
     }
 
+    @Override
     @Test
-    void getById_ReturnsMotherboardWhenExists() {
-        //Arrange
-        Motherboard expected = getMotherboard();
-        when(motherboardRepository.findById("1")).thenReturn(Optional.of(expected));
-
-        //Act
-        Motherboard actual = motherboardService.getById("1");
-
-        //Assert
-        assertEquals(expected, actual, "getById should return the Motherboard when it exists");
-        verify(motherboardRepository).findById("1");
-    }
-
-    @Test
-    void getById_ThrowsExceptionWhenMotherboardDoesNotExist() {
-        //Arrange
-        when(motherboardRepository.findById("1")).thenReturn(Optional.empty());
-
-        //Act & Assert
-        assertThrows(HardwareNotFoundException.class, () -> motherboardService.getById("1"),
-                "getById should throw HardwareNotFoundException when the Motherboard does not exist");
-        verify(motherboardRepository).findById("1");
-    }
-
-    @Test
-    void save_ReturnsSavedMotherboard() {
+    void getAllNamesWithPrices_shouldReturnMapOfNamesWithPrices() {
         // Arrange
-        Motherboard expected = getMotherboard();
-        when(motherboardRepository.save(expected)).thenReturn(expected);
+        HashMap<String, String> expected = new HashMap<>();
+        expected.put("testId", "test ($666)");
+        when(mockMotherboardRepository.findAll()).thenReturn(List.of(testMotherboard));
 
         // Act
-        Motherboard actual = motherboardService.save(expected);
+        HashMap<String, String> actual = service.getAllNamesWithPrices();
 
         // Assert
-        assertEquals(expected, actual, "save should return the saved Motherboard");
-        verify(motherboardRepository).save(expected);
+        assertEquals(expected, actual);
+        verify(mockMotherboardRepository).findAll();
+    }
+
+    @Override
+    @Test
+    void attachPhoto_shouldAttachPhotoCorrectly() {
+        Motherboard expected = testMotherboard.withPhotos(List.of("Test"));
+
+        when(mockMotherboardRepository.findById("testId")).thenReturn(Optional.of(testMotherboard));
+        when(mockMotherboardRepository.save(testMotherboard.withMotherboardPhotos(new ArrayList<>(List.of("Test"))))).thenReturn(expected);
+
+        Motherboard actualMotherboard = motherboardService.attachPhoto("testId", "Test");
+
+        assertEquals(actualMotherboard.motherboardPhotos(), expected.motherboardPhotos());
+        verify(mockMotherboardRepository).findById("testId");
+        verify(mockMotherboardRepository).save(testMotherboard.withMotherboardPhotos(new ArrayList<>(List.of("Test"))));
+    }
+
+    @Override
+    @Test
+    void attachPhoto_shouldThrowHardwareNotFoundException_whenEntityDoesNotExistInRepository() {
+        when(mockMotherboardRepository.findById("testId")).thenReturn(Optional.empty());
+
+        assertThrows(MotherboardNotFoundException.class, () -> motherboardService.attachPhoto("testId", "TEST"));
+        verify(mockMotherboardRepository).findById("testId");
     }
 
     @Test
-    void update_ReturnsUpdatedMotherboardWhenMotherboardExists() {
+    void getMotherboardsBySocket_shouldReturnAllMotherboardsWithSpecifiedSocket() {
         // Arrange
-        Motherboard expected = getMotherboard();
-        when(motherboardRepository.existsById("1")).thenReturn(true);
-        when(motherboardRepository.save(expected)).thenReturn(expected);
+        HashMap<String, String> expected = new HashMap<>();
+        expected.put("testId", "test ($666)");
+
+        when(mockMotherboardRepository.findAll()).thenReturn(List.of(testMotherboard));
 
         // Act
-        Motherboard actual = motherboardService.update(expected);
+        Map<String, String> actual = motherboardService.getMotherboardsBySocket("afd4");
 
         // Assert
-        assertEquals(expected, actual, "update should return the updated Motherboard");
-        verify(motherboardRepository).save(expected);
-        verify(motherboardRepository).existsById("1");
+        verify(mockMotherboardRepository).findAll();
+        assertEquals(expected, actual);
     }
 
     @Test
-    void update_ThrowsExceptionWhenMotherboardDoesNotExist() {
+    void getMotherboardsBySocket_shouldReturnEmptyHashmap_when_noMotherboardsWithSpecifiedSocketWereFound() {
         // Arrange
-        Motherboard expected = getMotherboard();
-        when(motherboardRepository.existsById("1")).thenReturn(false);
-
-        // Act & Assert
-        assertThrows(HardwareNotFoundException.class, () -> motherboardService.update(expected),
-                "update should throw HardwareNotFoundException when the Motherboard does not exist");
-        verify(motherboardRepository).existsById("1");
-    }
-
-    @Test
-    void deleteById_DeletesMotherboardWhenExists() {
-        // Arrange
-        String id = "1";
-        when(motherboardRepository.existsById(id)).thenReturn(true).thenReturn(false);
+        when(mockMotherboardRepository.findAll()).thenReturn(List.of(testMotherboard));
 
         // Act
-        boolean result = motherboardService.deleteById(id);
+        Map<String, String> actual = motherboardService.getMotherboardsBySocket("notExisting");
 
         // Assert
-        assertTrue(result, "deleteById should return true when the Motherboard exists and is deleted");
-        verify(motherboardRepository).deleteById(id);
-        verify(motherboardRepository, times(2)).existsById(id);
+        verify(mockMotherboardRepository).findAll();
+        assertEquals(new HashMap<>(), actual);
+    }
+
+
+    @Test
+    void getNameOfEntity_shouldReturnCorrectNameOfEntity() {
+        // Arrange & Act
+        String actual = service.getNameOfEntity(testMotherboard);
+
+        // Assert
+        assertEquals(testMotherboard.hardwareSpec().name(), actual);
     }
 
     @Test
-    void deleteById_ThrowsHardwareNotFoundExceptionWhenMotherboardDoesNotExist() {
+    void getAllWithSortingOfPriceDescAsPages_shouldGetAllMotherboardsWithProperSorting() {
         // Arrange
-        String id = "1";
-        when(motherboardRepository.existsById(id)).thenReturn(false);
-
-        // Act & Assert
-        assertThrows(HardwareNotFoundException.class, () -> motherboardService.deleteById(id), "Expected HardwareNotFoundException when Motherboard does not exist");
-        verify(motherboardRepository).existsById(id);
-    }
-
-    @Test
-    void attachPhoto_WhenMotherboardExists_ThenPhotoIsAttached() {
-        // Arrange
-        String motherboardId = "1";
-        String photoUrl = "https://example.com/photo.jpg";
-        Motherboard motherboardBeforeUpdate = new Motherboard("1", new HardwareSpec("test", "test", new BigDecimal("1"), 1.01f), 9500, new String[]{}, new String[]{}, new ArrayList<>());
-        Optional<Motherboard> optionalMotherboardBeforeUpdate = Optional.of(motherboardBeforeUpdate);
-
-        List<String> photosWithNewUrl = new ArrayList<>();
-        photosWithNewUrl.add(photoUrl);
-        Motherboard motherboardAfterUpdate = new Motherboard("1", new HardwareSpec("test", "test", new BigDecimal("1"), 1.01f), 9500, new String[]{}, new String[]{}, photosWithNewUrl);
-
-        when(motherboardRepository.findById(motherboardId)).thenReturn(optionalMotherboardBeforeUpdate);
-        when(motherboardRepository.save(any(Motherboard.class))).thenReturn(motherboardAfterUpdate);
+        Page<Motherboard> expected = new PageImpl<>(List.of(testMotherboard, testMotherboard2), pageable, 8);
+        when(repository.findAll()).thenReturn(motherboards);
 
         // Act
-        motherboardService.attachPhoto(motherboardId, photoUrl);
+        Page<Motherboard> actual = service.getAllWithSortingOfPriceDescAsPages(pageable);
 
         // Assert
-        verify(motherboardRepository).findById(motherboardId);
-        verify(motherboardRepository).save(motherboardAfterUpdate);
+        verify(repository).findAll();
+        assertEquals(expected, actual);
     }
 
     @Test
-    void attachPhoto_WhenMotherboardDoesNotExist_ThenNoActionTaken() {
+    void getAllWithSortingOfPriceAscAsPages_shouldGetAllMotherboardsWithProperSorting() {
         // Arrange
-        String motherboardId = "nonExistingId";
-        String photoUrl = "https://example.com/photo.jpg";
-        when(motherboardRepository.findById(motherboardId)).thenReturn(Optional.empty());
+        Page<Motherboard> expected = new PageImpl<>(List.of(testMotherboard2, testMotherboard), pageable, 8);
+        when(repository.findAll()).thenReturn(motherboards);
 
         // Act
-        motherboardService.attachPhoto(motherboardId, photoUrl);
+        Page<Motherboard> actual = service.getAllWithSortingOfPriceAscAsPages(pageable);
 
         // Assert
-        verify(motherboardRepository).findById(motherboardId);
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithSortingOfRatingDescAsPages_shouldGetAllMotherboardsWithProperSorting() {
+        // Arrange
+        Page<Motherboard> expected = new PageImpl<>(List.of(testMotherboard2, testMotherboard), pageable, 8);
+        when(repository.findAll()).thenReturn(motherboards);
+
+        // Act
+        Page<Motherboard> actual = service.getAllWithSortingOfRatingDescAsPages(pageable);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithSortingOfRatingAscAsPages_shouldGetAllMotherboardsWithProperSorting() {
+        // Arrange
+        Page<Motherboard> expected = new PageImpl<>(List.of(testMotherboard, testMotherboard2), pageable, 8);
+        when(repository.findAll()).thenReturn(motherboards);
+
+        // Act
+        Page<Motherboard> actual = service.getAllWithSortingOfRatingAscAsPages(pageable);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithFilteringByEnergyConsumptionAsPages_shouldGetAllMotherboardsWithProperFiltering() {
+        // Arrange
+        Page<Motherboard> expected = new PageImpl<>(Collections.singletonList(testMotherboard2), pageable, 8);
+        when(repository.findAll()).thenReturn(motherboards);
+
+        // Act
+        Page<Motherboard> actual = service.getAllWithFilteringByEnergyConsumptionAsPages(pageable, 100, 300);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithFilteringByPriceAsPages_shouldGetAllMotherboardsWithProperFiltering() {
+        // Arrange
+        Page<Motherboard> expected = new PageImpl<>(Collections.singletonList(testMotherboard), pageable, 8);
+        when(repository.findAll()).thenReturn(motherboards);
+
+        // Act
+        Page<Motherboard> actual = service.getAllWithFilteringByPriceAsPages(pageable, 500, 2500);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithFilteringBySocketAsPages_shouldGetAllMotherboardsWithProperFiltering() {
+        // Arrange
+        Page<Motherboard> expected = new PageImpl<>(Collections.singletonList(testMotherboard), pageable, 8);
+        when(repository.findAll()).thenReturn(motherboards);
+
+        // Act
+        Page<Motherboard> actual = service.getAllWithFilteringBySocketAsPages(pageable, "afd4");
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Override
+    protected MotherboardNotFoundException getException() {
+        return new MotherboardNotFoundException("no mam");
+    }
+
+    @Override
+    protected MotherboardRepository getMockRepository() {
+        return mockMotherboardRepository;
+    }
+
+    @Override
+    protected MotherboardService getService(MotherboardRepository repository) {
+        return new MotherboardService(repository);
+    }
+
+    @Override
+    protected Motherboard getEntity() {
+        return testMotherboard;
     }
 }

@@ -1,17 +1,28 @@
 package de.mightypc.backend.service.hardware;
 
-import de.mightypc.backend.model.specs.SSD;
+import de.mightypc.backend.exception.hardware.SsdNotFoundException;
+import de.mightypc.backend.model.hardware.SSD;
 import de.mightypc.backend.repository.hardware.SsdRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Optional;
 
 @Service
-public class SsdService extends BaseService<SSD, SsdRepository> {
-    protected SsdService(SsdRepository ssdRepository) {
+public class SsdService extends BaseService<SSD, SsdRepository, SsdNotFoundException> {
+    public SsdService(SsdRepository ssdRepository) {
         super(ssdRepository);
+    }
+
+    @Override
+    protected SsdNotFoundException getException(String message) {
+        return new SsdNotFoundException(message);
     }
 
     @Override
@@ -19,18 +30,121 @@ public class SsdService extends BaseService<SSD, SsdRepository> {
         return entity.id();
     }
 
-    public void attachPhoto(String id, String photoUrl) {
-        Optional<SSD> ssd = repository.findById(id);
-        if (ssd.isPresent()) {
-            SSD presentWorkout = ssd.get();
-            List<String> photos = ssd.get().ssdPhotos();
+    @Override
+    protected String getNameOfEntity(SSD entity) {
+        return entity.hardwareSpec().name();
+    }
 
-            if (photos == null) {
-                photos = new ArrayList<>();
-            }
+    @Override
+    @Transactional
+    public SSD attachPhoto(String id, String photoUrl) {
+        SSD currSSD = getById(id);
 
-            photos.addFirst(photoUrl);
-            repository.save(presentWorkout.withPhotos(photos));
+        ArrayList<String> photos = new ArrayList<>(currSSD.ssdPhotos());
+
+        photos.addFirst(photoUrl);
+        SSD updatedSSD = currSSD.withPhotos(photos);
+
+        return repository.save(updatedSSD);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public LinkedHashMap<String, String> getAllNamesWithPrices() {
+        LinkedHashMap<String, String> hashMap = new LinkedHashMap<>();
+
+        List<SSD> allSsds = getAllWithSortingOfPriceDesc();
+
+        for (SSD ssd : allSsds) {
+            hashMap.put(ssd.id(), ssd.hardwareSpec().name() + " ($" + ssd.hardwareSpec().price() + ")");
         }
+
+        return hashMap;
+    }
+
+    @Transactional(readOnly = true)
+    public Page<SSD> getAllWithSortingOfPriceDescAsPages(Pageable pageable) {
+        return new PageImpl<>(getAllWithSortingOfPriceDesc(), pageable, 8);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<SSD> getAllWithSortingOfPriceAscAsPages(Pageable pageable) {
+        return new PageImpl<>(getAllWithSortingOfPriceAsc(), pageable, 8);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<SSD> getAllWithSortingOfRatingDescAsPages(Pageable pageable) {
+        return new PageImpl<>(getAllWithSortingOfRatingDesc(), pageable, 8);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<SSD> getAllWithSortingOfRatingAscAsPages(Pageable pageable) {
+        return new PageImpl<>(getAllWithSortingOfRatingAsc(), pageable, 8);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<SSD> getAllWithFilteringByPriceAsPages(Pageable pageable, int lowestPrice, int highestPrice) {
+        return new PageImpl<>(getAllWithFilteringByPrice(lowestPrice, highestPrice), pageable, 8);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<SSD> getAllWithFilteringByEnergyConsumptionAsPages(Pageable pageable, int lowestEnergyConsumption, int highestEnergyConsumption) {
+        return new PageImpl<>(getAllWithFilteringByEnergyConsumption(lowestEnergyConsumption, highestEnergyConsumption), pageable, 8);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<SSD> getAllWithFilteringByCapacityAsPages(Pageable pageable, int minimalCapacity, int maximalCapacity) {
+        return new PageImpl<>(getAllWithFilteringByCapacity(minimalCapacity, maximalCapacity), pageable, 8);
+    }
+
+    private List<SSD> getAllWithSortingOfPriceDesc() {
+        return getAll()
+                .stream()
+                .sorted(Comparator.comparing(ssd -> ssd.hardwareSpec().price()))
+                .toList()
+                .reversed();
+    }
+
+    private List<SSD> getAllWithSortingOfPriceAsc() {
+        return getAll()
+                .stream()
+                .sorted(Comparator.comparing(ssd -> ssd.hardwareSpec().price()))
+                .toList();
+    }
+
+    private List<SSD> getAllWithSortingOfRatingDesc() {
+        return getAll()
+                .stream()
+                .sorted(Comparator.comparing(ssd -> ssd.hardwareSpec().rating()))
+                .toList()
+                .reversed();
+    }
+
+    private List<SSD> getAllWithSortingOfRatingAsc() {
+        return getAll()
+                .stream()
+                .sorted(Comparator.comparing(ssd -> ssd.hardwareSpec().rating()))
+                .toList();
+    }
+
+    private List<SSD> getAllWithFilteringByPrice(int lowestPrice, int highestPrice) {
+        return getAll().stream()
+                .filter(ssd -> ssd.hardwareSpec().price().intValue() >= lowestPrice
+                               && ssd.hardwareSpec().price().intValue() <= highestPrice)
+                .toList();
+    }
+
+    private List<SSD> getAllWithFilteringByCapacity(int minimalCapacity, int maximalCapacity) {
+        return getAll().stream()
+                .filter(ssd -> ssd.capacity() >= minimalCapacity
+                               && ssd.capacity() <= maximalCapacity)
+                .toList();
+    }
+
+    private List<SSD> getAllWithFilteringByEnergyConsumption(int lowestEnergyConsumption, int highestEnergyConsumption) {
+        return getAll().stream()
+                .filter(ssd -> ssd.energyConsumption() >= lowestEnergyConsumption
+                               && ssd.energyConsumption() <= highestEnergyConsumption)
+                .toList();
     }
 }

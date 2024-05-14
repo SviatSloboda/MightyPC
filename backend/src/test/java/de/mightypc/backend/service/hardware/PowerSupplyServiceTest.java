@@ -1,191 +1,275 @@
 package de.mightypc.backend.service.hardware;
 
-import de.mightypc.backend.exception.HardwareNotFoundException;
-import de.mightypc.backend.model.specs.PowerSupply;
-import de.mightypc.backend.model.specs.HardwareSpec;
+import de.mightypc.backend.exception.hardware.PowerSupplyNotFoundException;
+import de.mightypc.backend.model.hardware.PowerSupply;
+import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.PowerSupplyRepository;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.times;
+
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
-class PowerSupplyServiceTest {
-    private final PowerSupplyRepository powerSupplyRepository = mock(PowerSupplyRepository.class);
-    private final PowerSupplyService powerSupplyService = new PowerSupplyService(powerSupplyRepository);
+class PowerSupplyServiceTest extends BaseServiceTest<PowerSupply, PowerSupplyService, PowerSupplyRepository, PowerSupplyNotFoundException> {
+    private final PowerSupplyRepository mockPowerSupplyRepository = mock(PowerSupplyRepository.class);
+    private final PowerSupplyService powerSupplyService = new PowerSupplyService(mockPowerSupplyRepository);
 
-    private static PowerSupply getPowerSupply() {
-        return new PowerSupply("1", new HardwareSpec(
-                "test",
-                "test",
-                new BigDecimal("1"),
-                1.01f),
-                1
-        );
-    }
+    private final PowerSupply testPowerSupply = new PowerSupply(
+            "testId",
+            new HardwareSpec("test", "test", new BigDecimal(666), 1.99f),
+            123
+    );
 
+    private final PowerSupply testPowerSupply2 = new PowerSupply(
+            "testId2",
+            new HardwareSpec("test", "test", new BigDecimal(333), 3.9f),
+            1230
+    );
+
+    private final PageRequest pageable = PageRequest.of(0, 8);
+
+    private final List<PowerSupply> powerSupplies = new ArrayList<>(List.of(testPowerSupply, testPowerSupply2));
+
+    @Override
     @Test
-    void getAll_ReturnsAllPowerSupplys() {
+    void update_shouldUpdateEntityAndReturnIt() {
         // Arrange
-        List<PowerSupply> expected = new ArrayList<>(List.of(getPowerSupply()));
-        when(powerSupplyRepository.findAll()).thenReturn(expected);
+        PowerSupply expected = testPowerSupply.withPower(999);
+
+        when(mockPowerSupplyRepository.existsById("testId")).thenReturn(true);
+        when(mockPowerSupplyRepository.save(expected)).thenReturn(expected);
 
         // Act
-        List<PowerSupply> actual = powerSupplyService.getAll();
+        PowerSupply actual = service.update(expected);
 
         // Assert
-        assertEquals(expected, actual, "getAll should return all PowerSupplys");
-        verify(powerSupplyRepository).findAll();
+        verify(mockPowerSupplyRepository).save(actual);
+        assertEquals(expected, actual);
     }
 
+    @Override
     @Test
-    void getAll_ReturnsEmptyListWhenNoPowerSupplys() {
+    void update_shouldThrowHardwareNotFoundException_whenEntityDoesNotExistInRepository() {
         // Arrange
-        List<PowerSupply> expected = new ArrayList<>();
-        when(powerSupplyRepository.findAll()).thenReturn(expected);
+        PowerSupply expected = testPowerSupply.withPower(999);
+        when(mockPowerSupplyRepository.existsById("testId")).thenReturn(false);
+        when(mockPowerSupplyRepository.save(expected)).thenReturn(expected);
+
+        // Act && Assert
+        assertThrows(PowerSupplyNotFoundException.class, () -> service.update(expected));
+        verify(mockPowerSupplyRepository).existsById("testId");
+    }
+
+    @Override
+    @Test
+    void getAllNamesWithPrices_shouldReturnMapOfNamesWithPrices() {
+        // Arrange
+        HashMap<String, String> expected = new HashMap<>();
+        expected.put("testId", "test ($666)");
+        when(mockPowerSupplyRepository.findAll()).thenReturn(List.of(testPowerSupply));
+
+        // Act
+        HashMap<String, String> actual = service.getAllNamesWithPrices();
+
+        // Assert
+        assertEquals(expected, actual);
+        verify(mockPowerSupplyRepository).findAll();
+    }
+
+    @Override
+    @Test
+    void attachPhoto_shouldAttachPhotoCorrectly() {
+        // Arrange
+        PowerSupply expected = testPowerSupply.withPhotos(List.of("Test"));
+
+        when(mockPowerSupplyRepository.findById("testId")).thenReturn(Optional.of(testPowerSupply));
+        when(mockPowerSupplyRepository.save(testPowerSupply.withPowerSupplyPhotos(new ArrayList<>(List.of("Test"))))).thenReturn(expected);
+
+        // Act
+        PowerSupply actualPowerSupply = powerSupplyService.attachPhoto("testId", "Test");
+
+        // Assert
+        assertEquals(actualPowerSupply.powerSupplyPhotos(), expected.powerSupplyPhotos());
+        verify(mockPowerSupplyRepository).findById("testId");
+        verify(mockPowerSupplyRepository).save(testPowerSupply.withPowerSupplyPhotos(new ArrayList<>(List.of("Test"))));
+    }
+
+    @Override
+    @Test
+    void attachPhoto_shouldThrowHardwareNotFoundException_whenEntityDoesNotExistInRepository() {
+        // Arrange
+        when(mockPowerSupplyRepository.findById("testId")).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(HardwareNotFoundException.class, powerSupplyService::getAll);
+        assertThrows(PowerSupplyNotFoundException.class, () -> powerSupplyService.attachPhoto("testId", "TEST"));
+        verify(mockPowerSupplyRepository).findById("testId");
     }
 
     @Test
-    void getById_ReturnsPowerSupplyWhenExists() {
-        //Arrange
-        PowerSupply expected = getPowerSupply();
-        when(powerSupplyRepository.findById("1")).thenReturn(Optional.of(expected));
-
-        //Act
-        PowerSupply actual = powerSupplyService.getById("1");
-
-        //Assert
-        assertEquals(expected, actual, "getById should return the PowerSupply when it exists");
-        verify(powerSupplyRepository).findById("1");
-    }
-
-    @Test
-    void getById_ThrowsExceptionWhenPowerSupplyDoesNotExist() {
-        //Arrange
-        when(powerSupplyRepository.findById("1")).thenReturn(Optional.empty());
-
-        //Act & Assert
-        assertThrows(HardwareNotFoundException.class, () -> powerSupplyService.getById("1"),
-                "getById should throw HardwareNotFoundException when the PowerSupply does not exist");
-        verify(powerSupplyRepository).findById("1");
-    }
-
-    @Test
-    void save_ReturnsSavedPowerSupply() {
+    void getAllPowerSuppliesByEnergyConsumption_shouldReturnNamesAndPricesOfFilteredPowerSupplies() {
         // Arrange
-        PowerSupply expected = getPowerSupply();
-        when(powerSupplyRepository.save(expected)).thenReturn(expected);
+        HashMap<String, String> expected = new HashMap<>();
+        expected.put("testId", "test ($666)");
+        when(mockPowerSupplyRepository.findAll()).thenReturn(List.of(testPowerSupply));
 
         // Act
-        PowerSupply actual = powerSupplyService.save(expected);
+        Map<String, String> actual = powerSupplyService.getAllPowerSuppliesByEnergyConsumption(100);
 
         // Assert
-        assertEquals(expected, actual, "save should return the saved PowerSupply");
-        verify(powerSupplyRepository).save(expected);
+        verify(mockPowerSupplyRepository).findAll();
+        assertEquals(expected, actual);
     }
 
     @Test
-    void update_ReturnsUpdatedPowerSupplyWhenPowerSupplyExists() {
+    void getAllPowerSuppliesByEnergyConsumption_shouldReturnEmptyHashMap_when_entitiesWithSpecifiedEnergyConsumptionWereFound() {
         // Arrange
-        PowerSupply expected = getPowerSupply();
-        when(powerSupplyRepository.existsById("1")).thenReturn(true);
-        when(powerSupplyRepository.save(expected)).thenReturn(expected);
+        when(mockPowerSupplyRepository.findAll()).thenReturn(List.of(testPowerSupply));
 
         // Act
-        PowerSupply actual = powerSupplyService.update(expected);
+        Map<String, String> actual = powerSupplyService.getAllPowerSuppliesByEnergyConsumption(1000);
 
         // Assert
-        assertEquals(expected, actual, "update should return the updated PowerSupply");
-        verify(powerSupplyRepository).save(expected);
-        verify(powerSupplyRepository).existsById("1");
+        verify(mockPowerSupplyRepository).findAll();
+        assertEquals(new HashMap<>(), actual);
     }
 
     @Test
-    void update_ThrowsExceptionWhenPowerSupplyDoesNotExist() {
+    void getAllPowerSuppliesByEnergyConsumption_shouldThrowHardwareNotFoundExceptionWhenNoEntitiesWereFound() {
         // Arrange
-        PowerSupply expected = getPowerSupply();
-        when(powerSupplyRepository.existsById("1")).thenReturn(false);
+        when(mockPowerSupplyRepository.findAll()).thenReturn(Collections.emptyList());
 
         // Act & Assert
-        assertThrows(HardwareNotFoundException.class, () -> powerSupplyService.update(expected),
-                "update should throw HardwareNotFoundException when the PowerSupply does not exist");
-        verify(powerSupplyRepository).existsById("1");
+        assertThrows(PowerSupplyNotFoundException.class,
+                () -> powerSupplyService.getAllPowerSuppliesByEnergyConsumption(1000));
+
+        verify(mockPowerSupplyRepository).findAll();
     }
 
-    @Test
-    void deleteById_DeletesPowerSupplyWhenExists() {
-        // Arrange
-        String id = "1";
-        when(powerSupplyRepository.existsById(id)).thenReturn(true).thenReturn(false);
 
-        // Act
-        boolean result = powerSupplyService.deleteById(id);
+    @Test
+    void getNameOfEntity_shouldReturnCorrectNameOfEntity() {
+        // Arrange & Act
+        String actual = service.getNameOfEntity(testPowerSupply);
 
         // Assert
-        assertTrue(result, "deleteById should return true when the PowerSupply exists and is deleted");
-        verify(powerSupplyRepository).deleteById(id);
-        verify(powerSupplyRepository, times(2)).existsById(id);
+        assertEquals(testPowerSupply.hardwareSpec().name(), actual);
     }
 
     @Test
-    void deleteById_ThrowsHardwareNotFoundExceptionWhenPowerSupplyDoesNotExist() {
+    void getAllWithSortingOfPriceDescAsPages_shouldGetAllPowerSuppliesWithProperSorting() {
         // Arrange
-        String id = "1";
-        when(powerSupplyRepository.existsById(id)).thenReturn(false);
-
-        // Act & Assert
-        assertThrows(HardwareNotFoundException.class, () -> powerSupplyService.deleteById(id), "Expected HardwareNotFoundException when PowerSupply does not exist");
-        verify(powerSupplyRepository).existsById(id);
-    }
-
-    @Test
-    void attachPhoto_WhenPowerSupplyExists_ThenPhotoIsAttached() {
-        // Arrange
-        String powerSupplyId = "1";
-        String photoUrl = "https://example.com/photo.jpg";
-        PowerSupply powerSupplyBeforeUpdate = new PowerSupply("1", new HardwareSpec("test", "test", new BigDecimal("1"), 1.01f), 1, new ArrayList<>());
-        Optional<PowerSupply> optionalPowerSupplyBeforeUpdate = Optional.of(powerSupplyBeforeUpdate);
-
-        List<String> photosWithNewUrl = new ArrayList<>();
-        photosWithNewUrl.add(photoUrl);
-        PowerSupply powerSupplyAfterUpdate = new PowerSupply("1", new HardwareSpec("test", "test", new BigDecimal("1"), 1.01f), 1, photosWithNewUrl);
-
-        when(powerSupplyRepository.findById(powerSupplyId)).thenReturn(optionalPowerSupplyBeforeUpdate);
-        when(powerSupplyRepository.save(any(PowerSupply.class))).thenReturn(powerSupplyAfterUpdate);
+        Page<PowerSupply> expected = new PageImpl<>(List.of(testPowerSupply, testPowerSupply2), pageable, 8);
+        when(repository.findAll()).thenReturn(powerSupplies);
 
         // Act
-        powerSupplyService.attachPhoto(powerSupplyId, photoUrl);
+        Page<PowerSupply> actual = service.getAllWithSortingOfPriceDescAsPages(pageable);
 
         // Assert
-        verify(powerSupplyRepository).findById(powerSupplyId);
-        verify(powerSupplyRepository).save(powerSupplyAfterUpdate);
+        verify(repository).findAll();
+        assertEquals(expected, actual);
     }
 
-
     @Test
-    void attachPhoto_WhenPowerSupplyDoesNotExist_ThenNoActionTaken() {
+    void getAllWithSortingOfPriceAscAsPages_shouldGetAllPowerSuppliesWithProperSorting() {
         // Arrange
-        String powerSupplyId = "nonExistingId";
-        String photoUrl = "https://example.com/photo.jpg";
-        when(powerSupplyRepository.findById(powerSupplyId)).thenReturn(Optional.empty());
+        Page<PowerSupply> expected = new PageImpl<>(List.of(testPowerSupply2, testPowerSupply), pageable, 8);
+        when(repository.findAll()).thenReturn(powerSupplies);
 
         // Act
-        powerSupplyService.attachPhoto(powerSupplyId, photoUrl);
+        Page<PowerSupply> actual = service.getAllWithSortingOfPriceAscAsPages(pageable);
 
         // Assert
-        verify(powerSupplyRepository).findById(powerSupplyId);
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithSortingOfRatingDescAsPages_shouldGetAllPowerSuppliesWithProperSorting() {
+        // Arrange
+        Page<PowerSupply> expected = new PageImpl<>(List.of(testPowerSupply2, testPowerSupply), pageable, 8);
+        when(repository.findAll()).thenReturn(powerSupplies);
+
+        // Act
+        Page<PowerSupply> actual = service.getAllWithSortingOfRatingDescAsPages(pageable);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithSortingOfRatingAscAsPages_shouldGetAllPowerSuppliesWithProperSorting() {
+        // Arrange
+        Page<PowerSupply> expected = new PageImpl<>(List.of(testPowerSupply, testPowerSupply2), pageable, 8);
+        when(repository.findAll()).thenReturn(powerSupplies);
+
+        // Act
+        Page<PowerSupply> actual = service.getAllWithSortingOfRatingAscAsPages(pageable);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithFilteringByPowerAsPages_shouldGetAllPowerSuppliesWithProperFiltering() {
+        // Arrange
+        Page<PowerSupply> expected = new PageImpl<>(Collections.singletonList(testPowerSupply), pageable, 8);
+        when(repository.findAll()).thenReturn(powerSupplies);
+
+        // Act
+        Page<PowerSupply> actual = service.getAllWithFilteringByPowerAsPages(pageable, 100, 300);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithFilteringByPriceAsPages_shouldGetAllPowerSuppliesWithProperFiltering() {
+        // Arrange
+        Page<PowerSupply> expected = new PageImpl<>(Collections.singletonList(testPowerSupply), pageable, 8);
+        when(repository.findAll()).thenReturn(powerSupplies);
+
+        // Act
+        Page<PowerSupply> actual = service.getAllWithFilteringByPriceAsPages(pageable, 500, 2500);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Override
+    protected PowerSupplyNotFoundException getException() {
+        return new PowerSupplyNotFoundException("there is no such psu!");
+    }
+
+    @Override
+    protected PowerSupplyRepository getMockRepository() {
+        return mockPowerSupplyRepository;
+    }
+
+    @Override
+    protected PowerSupplyService getService(PowerSupplyRepository repository) {
+        return new PowerSupplyService(repository);
+    }
+
+    @Override
+    protected PowerSupply getEntity() {
+        return testPowerSupply;
     }
 }

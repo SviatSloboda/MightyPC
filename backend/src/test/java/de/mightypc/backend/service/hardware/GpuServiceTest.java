@@ -1,192 +1,236 @@
 package de.mightypc.backend.service.hardware;
 
-import de.mightypc.backend.exception.HardwareNotFoundException;
-import de.mightypc.backend.model.specs.GPU;
-import de.mightypc.backend.model.specs.HardwareSpec;
+import de.mightypc.backend.exception.hardware.GpuNotFoundException;
+import de.mightypc.backend.model.hardware.GPU;
+import de.mightypc.backend.model.hardware.GPU;
+import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.GpuRepository;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.times;
+
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
-class GpuServiceTest {
-    private final GpuRepository gpuRepository = mock(GpuRepository.class);
-    private final GpuService gpuService = new GpuService(gpuRepository);
+class GpuServiceTest extends BaseServiceTest<GPU, GpuService, GpuRepository, GpuNotFoundException> {
+    private final GpuRepository mockGpuRepository = mock(GpuRepository.class);
+    private final GpuService gpuService = new GpuService(mockGpuRepository);
 
-    private static GPU getGpu() {
-        return new GPU("1", new HardwareSpec(
-                "test",
-                "test",
-                new BigDecimal("1"),
-                1.01f),
-                9500,
-                125
-        );
-    }
+    private final GPU testGpu = new GPU(
+            "testId",
+            new HardwareSpec("test", "test", new BigDecimal(666), 1.99f),
+            23
+    );
 
+    private final GPU testGpu2 = new GPU(
+            "testId2",
+            new HardwareSpec("test", "test", new BigDecimal(333), 4.29f),
+            249
+    );
+
+    private final PageRequest pageable = PageRequest.of(0, 8);
+
+    private final List<GPU> gpus = new ArrayList<>(List.of(testGpu, testGpu2));
+
+
+    @Override
     @Test
-    void getAll_ReturnsAllGpus() {
+    void update_shouldUpdateEntityAndReturnIt() {
         // Arrange
-        List<GPU> expected = new ArrayList<>(List.of(getGpu()));
-        when(gpuRepository.findAll()).thenReturn(expected);
+        GPU expected = testGpu.withEnergyConsumption(999);
+
+        when(mockGpuRepository.existsById("testId")).thenReturn(true);
+        when(mockGpuRepository.save(expected)).thenReturn(expected);
 
         // Act
-        List<GPU> actual = gpuService.getAll();
+        GPU actual = service.update(expected);
 
         // Assert
-        assertEquals(expected, actual, "getAll should return all GPUs");
-        verify(gpuRepository).findAll();
+        verify(mockGpuRepository).save(expected);
+        assertEquals(expected, actual);
     }
 
+    @Override
     @Test
-    void getAll_ReturnsEmptyListWhenNoGpus() {
+    void update_shouldThrowHardwareNotFoundException_whenEntityDoesNotExistInRepository() {
         // Arrange
-        List<GPU> expected = new ArrayList<>();
-        when(gpuRepository.findAll()).thenReturn(expected);
+        GPU expected = testGpu.withEnergyConsumption(999);
+        when(mockGpuRepository.existsById("testId")).thenReturn(false);
 
         // Act & Assert
-        assertThrows(HardwareNotFoundException.class, gpuService::getAll);
+        assertThrows(GpuNotFoundException.class, () -> service.update(expected));
+        verify(mockGpuRepository).existsById("testId");
     }
 
+
+    @Override
     @Test
-    void getById_ReturnsGpuWhenExists() {
-        //Arrange
-        GPU expected = getGpu();
-        when(gpuRepository.findById("1")).thenReturn(Optional.of(expected));
-
-        //Act
-        GPU actual = gpuService.getById("1");
-
-        //Assert
-        assertEquals(expected, actual, "getById should return the GPU when it exists");
-        verify(gpuRepository).findById("1");
-    }
-
-    @Test
-    void getById_ThrowsExceptionWhenGpuDoesNotExist() {
-        //Arrange
-        when(gpuRepository.findById("1")).thenReturn(Optional.empty());
-
-        //Act & Assert
-        assertThrows(HardwareNotFoundException.class, () -> gpuService.getById("1"),
-                "getById should throw HardwareNotFoundException when the GPU does not exist");
-        verify(gpuRepository).findById("1");
-    }
-
-    @Test
-    void save_ReturnsSavedGpu() {
+    void getAllNamesWithPrices_shouldReturnMapOfNamesWithPrices() {
         // Arrange
-        GPU expected = getGpu();
-        when(gpuRepository.save(expected)).thenReturn(expected);
+        HashMap<String, String> expected = new HashMap<>();
+        expected.put("testId", "test ($666)");
+        when(mockGpuRepository.findAll()).thenReturn(List.of(testGpu));
 
         // Act
-        GPU actual = gpuService.save(expected);
+        HashMap<String, String> actual = service.getAllNamesWithPrices();
 
         // Assert
-        assertEquals(expected, actual, "save should return the saved GPU");
-        verify(gpuRepository).save(expected);
+        assertEquals(expected, actual);
+        verify(mockGpuRepository).findAll();
     }
 
+    @Override
     @Test
-    void update_ReturnsUpdatedGpuWhenGpuExists() {
+    void attachPhoto_shouldAttachPhotoCorrectly() {
         // Arrange
-        GPU expected = getGpu();
-        when(gpuRepository.existsById("1")).thenReturn(true);
-        when(gpuRepository.save(expected)).thenReturn(expected);
+        GPU expected = testGpu.withPhotos(List.of("Test"));
+
+        when(mockGpuRepository.findById("testId")).thenReturn(Optional.of(testGpu));
+        when(mockGpuRepository.save(testGpu.withGpuPhotos(new ArrayList<>(List.of("Test"))))).thenReturn(expected);
 
         // Act
-        GPU actual = gpuService.update(expected);
+        GPU actualGpu = gpuService.attachPhoto("testId", "Test");
 
         // Assert
-        assertEquals(expected, actual, "update should return the updated GPU");
-        verify(gpuRepository).save(expected);
-        verify(gpuRepository).existsById("1");
+        assertEquals(actualGpu.gpuPhotos(), expected.gpuPhotos());
+        verify(mockGpuRepository).findById("testId");
+        verify(mockGpuRepository).save(testGpu.withGpuPhotos(new ArrayList<>(List.of("Test"))));
     }
 
+    @Override
     @Test
-    void update_ThrowsExceptionWhenGpuDoesNotExist() {
+    void attachPhoto_shouldThrowHardwareNotFoundException_whenEntityDoesNotExistInRepository() {
         // Arrange
-        GPU expected = getGpu();
-        when(gpuRepository.existsById("1")).thenReturn(false);
+        when(mockGpuRepository.findById("testId")).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(HardwareNotFoundException.class, () -> gpuService.update(expected),
-                "update should throw HardwareNotFoundException when the GPU does not exist");
-        verify(gpuRepository).existsById("1");
+        assertThrows(GpuNotFoundException.class, () -> gpuService.attachPhoto("testId", "TEST"));
+        verify(mockGpuRepository).findById("testId");
     }
 
-    @Test
-    void deleteById_DeletesGpuWhenExists() {
-        // Arrange
-        String id = "1";
-        when(gpuRepository.existsById(id)).thenReturn(true).thenReturn(false);
 
-        // Act
-        boolean result = gpuService.deleteById(id);
+    @Test
+    void getNameOfEntity_shouldReturnCorrectNameOfEntity() {
+        // Arrange & Act
+        String actual = service.getNameOfEntity(testGpu);
 
         // Assert
-        assertTrue(result, "deleteById should return true when the GPU exists and is deleted");
-        verify(gpuRepository).deleteById(id);
-        verify(gpuRepository, times(2)).existsById(id);
+        assertEquals(testGpu.hardwareSpec().name(), actual);
     }
 
     @Test
-    void deleteById_ThrowsHardwareNotFoundExceptionWhenGpuDoesNotExist() {
+    void getAllWithSortingOfPriceDescAsPages_shouldGetAllGpusWithProperSorting() {
         // Arrange
-        String id = "1";
-        when(gpuRepository.existsById(id)).thenReturn(false);
-
-        // Act & Assert
-        assertThrows(HardwareNotFoundException.class, () -> gpuService.deleteById(id), "Expected HardwareNotFoundException when GPU does not exist");
-        verify(gpuRepository).existsById(id);
-    }
-
-    @Test
-    void attachPhoto_WhenGpuExists_ThenPhotoIsAttached() {
-        // Arrange
-        String gpuId = "1";
-        String photoUrl = "https://example.com/photo.jpg";
-        GPU gpuBeforeUpdate = new GPU("1", new HardwareSpec("test", "test", new BigDecimal("1"), 1.01f), 9500, 125, new ArrayList<>());
-        Optional<GPU> optionalGpuBeforeUpdate = Optional.of(gpuBeforeUpdate);
-
-        List<String> photosWithNewUrl = new ArrayList<>();
-        photosWithNewUrl.add(photoUrl);
-        GPU gpuAfterUpdate = new GPU("1", new HardwareSpec("test", "test", new BigDecimal("1"), 1.01f), 9500, 125, photosWithNewUrl);
-
-        when(gpuRepository.findById(gpuId)).thenReturn(optionalGpuBeforeUpdate);
-        when(gpuRepository.save(any(GPU.class))).thenReturn(gpuAfterUpdate);
+        Page<GPU> expected = new PageImpl<>(List.of(testGpu, testGpu2), pageable, 8);
+        when(repository.findAll()).thenReturn(gpus);
 
         // Act
-        gpuService.attachPhoto(gpuId, photoUrl);
+        Page<GPU> actual = service.getAllWithSortingOfPriceDescAsPages(pageable);
 
         // Assert
-        verify(gpuRepository).findById(gpuId);
-        verify(gpuRepository).save(gpuAfterUpdate);
+        verify(repository).findAll();
+        assertEquals(expected, actual);
     }
 
-
     @Test
-    void attachPhoto_WhenGpuDoesNotExist_ThenNoActionTaken() {
+    void getAllWithSortingOfPriceAscAsPages_shouldGetAllGpusWithProperSorting() {
         // Arrange
-        String gpuId = "nonExistingId";
-        String photoUrl = "https://example.com/photo.jpg";
-        when(gpuRepository.findById(gpuId)).thenReturn(Optional.empty());
+        Page<GPU> expected = new PageImpl<>(List.of(testGpu2, testGpu), pageable, 8);
+        when(repository.findAll()).thenReturn(gpus);
 
         // Act
-        gpuService.attachPhoto(gpuId, photoUrl);
+        Page<GPU> actual = service.getAllWithSortingOfPriceAscAsPages(pageable);
 
         // Assert
-        verify(gpuRepository).findById(gpuId);
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithSortingOfRatingDescAsPages_shouldGetAllGpusWithProperSorting() {
+        // Arrange
+        Page<GPU> expected = new PageImpl<>(List.of(testGpu2, testGpu), pageable, 8);
+        when(repository.findAll()).thenReturn(gpus);
+
+        // Act
+        Page<GPU> actual = service.getAllWithSortingOfRatingDescAsPages(pageable);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithSortingOfRatingAscAsPages_shouldGetAllGpusWithProperSorting() {
+        // Arrange
+        Page<GPU> expected = new PageImpl<>(List.of(testGpu, testGpu2), pageable, 8);
+        when(repository.findAll()).thenReturn(gpus);
+
+        // Act
+        Page<GPU> actual = service.getAllWithSortingOfRatingAscAsPages(pageable);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithFilteringByEnergyConsumptionAsPages_shouldGetAllGpusWithProperFiltering() {
+        // Arrange
+        Page<GPU> expected = new PageImpl<>(Collections.singletonList(testGpu2), pageable, 8);
+        when(repository.findAll()).thenReturn(gpus);
+
+        // Act
+        Page<GPU> actual = service.getAllWithFilteringByEnergyConsumptionAsPages(pageable, 100, 300);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithFilteringByPriceAsPages_shouldGetAllGpusWithProperFiltering() {
+        // Arrange
+        Page<GPU> expected = new PageImpl<>(Collections.singletonList(testGpu), pageable, 8);
+        when(repository.findAll()).thenReturn(gpus);
+
+        // Act
+        Page<GPU> actual = service.getAllWithFilteringByPriceAsPages(pageable, 500, 2500);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Override
+    protected GpuNotFoundException getException() {
+        return new GpuNotFoundException("There is no such Gpu!");
+    }
+
+    @Override
+    protected GpuRepository getMockRepository() {
+        return mockGpuRepository;
+    }
+
+    @Override
+    protected GpuService getService(GpuRepository repository) {
+        return new GpuService(repository);
+    }
+
+    @Override
+    protected GPU getEntity() {
+        return testGpu;
     }
 }

@@ -1,193 +1,265 @@
 package de.mightypc.backend.service.hardware;
 
-import de.mightypc.backend.exception.HardwareNotFoundException;
-import de.mightypc.backend.model.specs.RAM;
-import de.mightypc.backend.model.specs.HardwareSpec;
+import de.mightypc.backend.exception.hardware.RamNotFoundException;
+import de.mightypc.backend.model.hardware.RAM;
+import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.RamRepository;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.times;
+
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
-class RamServiceTest {
-    private final RamRepository ramRepository = mock(RamRepository.class);
-    private final RamService ramService = new RamService(ramRepository);
+class RamServiceTest extends BaseServiceTest<RAM, RamService, RamRepository, RamNotFoundException> {
+    private final RamRepository mockRamRepository = mock(RamRepository.class);
+    private final RamService ramService = new RamService(mockRamRepository);
 
-    private static RAM getRam() {
-        return new RAM("1", new HardwareSpec(
-                "test",
-                "test",
-                new BigDecimal("1"),
-                1.01f),
-                "ddr2",
-                123,
-                125
-        );
-    }
+    private final RAM testRam = new RAM(
+            "testId",
+            new HardwareSpec("test", "test", new BigDecimal(666), 1.99f),
+            "DDR4",
+            23,
+            23
+    );
 
+    private final RAM testRam2 = new RAM(
+            "testId2",
+            new HardwareSpec("test", "test", new BigDecimal(333), 4.99f),
+            "DDR228",
+            239,
+            230
+    );
+
+    private final PageRequest pageable = PageRequest.of(0, 8);
+
+    private final List<RAM> rams = new ArrayList<>(List.of(testRam, testRam2));
+
+    @Override
     @Test
-    void getAll_ReturnsAllRams() {
+    void update_shouldUpdateEntityAndReturnIt() {
         // Arrange
-        List<RAM> expected = new ArrayList<>(List.of(getRam()));
-        when(ramRepository.findAll()).thenReturn(expected);
+        RAM expected = testRam.withEnergyConsumption(999);
+
+        when(mockRamRepository.existsById("testId")).thenReturn(true);
+        when(mockRamRepository.save(expected)).thenReturn(expected);
 
         // Act
-        List<RAM> actual = ramService.getAll();
+        RAM actual = service.update(expected);
 
         // Assert
-        assertEquals(expected, actual, "getAll should return all RAMs");
-        verify(ramRepository).findAll();
+        verify(mockRamRepository).save(expected);
+        assertEquals(expected, actual);
     }
 
+    @Override
     @Test
-    void getAll_ReturnsEmptyListWhenNoRams() {
+    void update_shouldThrowHardwareNotFoundException_whenEntityDoesNotExistInRepository() {
         // Arrange
-        List<RAM> expected = new ArrayList<>();
-        when(ramRepository.findAll()).thenReturn(expected);
+        RAM expected = testRam.withEnergyConsumption(999);
+        when(mockRamRepository.existsById("testId")).thenReturn(false);
+        when(mockRamRepository.save(expected)).thenReturn(expected);
+
+        // Act && Assert
+        assertThrows(RamNotFoundException.class, () -> service.update(expected));
+        verify(mockRamRepository).existsById("testId");
+    }
+
+    @Override
+    @Test
+    void getAllNamesWithPrices_shouldReturnMapOfNamesWithPrices() {
+        // Arrange
+        HashMap<String, String> expected = new HashMap<>();
+        expected.put("testId", "test ($666)");
+        when(mockRamRepository.findAll()).thenReturn(List.of(testRam));
+
+        // Act
+        HashMap<String, String> actual = service.getAllNamesWithPrices();
+
+        // Assert
+        assertEquals(expected, actual);
+        verify(mockRamRepository).findAll();
+    }
+
+    @Override
+    @Test
+    void attachPhoto_shouldAttachPhotoCorrectly() {
+        // Arrange
+        RAM expected = testRam.withPhotos(List.of("Test"));
+
+        when(mockRamRepository.findById("testId")).thenReturn(Optional.of(testRam));
+        when(mockRamRepository.save(testRam.withRamPhotos(new ArrayList<>(List.of("Test"))))).thenReturn(expected);
+
+        // Act
+        RAM actualRam = ramService.attachPhoto("testId", "Test");
+
+        // Assert
+        assertEquals(actualRam.ramPhotos(), expected.ramPhotos());
+        verify(mockRamRepository).findById("testId");
+        verify(mockRamRepository).save(testRam.withRamPhotos(new ArrayList<>(List.of("Test"))));
+    }
+
+    @Override
+    @Test
+    void attachPhoto_shouldThrowHardwareNotFoundException_whenEntityDoesNotExistInRepository() {
+        // Arrange
+        when(mockRamRepository.findById("testId")).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(HardwareNotFoundException.class, ramService::getAll);
+        assertThrows(RamNotFoundException.class, () -> ramService.attachPhoto("testId", "TEST"));
+        verify(mockRamRepository).findById("testId");
     }
 
     @Test
-    void getById_ReturnsRamWhenExists() {
-        //Arrange
-        RAM expected = getRam();
-        when(ramRepository.findById("1")).thenReturn(Optional.of(expected));
-
-        //Act
-        RAM actual = ramService.getById("1");
-
-        //Assert
-        assertEquals(expected, actual, "getById should return the RAM when it exists");
-        verify(ramRepository).findById("1");
-    }
-
-    @Test
-    void getById_ThrowsExceptionWhenRamDoesNotExist() {
-        //Arrange
-        when(ramRepository.findById("1")).thenReturn(Optional.empty());
-
-        //Act & Assert
-        assertThrows(HardwareNotFoundException.class, () -> ramService.getById("1"),
-                "getById should throw HardwareNotFoundException when the RAM does not exist");
-        verify(ramRepository).findById("1");
-    }
-
-    @Test
-    void save_ReturnsSavedRam() {
-        // Arrange
-        RAM expected = getRam();
-        when(ramRepository.save(expected)).thenReturn(expected);
-
-        // Act
-        RAM actual = ramService.save(expected);
+    void getNameOfEntity_shouldReturnCorrectNameOfEntity() {
+        // Arrange & Act
+        String actual = service.getNameOfEntity(testRam);
 
         // Assert
-        assertEquals(expected, actual, "save should return the saved RAM");
-        verify(ramRepository).save(expected);
+        assertEquals(testRam.hardwareSpec().name(), actual);
     }
 
     @Test
-    void update_ReturnsUpdatedRamWhenRamExists() {
+    void getAllWithSortingOfPriceDescAsPages_shouldGetAllRamsWithProperSorting() {
         // Arrange
-        RAM expected = getRam();
-        when(ramRepository.existsById("1")).thenReturn(true);
-        when(ramRepository.save(expected)).thenReturn(expected);
+        Page<RAM> expected = new PageImpl<>(List.of(testRam, testRam2), pageable, 8);
+        when(repository.findAll()).thenReturn(rams);
 
         // Act
-        RAM actual = ramService.update(expected);
+        Page<RAM> actual = service.getAllWithSortingOfPriceDescAsPages(pageable);
 
         // Assert
-        assertEquals(expected, actual, "update should return the updated RAM");
-        verify(ramRepository).save(expected);
-        verify(ramRepository).existsById("1");
+        verify(repository).findAll();
+        assertEquals(expected, actual);
     }
 
     @Test
-    void update_ThrowsExceptionWhenRamDoesNotExist() {
+    void getAllWithSortingOfPriceAscAsPages_shouldGetAllRamsWithProperSorting() {
         // Arrange
-        RAM expected = getRam();
-        when(ramRepository.existsById("1")).thenReturn(false);
-
-        // Act & Assert
-        assertThrows(HardwareNotFoundException.class, () -> ramService.update(expected),
-                "update should throw HardwareNotFoundException when the RAM does not exist");
-        verify(ramRepository).existsById("1");
-    }
-
-    @Test
-    void deleteById_DeletesRamWhenExists() {
-        // Arrange
-        String id = "1";
-        when(ramRepository.existsById(id)).thenReturn(true).thenReturn(false);
+        Page<RAM> expected = new PageImpl<>(List.of(testRam2, testRam), pageable, 8);
+        when(repository.findAll()).thenReturn(rams);
 
         // Act
-        boolean result = ramService.deleteById(id);
+        Page<RAM> actual = service.getAllWithSortingOfPriceAscAsPages(pageable);
 
         // Assert
-        assertTrue(result, "deleteById should return true when the RAM exists and is deleted");
-        verify(ramRepository).deleteById(id);
-        verify(ramRepository, times(2)).existsById(id);
+        verify(repository).findAll();
+        assertEquals(expected, actual);
     }
 
     @Test
-    void deleteById_ThrowsHardwareNotFoundExceptionWhenRamDoesNotExist() {
+    void getAllWithSortingOfRatingDescAsPages_shouldGetAllRamsWithProperSorting() {
         // Arrange
-        String id = "1";
-        when(ramRepository.existsById(id)).thenReturn(false);
-
-        // Act & Assert
-        assertThrows(HardwareNotFoundException.class, () -> ramService.deleteById(id), "Expected HardwareNotFoundException when RAM does not exist");
-        verify(ramRepository).existsById(id);
-    }
-
-    @Test
-    void attachPhoto_WhenRamExists_ThenPhotoIsAttached() {
-        // Arrange
-        String ramId = "1";
-        String photoUrl = "https://example.com/photo.jpg";
-        RAM ramBeforeUpdate = new RAM("1", new HardwareSpec("test", "test", new BigDecimal("1"), 1.01f), "ddr2", 123, 125, new ArrayList<>());
-        Optional<RAM> optionalRamBeforeUpdate = Optional.of(ramBeforeUpdate);
-
-        List<String> photosWithNewUrl = new ArrayList<>();
-        photosWithNewUrl.add(photoUrl);
-        RAM ramAfterUpdate = new RAM("1", new HardwareSpec("test", "test", new BigDecimal("1"), 1.01f), "ddr2", 123, 125, photosWithNewUrl);
-
-        when(ramRepository.findById(ramId)).thenReturn(optionalRamBeforeUpdate);
-        when(ramRepository.save(any(RAM.class))).thenReturn(ramAfterUpdate);
+        Page<RAM> expected = new PageImpl<>(List.of(testRam2, testRam), pageable, 8);
+        when(repository.findAll()).thenReturn(rams);
 
         // Act
-        ramService.attachPhoto(ramId, photoUrl);
+        Page<RAM> actual = service.getAllWithSortingOfRatingDescAsPages(pageable);
 
         // Assert
-        verify(ramRepository).findById(ramId);
-        verify(ramRepository).save(ramAfterUpdate);
+        verify(repository).findAll();
+        assertEquals(expected, actual);
     }
 
-
     @Test
-    void attachPhoto_WhenRamDoesNotExist_ThenNoActionTaken() {
+    void getAllWithSortingOfRatingAscAsPages_shouldGetAllRamsWithProperSorting() {
         // Arrange
-        String ramId = "nonExistingId";
-        String photoUrl = "https://example.com/photo.jpg";
-        when(ramRepository.findById(ramId)).thenReturn(Optional.empty());
+        Page<RAM> expected = new PageImpl<>(List.of(testRam, testRam2), pageable, 8);
+        when(repository.findAll()).thenReturn(rams);
 
         // Act
-        ramService.attachPhoto(ramId, photoUrl);
+        Page<RAM> actual = service.getAllWithSortingOfRatingAscAsPages(pageable);
 
         // Assert
-        verify(ramRepository).findById(ramId);
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithFilteringByEnergyConsumptionAsPages_shouldGetAllRamsWithProperFiltering() {
+        // Arrange
+        Page<RAM> expected = new PageImpl<>(Collections.singletonList(testRam2), pageable, 8);
+        when(repository.findAll()).thenReturn(rams);
+
+        // Act
+        Page<RAM> actual = service.getAllWithFilteringByEnergyConsumptionAsPages(pageable, 100, 300);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithFilteringByPriceAsPages_shouldGetAllRamsWithProperFiltering() {
+        // Arrange
+        Page<RAM> expected = new PageImpl<>(Collections.singletonList(testRam), pageable, 8);
+        when(repository.findAll()).thenReturn(rams);
+
+        // Act
+        Page<RAM> actual = service.getAllWithFilteringByPriceAsPages(pageable, 500, 2500);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithFilteringByMemorySizeAsPages_shouldGetAllRamsWithProperFiltering() {
+        // Arrange
+        Page<RAM> expected = new PageImpl<>(Collections.singletonList(testRam), pageable, 8);
+        when(repository.findAll()).thenReturn(rams);
+
+        // Act
+        Page<RAM> actual = service.getAllWithFilteringByMemorySizeAsPages(pageable, 1, 50);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithFilteringByTypeSizeAsPages_shouldGetAllRamsWithProperFiltering() {
+        // Arrange
+        Page<RAM> expected = new PageImpl<>(Collections.singletonList(testRam2), pageable, 8);
+        when(repository.findAll()).thenReturn(rams);
+
+        // Act
+        Page<RAM> actual = service.getAllWithFilteringByTypeAsPages(pageable, "DDR228");
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Override
+    protected RamNotFoundException getException() {
+        return new RamNotFoundException("there is no such ram!");
+    }
+
+    @Override
+    protected RamRepository getMockRepository() {
+        return mockRamRepository;
+    }
+
+    @Override
+    protected RamService getService(RamRepository repository) {
+        return new RamService(repository);
+    }
+
+    @Override
+    protected RAM getEntity() {
+        return testRam;
     }
 }

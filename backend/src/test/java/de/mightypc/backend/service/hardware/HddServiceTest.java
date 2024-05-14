@@ -1,192 +1,249 @@
 package de.mightypc.backend.service.hardware;
 
-import de.mightypc.backend.exception.HardwareNotFoundException;
-import de.mightypc.backend.model.specs.HDD;
-import de.mightypc.backend.model.specs.HardwareSpec;
+import de.mightypc.backend.exception.hardware.HddNotFoundException;
+import de.mightypc.backend.model.hardware.GPU;
+import de.mightypc.backend.model.hardware.HDD;
+import de.mightypc.backend.model.hardware.HDD;
+import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.HddRepository;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.times;
+
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
-class HddServiceTest {
-    private final HddRepository hddRepository = mock(HddRepository.class);
-    private final HddService hddService = new HddService(hddRepository);
+class HddServiceTest extends BaseServiceTest<HDD, HddService, HddRepository, HddNotFoundException> {
+    private final HddRepository mockHddRepository = mock(HddRepository.class);
+    private final HddService hddService = new HddService(mockHddRepository);
 
-    private static HDD getHdd() {
-        return new HDD("1", new HardwareSpec(
-                "test",
-                "test",
-                new BigDecimal("1"),
-                1.01f),
-                9500,
-                125
-        );
-    }
+    private final HDD testHdd = new HDD(
+            "testId",
+            new HardwareSpec("test", "test", new BigDecimal(666), 1.99f),
+            23,
+            23
+    );
 
+    private final HDD testHdd2 = new HDD(
+            "testId2",
+            new HardwareSpec("test", "test", new BigDecimal(333), 5.00f),
+            250,
+            299
+    );
+
+    private final PageRequest pageable = PageRequest.of(0, 8);
+
+    private final List<HDD> hdds = new ArrayList<>(List.of(testHdd, testHdd2));
+
+    @Override
     @Test
-    void getAll_ReturnsAllHdds() {
+    void update_shouldUpdateEntityAndReturnIt() {
         // Arrange
-        List<HDD> expected = new ArrayList<>(List.of(getHdd()));
-        when(hddRepository.findAll()).thenReturn(expected);
+        HDD expected = testHdd.withEnergyConsumption(999);
+
+        when(mockHddRepository.existsById("testId")).thenReturn(true);
+        when(mockHddRepository.save(expected)).thenReturn(expected);
 
         // Act
-        List<HDD> actual = hddService.getAll();
+        HDD actual = service.update(expected);
 
         // Assert
-        assertEquals(expected, actual, "getAll should return all HDDs");
-        verify(hddRepository).findAll();
+        verify(mockHddRepository).save(expected);
+        assertEquals(expected, actual);
     }
 
+    @Override
     @Test
-    void getAll_ReturnsEmptyListWhenNoHdds() {
+    void update_shouldThrowHardwareNotFoundException_whenEntityDoesNotExistInRepository() {
         // Arrange
-        List<HDD> expected = new ArrayList<>();
-        when(hddRepository.findAll()).thenReturn(expected);
+        HDD expected = testHdd.withEnergyConsumption(999);
+        when(mockHddRepository.existsById("testId")).thenReturn(false);
+        when(mockHddRepository.save(expected)).thenReturn(expected);
 
-        // Act & Assert
-        assertThrows(HardwareNotFoundException.class, hddService::getAll);
+        // Act && Assert
+        assertThrows(HddNotFoundException.class, () -> service.update(expected));
+        verify(mockHddRepository).existsById("testId");
     }
 
+    @Override
     @Test
-    void getById_ReturnsHddWhenExists() {
-        //Arrange
-        HDD expected = getHdd();
-        when(hddRepository.findById("1")).thenReturn(Optional.of(expected));
-
-        //Act
-        HDD actual = hddService.getById("1");
-
-        //Assert
-        assertEquals(expected, actual, "getById should return the HDD when it exists");
-        verify(hddRepository).findById("1");
-    }
-
-    @Test
-    void getById_ThrowsExceptionWhenHddDoesNotExist() {
-        //Arrange
-        when(hddRepository.findById("1")).thenReturn(Optional.empty());
-
-        //Act & Assert
-        assertThrows(HardwareNotFoundException.class, () -> hddService.getById("1"),
-                "getById should throw HardwareNotFoundException when the HDD does not exist");
-        verify(hddRepository).findById("1");
-    }
-
-    @Test
-    void save_ReturnsSavedHdd() {
+    void getAllNamesWithPrices_shouldReturnMapOfNamesWithPrices() {
         // Arrange
-        HDD expected = getHdd();
-        when(hddRepository.save(expected)).thenReturn(expected);
+        HashMap<String, String> expected = new HashMap<>();
+        expected.put("testId", "test ($666)");
+        when(mockHddRepository.findAll()).thenReturn(List.of(testHdd));
 
         // Act
-        HDD actual = hddService.save(expected);
+        HashMap<String, String> actual = service.getAllNamesWithPrices();
 
         // Assert
-        assertEquals(expected, actual, "save should return the saved HDD");
-        verify(hddRepository).save(expected);
+        assertEquals(expected, actual);
+        verify(mockHddRepository).findAll();
     }
 
+    @Override
     @Test
-    void update_ReturnsUpdatedHddWhenHddExists() {
+    void attachPhoto_shouldAttachPhotoCorrectly() {
         // Arrange
-        HDD expected = getHdd();
-        when(hddRepository.existsById("1")).thenReturn(true);
-        when(hddRepository.save(expected)).thenReturn(expected);
+        HDD expected = testHdd.withPhotos(List.of("Test"));
+
+        when(mockHddRepository.findById("testId")).thenReturn(Optional.of(testHdd));
+        when(mockHddRepository.save(testHdd.withHddPhotos(new ArrayList<>(List.of("Test"))))).thenReturn(expected);
 
         // Act
-        HDD actual = hddService.update(expected);
+        HDD actualHdd = hddService.attachPhoto("testId", "Test");
 
         // Assert
-        assertEquals(expected, actual, "update should return the updated HDD");
-        verify(hddRepository).save(expected);
-        verify(hddRepository).existsById("1");
+        assertEquals(actualHdd.hddPhotos(), expected.hddPhotos());
+        verify(mockHddRepository).findById("testId");
+        verify(mockHddRepository).save(testHdd.withHddPhotos(new ArrayList<>(List.of("Test"))));
+    }
+
+    @Override
+    @Test
+    void attachPhoto_shouldThrowHardwareNotFoundException_whenEntityDoesNotExistInRepository() {
+        when(mockHddRepository.findById("testId")).thenReturn(Optional.empty());
+
+        assertThrows(HddNotFoundException.class, () -> hddService.attachPhoto("testId", "TEST"));
+        verify(mockHddRepository).findById("testId");
     }
 
     @Test
-    void update_ThrowsExceptionWhenHddDoesNotExist() {
-        // Arrange
-        HDD expected = getHdd();
-        when(hddRepository.existsById("1")).thenReturn(false);
+    void getNameOfEntity_shouldReturnCorrectNameOfEntity() {
+        // Arrange & Act
+        String actual = service.getNameOfEntity(testHdd);
 
-        // Act & Assert
-        assertThrows(HardwareNotFoundException.class, () -> hddService.update(expected),
-                "update should throw HardwareNotFoundException when the HDD does not exist");
-        verify(hddRepository).existsById("1");
+        // Assert
+        assertEquals(testHdd.hardwareSpec().name(), actual);
     }
 
     @Test
-    void deleteById_DeletesHddWhenExists() {
+    void getAllWithSortingOfPriceDescAsPages_shouldGetAllHddsWithProperSorting() {
         // Arrange
-        String id = "1";
-        when(hddRepository.existsById(id)).thenReturn(true).thenReturn(false);
+        Page<HDD> expected = new PageImpl<>(List.of(testHdd, testHdd2), pageable, 8);
+        when(repository.findAll()).thenReturn(hdds);
 
         // Act
-        boolean result = hddService.deleteById(id);
+        Page<HDD> actual = service.getAllWithSortingOfPriceDescAsPages(pageable);
 
         // Assert
-        assertTrue(result, "deleteById should return true when the HDD exists and is deleted");
-        verify(hddRepository).deleteById(id);
-        verify(hddRepository, times(2)).existsById(id);
+        verify(repository).findAll();
+        assertEquals(expected, actual);
     }
 
     @Test
-    void deleteById_ThrowsHardwareNotFoundExceptionWhenHddDoesNotExist() {
+    void getAllWithSortingOfPriceAscAsPages_shouldGetAllHddsWithProperSorting() {
         // Arrange
-        String id = "1";
-        when(hddRepository.existsById(id)).thenReturn(false);
-
-        // Act & Assert
-        assertThrows(HardwareNotFoundException.class, () -> hddService.deleteById(id), "Expected HardwareNotFoundException when HDD does not exist");
-        verify(hddRepository).existsById(id);
-    }
-
-    @Test
-    void attachPhoto_WhenHddExists_ThenPhotoIsAttached() {
-        // Arrange
-        String hddId = "1";
-        String photoUrl = "https://example.com/photo.jpg";
-        HDD hddBeforeUpdate = new HDD("1", new HardwareSpec("test", "test", new BigDecimal("1"), 1.01f), 9500, 125, new ArrayList<>());
-        Optional<HDD> optionalHddBeforeUpdate = Optional.of(hddBeforeUpdate);
-
-        List<String> photosWithNewUrl = new ArrayList<>();
-        photosWithNewUrl.add(photoUrl);
-        HDD hddAfterUpdate = new HDD("1", new HardwareSpec("test", "test", new BigDecimal("1"), 1.01f), 9500, 125, photosWithNewUrl);
-
-        when(hddRepository.findById(hddId)).thenReturn(optionalHddBeforeUpdate);
-        when(hddRepository.save(any(HDD.class))).thenReturn(hddAfterUpdate);
+        Page<HDD> expected = new PageImpl<>(List.of(testHdd2, testHdd), pageable, 8);
+        when(repository.findAll()).thenReturn(hdds);
 
         // Act
-        hddService.attachPhoto(hddId, photoUrl);
+        Page<HDD> actual = service.getAllWithSortingOfPriceAscAsPages(pageable);
 
         // Assert
-        verify(hddRepository).findById(hddId);
-        verify(hddRepository).save(hddAfterUpdate);
+        verify(repository).findAll();
+        assertEquals(expected, actual);
     }
 
-
     @Test
-    void attachPhoto_WhenHddDoesNotExist_ThenNoActionTaken() {
+    void getAllWithSortingOfRatingDescAsPages_shouldGetAllHddsWithProperSorting() {
         // Arrange
-        String hddId = "nonExistingId";
-        String photoUrl = "https://example.com/photo.jpg";
-        when(hddRepository.findById(hddId)).thenReturn(Optional.empty());
+        Page<HDD> expected = new PageImpl<>(List.of(testHdd2, testHdd), pageable, 8);
+        when(repository.findAll()).thenReturn(hdds);
 
         // Act
-        hddService.attachPhoto(hddId, photoUrl);
+        Page<HDD> actual = service.getAllWithSortingOfRatingDescAsPages(pageable);
 
         // Assert
-        verify(hddRepository).findById(hddId);
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithSortingOfRatingAscAsPages_shouldGetAllHddsWithProperSorting() {
+        // Arrange
+        Page<HDD> expected = new PageImpl<>(List.of(testHdd, testHdd2), pageable, 8);
+        when(repository.findAll()).thenReturn(hdds);
+
+        // Act
+        Page<HDD> actual = service.getAllWithSortingOfRatingAscAsPages(pageable);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithFilteringByEnergyConsumptionAsPages_shouldGetAllHddsWithProperFiltering() {
+        // Arrange
+        Page<HDD> expected = new PageImpl<>(Collections.singletonList(testHdd2), pageable, 8);
+        when(repository.findAll()).thenReturn(hdds);
+
+        // Act
+        Page<HDD> actual = service.getAllWithFilteringByEnergyConsumptionAsPages(pageable, 100, 300);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithFilteringByPriceAsPages_shouldGetAllHddsWithProperFiltering() {
+        // Arrange
+        Page<HDD> expected = new PageImpl<>(Collections.singletonList(testHdd), pageable, 8);
+        when(repository.findAll()).thenReturn(hdds);
+
+        // Act
+        Page<HDD> actual = service.getAllWithFilteringByPriceAsPages(pageable, 500, 2500);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithFilteringByCapacityAsPages_shouldGetAllHddsWithProperFiltering() {
+        // Arrange
+        Page<HDD> expected = new PageImpl<>(Collections.singletonList(testHdd), pageable, 8);
+        when(repository.findAll()).thenReturn(hdds);
+
+        // Act
+        Page<HDD> actual = service.getAllWithFilteringByCapacityAsPages(pageable, 1, 50);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Override
+    protected HddNotFoundException getException() {
+        return new HddNotFoundException("There is no such hdd with id: ");
+    }
+
+    @Override
+    protected HddRepository getMockRepository() {
+        return mockHddRepository;
+    }
+
+    @Override
+    protected HddService getService(HddRepository repository) {
+        return new HddService(repository);
+    }
+
+    @Override
+    protected HDD getEntity() {
+        return testHdd;
     }
 }

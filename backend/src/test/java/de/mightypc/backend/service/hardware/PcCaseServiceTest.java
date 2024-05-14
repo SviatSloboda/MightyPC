@@ -1,191 +1,220 @@
 package de.mightypc.backend.service.hardware;
 
-import de.mightypc.backend.exception.HardwareNotFoundException;
-import de.mightypc.backend.model.specs.PcCase;
-import de.mightypc.backend.model.specs.HardwareSpec;
+import de.mightypc.backend.exception.hardware.PcCaseNotFoundException;
+import de.mightypc.backend.model.hardware.PcCase;
+import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.PcCaseRepository;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.times;
+
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
-class PcCaseServiceTest {
-    private final PcCaseRepository pcCaseRepository = mock(PcCaseRepository.class);
-    private final PcCaseService pcCaseService = new PcCaseService(pcCaseRepository);
+class PcCaseServiceTest extends BaseServiceTest<PcCase, PcCaseService, PcCaseRepository, PcCaseNotFoundException> {
+    private final PcCaseRepository mockPcCaseRepository = mock(PcCaseRepository.class);
+    private final PcCaseService pcCaseService = new PcCaseService(mockPcCaseRepository);
 
-    private static PcCase getPcCase() {
-        return new PcCase("1", new HardwareSpec(
-                "test",
-                "test",
-                new BigDecimal("1"),
-                1.01f),
-                "10x10x10"
-        );
-    }
+    private final PcCase testPcCase = new PcCase(
+            "testId",
+            new HardwareSpec("test", "test", new BigDecimal(666), 1.99f),
+            "3x3x3"
+    );
 
+    private final PcCase testPcCase2 = new PcCase(
+            "testId2",
+            new HardwareSpec("test", "test", new BigDecimal(333), 4.39f),
+            "3x3x3"
+    );
+
+    private final PageRequest pageable = PageRequest.of(0, 8);
+
+    private final List<PcCase> pcCases = new ArrayList<>(List.of(testPcCase, testPcCase2));
+
+    @Override
     @Test
-    void getAll_ReturnsAllPcCases() {
+    void update_shouldUpdateEntityAndReturnIt() {
         // Arrange
-        List<PcCase> expected = new ArrayList<>(List.of(getPcCase()));
-        when(pcCaseRepository.findAll()).thenReturn(expected);
+        PcCase expected = testPcCase.withDimensions("999");
+
+        when(mockPcCaseRepository.existsById("testId")).thenReturn(true);
+        when(mockPcCaseRepository.save(expected)).thenReturn(expected);
 
         // Act
-        List<PcCase> actual = pcCaseService.getAll();
+        PcCase actual = service.update(expected);
 
         // Assert
-        assertEquals(expected, actual, "getAll should return all PcCases");
-        verify(pcCaseRepository).findAll();
+        verify(mockPcCaseRepository).save(actual);
+        assertEquals(expected, actual);
+    }
+
+    @Override
+    @Test
+    void update_shouldThrowHardwareNotFoundException_whenEntityDoesNotExistInRepository() {
+        // Arrange
+        PcCase expected = testPcCase.withDimensions("999");
+        when(mockPcCaseRepository.existsById("testId")).thenReturn(false);
+        when(mockPcCaseRepository.save(expected)).thenReturn(expected);
+
+        // Act && Assert
+        assertThrows(PcCaseNotFoundException.class, () -> service.update(expected));
+        verify(mockPcCaseRepository).existsById("testId");
+    }
+
+    @Override
+    @Test
+    void getAllNamesWithPrices_shouldReturnMapOfNamesWithPrices() {
+        // Arrange
+        HashMap<String, String> expected = new HashMap<>();
+        expected.put("testId", "test ($666)");
+        when(mockPcCaseRepository.findAll()).thenReturn(List.of(testPcCase));
+
+        // Act
+        HashMap<String, String> actual = service.getAllNamesWithPrices();
+
+        // Assert
+        assertEquals(expected, actual);
+        verify(mockPcCaseRepository).findAll();
+    }
+
+    @Override
+    @Test
+    void attachPhoto_shouldAttachPhotoCorrectly() {
+        // Arrange
+        PcCase expected = testPcCase.withPhotos(List.of("Test"));
+
+        when(mockPcCaseRepository.findById("testId")).thenReturn(Optional.of(testPcCase));
+        when(mockPcCaseRepository.save(testPcCase.withPcCasePhotos(new ArrayList<>(List.of("Test"))))).thenReturn(expected);
+
+        // Act
+        PcCase actualPcCase = pcCaseService.attachPhoto("testId", "Test");
+
+        // Assert
+        assertEquals(actualPcCase.pcCasePhotos(), expected.pcCasePhotos());
+        verify(mockPcCaseRepository).findById("testId");
+        verify(mockPcCaseRepository).save(testPcCase.withPcCasePhotos(new ArrayList<>(List.of("Test"))));
+    }
+
+
+    @Test
+    void getNameOfEntity_shouldReturnCorrectNameOfEntity() {
+        // Arrange & Act
+        String actual = service.getNameOfEntity(testPcCase);
+
+        // Assert
+        assertEquals(testPcCase.hardwareSpec().name(), actual);
     }
 
     @Test
-    void getAll_ReturnsEmptyListWhenNoPcCases() {
+    void getAllWithSortingOfPriceDescAsPages_shouldGetAllPcCasesWithProperSorting() {
         // Arrange
-        List<PcCase> expected = new ArrayList<>();
-        when(pcCaseRepository.findAll()).thenReturn(expected);
+        Page<PcCase> expected = new PageImpl<>(List.of(testPcCase, testPcCase2), pageable, 8);
+        when(repository.findAll()).thenReturn(pcCases);
+
+        // Act
+        Page<PcCase> actual = service.getAllWithSortingOfPriceDescAsPages(pageable);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithSortingOfPriceAscAsPages_shouldGetAllPcCasesWithProperSorting() {
+        // Arrange
+        Page<PcCase> expected = new PageImpl<>(List.of(testPcCase2, testPcCase), pageable, 8);
+        when(repository.findAll()).thenReturn(pcCases);
+
+        // Act
+        Page<PcCase> actual = service.getAllWithSortingOfPriceAscAsPages(pageable);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithSortingOfRatingDescAsPages_shouldGetAllPcCasesWithProperSorting() {
+        // Arrange
+        Page<PcCase> expected = new PageImpl<>(List.of(testPcCase2, testPcCase), pageable, 8);
+        when(repository.findAll()).thenReturn(pcCases);
+
+        // Act
+        Page<PcCase> actual = service.getAllWithSortingOfRatingDescAsPages(pageable);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithSortingOfRatingAscAsPages_shouldGetAllPcCasesWithProperSorting() {
+        // Arrange
+        Page<PcCase> expected = new PageImpl<>(List.of(testPcCase, testPcCase2), pageable, 8);
+        when(repository.findAll()).thenReturn(pcCases);
+
+        // Act
+        Page<PcCase> actual = service.getAllWithSortingOfRatingAscAsPages(pageable);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getAllWithFilteringByPriceAsPages_shouldGetAllPcCasesWithProperFiltering() {
+        // Arrange
+        Page<PcCase> expected = new PageImpl<>(Collections.singletonList(testPcCase), pageable, 8);
+        when(repository.findAll()).thenReturn(pcCases);
+
+        // Act
+        Page<PcCase> actual = service.getAllWithFilteringByPriceAsPages(pageable, 500, 2500);
+
+        // Assert
+        verify(repository).findAll();
+        assertEquals(expected, actual);
+    }
+
+    @Override
+    @Test
+    void attachPhoto_shouldThrowHardwareNotFoundException_whenEntityDoesNotExistInRepository() {
+        // Arrange
+        when(mockPcCaseRepository.findById("testId")).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(HardwareNotFoundException.class, pcCaseService::getAll);
+        assertThrows(PcCaseNotFoundException.class, () -> pcCaseService.attachPhoto("testId", "TEST"));
+        verify(mockPcCaseRepository).findById("testId");
     }
 
-    @Test
-    void getById_ReturnsPcCaseWhenExists() {
-        //Arrange
-        PcCase expected = getPcCase();
-        when(pcCaseRepository.findById("1")).thenReturn(Optional.of(expected));
-
-        //Act
-        PcCase actual = pcCaseService.getById("1");
-
-        //Assert
-        assertEquals(expected, actual, "getById should return the PcCase when it exists");
-        verify(pcCaseRepository).findById("1");
+    @Override
+    protected PcCaseNotFoundException getException() {
+        return new PcCaseNotFoundException("there is no such pcCase!");
     }
 
-    @Test
-    void getById_ThrowsExceptionWhenPcCaseDoesNotExist() {
-        //Arrange
-        when(pcCaseRepository.findById("1")).thenReturn(Optional.empty());
-
-        //Act & Assert
-        assertThrows(HardwareNotFoundException.class, () -> pcCaseService.getById("1"),
-                "getById should throw HardwareNotFoundException when the PcCase does not exist");
-        verify(pcCaseRepository).findById("1");
+    @Override
+    protected PcCaseRepository getMockRepository() {
+        return mockPcCaseRepository;
     }
 
-    @Test
-    void save_ReturnsSavedPcCase() {
-        // Arrange
-        PcCase expected = getPcCase();
-        when(pcCaseRepository.save(expected)).thenReturn(expected);
-
-        // Act
-        PcCase actual = pcCaseService.save(expected);
-
-        // Assert
-        assertEquals(expected, actual, "save should return the saved PcCase");
-        verify(pcCaseRepository).save(expected);
+    @Override
+    protected PcCaseService getService(PcCaseRepository repository) {
+        return new PcCaseService(repository);
     }
 
-    @Test
-    void update_ReturnsUpdatedPcCaseWhenPcCaseExists() {
-        // Arrange
-        PcCase expected = getPcCase();
-        when(pcCaseRepository.existsById("1")).thenReturn(true);
-        when(pcCaseRepository.save(expected)).thenReturn(expected);
-
-        // Act
-        PcCase actual = pcCaseService.update(expected);
-
-        // Assert
-        assertEquals(expected, actual, "update should return the updated PcCase");
-        verify(pcCaseRepository).save(expected);
-        verify(pcCaseRepository).existsById("1");
-    }
-
-    @Test
-    void update_ThrowsExceptionWhenPcCaseDoesNotExist() {
-        // Arrange
-        PcCase expected = getPcCase();
-        when(pcCaseRepository.existsById("1")).thenReturn(false);
-
-        // Act & Assert
-        assertThrows(HardwareNotFoundException.class, () -> pcCaseService.update(expected),
-                "update should throw HardwareNotFoundException when the PcCase does not exist");
-        verify(pcCaseRepository).existsById("1");
-    }
-
-    @Test
-    void deleteById_DeletesPcCaseWhenExists() {
-        // Arrange
-        String id = "1";
-        when(pcCaseRepository.existsById(id)).thenReturn(true).thenReturn(false);
-
-        // Act
-        boolean result = pcCaseService.deleteById(id);
-
-        // Assert
-        assertTrue(result, "deleteById should return true when the PcCase exists and is deleted");
-        verify(pcCaseRepository).deleteById(id);
-        verify(pcCaseRepository, times(2)).existsById(id);
-    }
-
-    @Test
-    void deleteById_ThrowsHardwareNotFoundExceptionWhenPcCaseDoesNotExist() {
-        // Arrange
-        String id = "1";
-        when(pcCaseRepository.existsById(id)).thenReturn(false);
-
-        // Act & Assert
-        assertThrows(HardwareNotFoundException.class, () -> pcCaseService.deleteById(id), "Expected HardwareNotFoundException when PcCase does not exist");
-        verify(pcCaseRepository).existsById(id);
-    }
-
-    @Test
-    void attachPhoto_WhenPcCaseExists_ThenPhotoIsAttached() {
-        // Arrange
-        String pcCaseId = "1";
-        String photoUrl = "https://example.com/photo.jpg";
-        PcCase pcCaseBeforeUpdate = new PcCase("1", new HardwareSpec("test", "test", new BigDecimal("1"), 1.01f), "10x10x10", new ArrayList<>());
-        Optional<PcCase> optionalPcCaseBeforeUpdate = Optional.of(pcCaseBeforeUpdate);
-
-        List<String> photosWithNewUrl = new ArrayList<>();
-        photosWithNewUrl.add(photoUrl);
-        PcCase pcCaseAfterUpdate = new PcCase("1", new HardwareSpec("test", "test", new BigDecimal("1"), 1.01f), "10x10x10", photosWithNewUrl);
-
-        when(pcCaseRepository.findById(pcCaseId)).thenReturn(optionalPcCaseBeforeUpdate);
-        when(pcCaseRepository.save(any(PcCase.class))).thenReturn(pcCaseAfterUpdate);
-
-        // Act
-        pcCaseService.attachPhoto(pcCaseId, photoUrl);
-
-        // Assert
-        verify(pcCaseRepository).findById(pcCaseId);
-        verify(pcCaseRepository).save(pcCaseAfterUpdate);
-    }
-
-
-    @Test
-    void attachPhoto_WhenPcCaseDoesNotExist_ThenNoActionTaken() {
-        // Arrange
-        String pcCaseId = "nonExistingId";
-        String photoUrl = "https://example.com/photo.jpg";
-        when(pcCaseRepository.findById(pcCaseId)).thenReturn(Optional.empty());
-
-        // Act
-        pcCaseService.attachPhoto(pcCaseId, photoUrl);
-
-        // Assert
-        verify(pcCaseRepository).findById(pcCaseId);
+    @Override
+    protected PcCase getEntity() {
+        return testPcCase;
     }
 }
