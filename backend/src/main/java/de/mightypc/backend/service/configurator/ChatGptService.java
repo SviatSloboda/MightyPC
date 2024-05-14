@@ -17,7 +17,9 @@ public class ChatGptService {
 
     public ChatGptService(@Value("${app.chatgpt.api.url}") String url,
                           @Value("${app.chatgpt.api.key}") String apiKey,
-                          @Value("${app.chatgpt.api.org}") String org, ConfiguratorService configuratorService) {
+                          @Value("${app.chatgpt.api.org}") String org,
+                          ConfiguratorService configuratorService
+    ) {
 
         this.configuratorService = configuratorService;
 
