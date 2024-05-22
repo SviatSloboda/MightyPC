@@ -67,7 +67,7 @@ public abstract class BaseService<T, R extends MongoRepository<T, String>, E ext
 
     protected abstract E getException(String message);
 
-    public abstract Map<String, String> getAllNamesWithPrices();
+    public abstract String getAllNamesWithPrices();
 
     public abstract T attachPhoto(String id, String photoUrl);
 

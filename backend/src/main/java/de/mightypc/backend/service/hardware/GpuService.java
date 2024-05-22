@@ -1,6 +1,11 @@
 package de.mightypc.backend.service.hardware;
 
 import de.mightypc.backend.exception.hardware.GpuNotFoundException;
+import de.mightypc.backend.model.configurator.ItemForConfigurator;
+import de.mightypc.backend.model.hardware.CPU;
+import de.mightypc.backend.model.hardware.GPU;
+import de.mightypc.backend.model.hardware.GPU;
+import de.mightypc.backend.model.hardware.GPU;
 import de.mightypc.backend.model.hardware.GPU;
 import de.mightypc.backend.repository.hardware.GpuRepository;
 import org.springframework.data.domain.Page;
@@ -46,18 +51,47 @@ public class GpuService extends BaseService<GPU, GpuRepository, GpuNotFoundExcep
         return repository.save(updatedGpu);
     }
 
-    @Override
     @Transactional(readOnly = true)
-    public LinkedHashMap<String, String> getAllNamesWithPrices() {
-        LinkedHashMap<String, String> hashMap = new LinkedHashMap<>();
+    public String getAllNamesWithPrices() {
+        StringBuilder stringBuilder = new StringBuilder("$gpus:\n");
+        List<GPU> allGpus = getAllWithSortingOfPriceDesc();
+
+        for (GPU gpu : allGpus) {
+            String gpuAsString = "{" + gpu.id() + ":" + gpu.hardwareSpec().name() + ":($" + gpu.hardwareSpec().price() + ")}\n";
+            stringBuilder.append(gpuAsString);
+        }
+
+        return stringBuilder.toString();
+    }
+
+    public List<String> getAllIds() {
+        return getAllWithSortingOfPriceDesc().stream().map(GPU::id).toList();
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<ItemForConfigurator> getAllHardwareInfoForConfiguration() {
+        List<ItemForConfigurator> items = new ArrayList<>();
 
         List<GPU> allGpus = getAllWithSortingOfPriceDesc();
 
         for (GPU gpu : allGpus) {
-            hashMap.put(gpu.id(), gpu.hardwareSpec().name() + " ($" + gpu.hardwareSpec().price() + ")");
+            String gpuPhoto = "";
+
+            if(!gpu.gpuPhotos().isEmpty()){
+                gpuPhoto = gpu.gpuPhotos().getFirst();
+            }
+
+            items.add(new ItemForConfigurator(
+                    gpu.id(),
+                    gpu.hardwareSpec().name(),
+                    gpu.hardwareSpec().price(),
+                    gpuPhoto,
+                    "gpu"
+            ));
         }
 
-        return hashMap;
+        return items;
     }
 
     @Transactional(readOnly = true)

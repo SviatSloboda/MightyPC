@@ -3,11 +3,11 @@ import axios from 'axios';
 import ProductBox from './utils/ProductBox.tsx';
 import Modal, {useModal} from './utils/Modal.tsx';
 import {useNavigate} from "react-router-dom";
-import pcCasePhoto from "../../assets/pcCase.png";
 import {PcCase} from "../../model/pc/hardware/PcCase.tsx";
 import {useAuth} from "../../contexts/AuthContext.tsx";
 import useLoginModal from "./utils/useLoginModal";
 import LoginModal from "./utils/LoginModal";
+import pcCasePhoto from "../../assets/hardware/pcCase.png";
 
 export default function PcCasePage() {
     const [PcCases, setPcCases] = useState<PcCase[]>([]);
@@ -65,11 +65,11 @@ export default function PcCasePage() {
         }
         const payload = {
             id: pcCase.id,
-            type: "pcCase",
             name: pcCase.hardwareSpec.name,
             description: pcCase.hardwareSpec.description,
             price: pcCase.hardwareSpec.price,
-            photos: pcCase.pcCasePhotos && pcCase.pcCasePhotos.length > 0 ? pcCase.pcCasePhotos : [pcCasePhoto]
+            photo: pcCase.pcCasePhotos && pcCase.pcCasePhotos.length > 0 ? pcCase.pcCasePhotos[pcCase.pcCasePhotos.length - 1] : pcCasePhoto,
+            pathToCharacteristicsPage: "/hardware/pc-case"
         };
 
         axios.post(`/api/basket/${user.id}`, payload)

@@ -1,6 +1,8 @@
 package de.mightypc.backend.service.hardware;
 
 import de.mightypc.backend.exception.hardware.HddNotFoundException;
+import de.mightypc.backend.model.configurator.ItemForConfigurator;
+import de.mightypc.backend.model.hardware.GPU;
 import de.mightypc.backend.model.hardware.HDD;
 import de.mightypc.backend.repository.hardware.HddRepository;
 
@@ -12,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 @Service
@@ -49,18 +50,47 @@ public class HddService extends BaseService<HDD, HddRepository, HddNotFoundExcep
         return repository.save(updatedHdd);
     }
 
-    @Override
     @Transactional(readOnly = true)
-    public LinkedHashMap<String, String> getAllNamesWithPrices() {
-        LinkedHashMap<String, String> hashMap = new LinkedHashMap<>();
+    public String getAllNamesWithPrices() {
+        StringBuilder stringBuilder = new StringBuilder("$hdds:\n");
+        List<HDD> allHdds = getAllWithSortingOfPriceDesc();
+
+        for (HDD hdd : allHdds) {
+            String hddAsString = "{" + hdd.id() + ":" + hdd.hardwareSpec().name() + ":($" + hdd.hardwareSpec().price() + ")}\n";
+            stringBuilder.append(hddAsString);
+        }
+
+        return stringBuilder.toString();
+    }
+
+    public List<String> getAllIds() {
+        return getAllWithSortingOfPriceDesc().stream().map(HDD::id).toList();
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<ItemForConfigurator> getAllHardwareInfoForConfiguration() {
+        List<ItemForConfigurator> items = new ArrayList<>();
 
         List<HDD> allHdds = getAllWithSortingOfPriceDesc();
 
         for (HDD hdd : allHdds) {
-            hashMap.put(hdd.id(), hdd.hardwareSpec().name() + " ($" + hdd.hardwareSpec().price() + ")");
+            String hddPhoto = "";
+
+            if(!hdd.hddPhotos().isEmpty()){
+                hddPhoto = hdd.hddPhotos().getFirst();
+            }
+
+            items.add(new ItemForConfigurator(
+                    hdd.id(),
+                    hdd.hardwareSpec().name(),
+                    hdd.hardwareSpec().price(),
+                    hddPhoto,
+                    "hdd"
+            ));
         }
 
-        return hashMap;
+        return items;
     }
 
     @Transactional(readOnly = true)

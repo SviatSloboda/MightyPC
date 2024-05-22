@@ -1,12 +1,12 @@
 import {Link} from "react-router-dom";
-import cpu from "../../assets/cpu.png";
-import gpu from "../../assets/gpu.png";
-import motherboard from "../../assets/motherboard.png";
-import hdd from "../../assets/hdd.png";
-import ram from "../../assets/ram.png";
-import psu from "../../assets/psu.png";
-import ssd from "../../assets/ssd.png";
-import pcCase from "../../assets/pcCase.png";
+import cpu from "../../assets/hardware/cpu.png";
+import gpu from "../../assets/hardware/gpu.png";
+import motherboard from "../../assets/hardware/motherboard.png";
+import hdd from "../../assets/hardware/hdd.png";
+import ram from "../../assets/hardware/ram.png";
+import psu from "../../assets/hardware/psu.png";
+import ssd from "../../assets/hardware/ssd.png";
+import pcCase from "../../assets/hardware/pcCase.png";
 
 const hardwareItems = [{name: 'CPU', image: cpu, path: '/hardware/cpu'}, {
     name: 'GPU', image: gpu, path: '/hardware/gpu'

@@ -3,11 +3,11 @@ import axios from 'axios';
 import ProductBox from './utils/ProductBox.tsx';
 import Modal, {useModal} from './utils/Modal.tsx';
 import {useNavigate} from "react-router-dom";
-import psuPhoto from "../../assets/psu.png";
 import {PSU} from "../../model/pc/hardware/PSU.tsx";
 import {useAuth} from "../../contexts/AuthContext.tsx";
 import useLoginModal from "./utils/useLoginModal";
 import LoginModal from "./utils/LoginModal";
+import psuPhoto from "../../assets/hardware/psu.png";
 
 export default function PowerSupplyPage() {
     const [PSUs, setPSUs] = useState<PSU[]>([]);
@@ -69,11 +69,11 @@ export default function PowerSupplyPage() {
         }
         const payload = {
             id: psu.id,
-            type: "psu",
             name: psu.hardwareSpec.name,
             description: psu.hardwareSpec.description,
             price: psu.hardwareSpec.price,
-            photos: psu.psuPhotos && psu.psuPhotos.length > 0 ? psu.psuPhotos : [psuPhoto]
+            photo: psu.psuPhotos && psu.psuPhotos.length > 0 ? psu.psuPhotos[psu.psuPhotos.length - 1] : psuPhoto,
+            pathToCharacteristicsPage: "/hardware/psu"
         };
 
         axios.post(`/api/basket/${user.id}`, payload)

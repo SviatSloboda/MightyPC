@@ -8,6 +8,6 @@ public record ChatGptRequest(
         List<ChatGptMessage> messages
 ) {
     public ChatGptRequest(String message) {
-        this("gpt-3.5-turbo", Collections.singletonList(new ChatGptMessage("user", message)));
+        this("gpt-4o", Collections.singletonList(new ChatGptMessage("user", message)));
     }
 }

@@ -2,12 +2,12 @@ import {useEffect, useState} from "react";
 import axios from "axios";
 import {useNavigate, useParams} from "react-router-dom";
 import {Motherboard} from "../../../model/pc/hardware/Motherboard.tsx";
-import motherboardPhoto from "../../../assets/motherboard.png";
 import Photo from "../utils/Photo.tsx";
 import Rating from "../utils/Rating.tsx";
 import {useAuth} from "../../../contexts/AuthContext.tsx";
 import useLoginModal from "../utils/useLoginModal";
 import LoginModal from "../utils/LoginModal";
+import motherboardPhoto from "../../../assets/hardware/motherboard.png";
 
 export default function MotherboardCharacteristics() {
     const {id} = useParams<{ id: string }>();
@@ -94,11 +94,11 @@ export default function MotherboardCharacteristics() {
         }
         const payload = {
             id: motherboard?.id,
-            type: "motherboard",
             name: motherboard?.hardwareSpec.name,
             description: motherboard?.hardwareSpec.description,
             price: motherboard?.hardwareSpec.price,
-            photos: photos.length > 0 ? photos : [motherboardPhoto]
+            photo: motherboard?.motherboardPhotos && motherboard.motherboardPhotos.length > 0 ? motherboard.motherboardPhotos[motherboard.motherboardPhotos.length - 1] : motherboardPhoto,
+            pathToCharacteristicsPage: "/hardware/motherboard"
         };
 
         axios.post(`/api/basket/${user.id}`, payload)

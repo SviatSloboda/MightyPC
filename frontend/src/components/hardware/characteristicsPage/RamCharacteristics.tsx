@@ -2,12 +2,12 @@ import {useEffect, useState} from "react";
 import axios from "axios";
 import {useNavigate, useParams} from "react-router-dom";
 import {RAM} from "../../../model/pc/hardware/RAM.tsx";
-import ramPhoto from "../../../assets/ram.png";
 import Photo from "../utils/Photo.tsx";
 import Rating from "../utils/Rating.tsx";
 import {useAuth} from "../../../contexts/AuthContext.tsx";
 import useLoginModal from "../utils/useLoginModal";
 import LoginModal from "../utils/LoginModal";
+import ramPhoto from "../../../assets/hardware/ram.png";
 
 export default function RamCharacteristics() {
     const [ram, setRam] = useState<RAM>();
@@ -88,14 +88,14 @@ export default function RamCharacteristics() {
             showLoginModal();
             return;
         }
-        // Assume the payload structure required for RAM is similar to motherboard, pcCase, and PSU
+
         const payload = {
             id: ram?.id,
-            type: "ram",
             name: ram?.hardwareSpec.name,
             description: ram?.hardwareSpec.description,
             price: ram?.hardwareSpec.price,
-            photos: ram && (ram.ramPhotos?.length ?? 0) > 0 ? ram.ramPhotos : ['https://res.cloudinary.com/dmacmrhwq/image/upload/v1708536729/cloudinary_file_test/plain.png.png']
+            photo: ram?.ramPhotos && ram.ramPhotos.length > 0 ? ram.ramPhotos[ram.ramPhotos.length - 1] : ramPhoto,
+            pathToCharacteristicsPage: "/hardware/ram"
         };
 
         axios.post<void>(`/api/basket/${user?.id}`, payload)

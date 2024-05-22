@@ -3,7 +3,7 @@ import axios from 'axios';
 import ProductBox from './utils/ProductBox.tsx';
 import Modal, {useModal} from './utils/Modal.tsx';
 import {useNavigate} from "react-router-dom";
-import cpuPhoto from "../../assets/cpu.png";
+import cpuPhoto from "../../assets/hardware/cpu.png";
 import {CPU} from "../../model/pc/hardware/CPU.tsx";
 import {useAuth} from "../../contexts/AuthContext.tsx";
 import useLoginModal from "./utils/useLoginModal";
@@ -11,7 +11,7 @@ import LoginModal from "./utils/LoginModal";
 import {login} from "../../contexts/authUtils.ts";
 
 export default function CpuPage() {
-    const [CPUs, setCPUs] = useState<CPU[]>([]);
+    const [cpus, setCpus] = useState<CPU[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const cpusPerPage = 8;
@@ -30,7 +30,7 @@ export default function CpuPage() {
         async function fetchCpus() {
             try {
                 const response = await axios.get(`/api/hardware/cpu/page?page=${currentPage}&size=${cpusPerPage}`);
-                setCPUs(response.data.content);
+                setCpus(response.data.content);
                 setTotalPages(response.data.totalPages);
             } catch (error) {
                 console.error("Failed to fetch CPUs:", error);
@@ -53,7 +53,7 @@ export default function CpuPage() {
         axios.post('/api/hardware/cpu', payload)
             .then(response => {
                 console.log('CPU added:', response.data);
-                setCPUs(prevCPUs => [...prevCPUs, response.data]);
+                setCpus(prevCPUs => [...prevCPUs, response.data]);
                 toggleModal();
             })
             .catch(error => console.error('Failed to add CPU:', error));
@@ -66,11 +66,11 @@ export default function CpuPage() {
         }
         const payload = {
             id: cpu.id,
-            type: "cpu",
             name: cpu.hardwareSpec.name,
             description: cpu.hardwareSpec.description,
             price: cpu.hardwareSpec.price,
-            photos: cpu.cpuPhotos && cpu.cpuPhotos.length > 0 ? cpu.cpuPhotos : [cpuPhoto]
+            photo: cpu.cpuPhotos && cpu.cpuPhotos.length > 0 ? cpu.cpuPhotos[cpu.cpuPhotos.length - 1] : cpuPhoto,
+            pathToCharacteristicsPage: "/hardware/cpu"
         };
 
         axios.post<void>(`/api/basket/${user.id}`, payload)
@@ -120,7 +120,7 @@ export default function CpuPage() {
         </Modal>
 
         <div className="product-list">
-            {CPUs.map(cpu => (<ProductBox
+            {cpus.map(cpu => (<ProductBox
                 key={cpu.id}
                 product={cpu}
                 imgSrc={cpu.cpuPhotos && cpu.cpuPhotos.length > 0 ? cpu.cpuPhotos[0] : cpuPhoto}

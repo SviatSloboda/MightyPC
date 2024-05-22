@@ -3,11 +3,11 @@ import axios from 'axios';
 import ProductBox from './utils/ProductBox.tsx';
 import Modal, {useModal} from './utils/Modal.tsx';
 import {useNavigate} from "react-router-dom";
-import hddPhoto from "../../assets/hdd.png";
 import {HDD} from "../../model/pc/hardware/HDD.tsx";
 import {useAuth} from "../../contexts/AuthContext.tsx";
 import useLoginModal from "./utils/useLoginModal";
 import LoginModal from "./utils/LoginModal";
+import hddPhoto from "../../assets/hardware/hdd.png";
 
 export default function HddPage() {
     const [HDDs, setHDDs] = useState<HDD[]>([]);
@@ -66,11 +66,11 @@ export default function HddPage() {
         }
         const payload = {
             id: hdd.id,
-            type: "hdd",
             name: hdd.hardwareSpec.name,
             description: hdd.hardwareSpec.description,
             price: hdd.hardwareSpec.price,
-            photos: hdd.hddPhotos && hdd.hddPhotos.length > 0 ? hdd.hddPhotos : [hddPhoto]
+            photo: hdd.hddPhotos && hdd.hddPhotos.length > 0 ? hdd.hddPhotos[hdd.hddPhotos.length - 1] : hddPhoto,
+            pathToCharacteristicsPage: "/hardware/hdd"
         };
 
         axios.post<void>(`/api/basket/${user.id}`, payload)

@@ -3,11 +3,11 @@ import axios from 'axios';
 import ProductBox from './utils/ProductBox.tsx';
 import Modal, {useModal} from './utils/Modal.tsx';
 import {useNavigate} from "react-router-dom";
-import ssdPhoto from "../../assets/ssd.png";
 import {SSD} from "../../model/pc/hardware/SSD.tsx";
 import {useAuth} from "../../contexts/AuthContext.tsx";
 import useLoginModal from "./utils/useLoginModal";
 import LoginModal from "./utils/LoginModal";
+import ssdPhoto from "../../assets/hardware/ssd.png";
 
 export default function SsdPage() {
     const [SSDs, setSSDs] = useState<SSD[]>([]);
@@ -66,11 +66,11 @@ export default function SsdPage() {
         }
         const payload = {
             id: ssd.id,
-            type: "ssd",
             name: ssd.hardwareSpec.name,
             description: ssd.hardwareSpec.description,
             price: ssd.hardwareSpec.price,
-            photos: ssd.ssdPhotos && ssd.ssdPhotos.length > 0 ? ssd.ssdPhotos : [ssdPhoto]
+            photo: ssd.ssdPhotos && ssd.ssdPhotos.length > 0 ? ssd.ssdPhotos[ssd.ssdPhotos.length - 1] : ssdPhoto,
+            pathToCharacteristicsPage: "/hardware/ssd"
         };
 
         axios.post(`/api/basket/${user.id}`, payload)

@@ -3,11 +3,11 @@ import axios from 'axios';
 import ProductBox from './utils/ProductBox.tsx';
 import Modal, {useModal} from './utils/Modal.tsx';
 import {useNavigate} from "react-router-dom";
-import ramPhoto from "../../assets/ram.png";
 import {RAM} from "../../model/pc/hardware/RAM.tsx";
 import {useAuth} from "../../contexts/AuthContext.tsx";
 import useLoginModal from "./utils/useLoginModal";
 import LoginModal from "./utils/LoginModal";
+import ramPhoto from "../../assets/hardware/ram.png";
 
 export default function RamPage() {
     const [RAMs, setRAMs] = useState<RAM[]>([]);
@@ -67,11 +67,11 @@ export default function RamPage() {
         }
         const payload = {
             id: ram.id,
-            type: "ram",
+            pathToCharacteristicsPage: "/api/hardware/ram",
             name: ram.hardwareSpec.name,
             description: ram.hardwareSpec.description,
             price: ram.hardwareSpec.price,
-            photos: ram.ramPhotos && ram.ramPhotos.length > 0 ? ram.ramPhotos : [ramPhoto]
+            photo: ram.ramPhotos && ram.ramPhotos.length > 0 ? ram.ramPhotos[ram.ramPhotos.length - 1] : ramPhoto
         };
 
         axios.post(`/api/basket/${user.id}`, payload)

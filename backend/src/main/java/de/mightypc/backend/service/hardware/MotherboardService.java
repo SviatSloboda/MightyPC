@@ -1,6 +1,11 @@
 package de.mightypc.backend.service.hardware;
 
 import de.mightypc.backend.exception.hardware.MotherboardNotFoundException;
+import de.mightypc.backend.model.configurator.ItemForConfigurator;
+import de.mightypc.backend.model.hardware.GPU;
+import de.mightypc.backend.model.hardware.Motherboard;
+import de.mightypc.backend.model.hardware.Motherboard;
+import de.mightypc.backend.model.hardware.Motherboard;
 import de.mightypc.backend.model.hardware.Motherboard;
 import de.mightypc.backend.repository.hardware.MotherboardRepository;
 import org.springframework.data.domain.Page;
@@ -65,18 +70,46 @@ public class MotherboardService extends BaseService<Motherboard, MotherboardRepo
         return hashMap;
     }
 
-    @Override
     @Transactional(readOnly = true)
-    public LinkedHashMap<String, String> getAllNamesWithPrices() {
-        LinkedHashMap<String, String> hashMap = new LinkedHashMap<>();
+    public String getAllNamesWithPrices() {
+        StringBuilder stringBuilder = new StringBuilder("$motherboards:\n");
+        List<Motherboard> allMotherboards = getAllWithSortingOfPriceDesc();
+
+        for (Motherboard motherboard : allMotherboards) {
+            String motherboardAsString = "{" + motherboard.id() + ":" + motherboard.hardwareSpec().name() + ":($" + motherboard.hardwareSpec().price() + ")}\n";
+            stringBuilder.append(motherboardAsString);
+        }
+
+        return stringBuilder.toString();
+    }
+
+    public List<String> getAllIds() {
+        return getAllWithSortingOfPriceDesc().stream().map(Motherboard::id).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ItemForConfigurator> getAllHardwareInfoForConfiguration() {
+        List<ItemForConfigurator> items = new ArrayList<>();
 
         List<Motherboard> allMotherboards = getAllWithSortingOfPriceDesc();
 
         for (Motherboard motherboard : allMotherboards) {
-            hashMap.put(motherboard.id(), motherboard.hardwareSpec().name() + " ($" + motherboard.hardwareSpec().price() + ")");
+            String motherboardPhoto = "";
+
+            if(!motherboard.motherboardPhotos().isEmpty()){
+                motherboardPhoto = motherboard.motherboardPhotos().getFirst();
+            }
+
+            items.add(new ItemForConfigurator(
+                    motherboard.id(),
+                    motherboard.hardwareSpec().name(),
+                    motherboard.hardwareSpec().price(),
+                    motherboardPhoto,
+                    "motherboard"
+            ));
         }
 
-        return hashMap;
+        return items;
     }
 
     @Transactional(readOnly = true)

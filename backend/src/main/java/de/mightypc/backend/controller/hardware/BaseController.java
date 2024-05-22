@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
-import java.util.Map;
 
 public abstract class BaseController<T, S extends BaseService<T, ?, ?>> {
     S service;
@@ -46,7 +45,7 @@ public abstract class BaseController<T, S extends BaseService<T, ?, ?>> {
     }
 
     @GetMapping("/names")
-    public Map<String, String> getAllNames() {
+    public String getAllNames() {
         return service.getAllNamesWithPrices();
     }
 }

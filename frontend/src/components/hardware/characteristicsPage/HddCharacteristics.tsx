@@ -2,12 +2,12 @@ import {useEffect, useState} from "react";
 import axios from "axios";
 import {useNavigate, useParams} from "react-router-dom";
 import {HDD} from "../../../model/pc/hardware/HDD.tsx";
-import hddPhoto from "../../../assets/hdd.png";
 import Photo from "../utils/Photo.tsx";
 import Rating from "../utils/Rating.tsx";
 import {useAuth} from "../../../contexts/AuthContext.tsx";
 import useLoginModal from "../utils/useLoginModal";
 import LoginModal from "../utils/LoginModal";
+import hddPhoto from "../../../assets/hardware/hdd.png";
 
 export default function HddCharacteristics() {
     const [hdd, setHdd] = useState<HDD>();
@@ -91,11 +91,11 @@ export default function HddCharacteristics() {
         }
         const payload = {
             id: hdd?.id,
-            type: "hdd",
             name: hdd?.hardwareSpec.name,
             description: hdd?.hardwareSpec.description,
             price: hdd?.hardwareSpec.price,
-            photos: hdd && (hdd.hddPhotos?.length ?? 0) > 0 ? hdd.hddPhotos : ['https://res.cloudinary.com/dmacmrhwq/image/upload/v1708536729/cloudinary_file_test/plain.png.png']
+            photo: hdd?.hddPhotos && hdd.hddPhotos.length > 0 ? hdd.hddPhotos[hdd.hddPhotos.length - 1] : hddPhoto,
+            pathToCharacteristicsPage: "/hardware/hdd"
         };
 
         axios.post<void>(`/api/basket/${user?.id}`, payload)

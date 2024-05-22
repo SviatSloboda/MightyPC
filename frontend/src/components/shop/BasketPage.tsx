@@ -2,7 +2,7 @@ import {useCallback, useEffect, useState} from 'react';
 import axios from 'axios';
 import {useAuth} from "../../contexts/AuthContext.tsx";
 import {Item} from "../../model/shop/Item.tsx";
-import empty_basket from "../../assets/empty_basket.png";
+import empty_basket from "../../assets/shop/empty_basket.png";
 import {useNavigate} from "react-router-dom";
 
 export default function BasketPage() {
@@ -56,12 +56,12 @@ export default function BasketPage() {
             <p className="basket-empty__message">Basket is empty!</p>
         </div>) : (<div className="basket-items">
             {items.map((item: Item) => (<div key={item.id} className="basket-item">
-                <img src={item.photos[0]} alt={item.name} className="basket-item__image"/>
+                <img src={item.photo} alt={item.name} className="basket-item__image"/>
                 <div className="basket-item__details">
                     <h2 className="basket-item__name">{item.name}</h2>
                     <p className="basket-item__description">{item.description}</p>
                     <p className="basket-item__price">${item.price}</p>
-                    <button onClick={() => deleteItem(item.id)} className="basket-item__button">Remove
+                    <button onClick={() => deleteItem(item.id)} className="product-box__button">Remove
                     </button>
                 </div>
             </div>))}

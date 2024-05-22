@@ -1,7 +1,9 @@
 package de.mightypc.backend.service.hardware;
 
 import de.mightypc.backend.exception.hardware.CpuNotFoundException;
+import de.mightypc.backend.model.configurator.ItemForConfigurator;
 import de.mightypc.backend.model.hardware.CPU;
+import de.mightypc.backend.model.shop.order.Item;
 import de.mightypc.backend.repository.hardware.CpuRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -13,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CpuService extends BaseService<CPU, CpuRepository, CpuNotFoundException> {
@@ -48,18 +51,47 @@ public class CpuService extends BaseService<CPU, CpuRepository, CpuNotFoundExcep
         return repository.save(updatedCpu);
     }
 
-    @Override
     @Transactional(readOnly = true)
-    public LinkedHashMap<String, String> getAllNamesWithPrices() {
-        LinkedHashMap<String, String> hashMap = new LinkedHashMap<>();
+    public String getAllNamesWithPrices() {
+        StringBuilder stringBuilder = new StringBuilder("$cpus:\n");
+        List<CPU> allCpus = getAllWithSortingOfPriceDesc();
+
+        for (CPU cpu : allCpus) {
+            String cpuAsString = "{" + cpu.id() + ":" + cpu.hardwareSpec().name() + ":($" + cpu.hardwareSpec().price() + ")}\n";
+            stringBuilder.append(cpuAsString);
+        }
+
+        return stringBuilder.toString();
+    }
+
+    @Transactional(readOnly = true)
+    public List<String> getAllIds() {
+        return getAllWithSortingOfPriceDesc().stream().map(CPU::id).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ItemForConfigurator> getAllHardwareInfoForConfiguration() {
+        List<ItemForConfigurator> items = new ArrayList<>();
 
         List<CPU> allCpus = getAllWithSortingOfPriceDesc();
 
         for (CPU cpu : allCpus) {
-            hashMap.put(cpu.id(), cpu.hardwareSpec().name() + " ($" + cpu.hardwareSpec().price() + ")");
+            String cpuPhoto = "";
+
+            if(!cpu.cpuPhotos().isEmpty()){
+                cpuPhoto = cpu.cpuPhotos().getFirst();
+            }
+
+            items.add(new ItemForConfigurator(
+                    cpu.id(),
+                    cpu.hardwareSpec().name(),
+                    cpu.hardwareSpec().price(),
+                    cpuPhoto,
+                    "cpu"
+            ));
         }
 
-        return hashMap;
+        return items;
     }
 
     @Transactional(readOnly = true)

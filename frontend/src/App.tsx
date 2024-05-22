@@ -26,9 +26,9 @@ import OrderPage from "./components/shop/OrderPage.tsx";
 import PcCharacteristics from "./components/pc/PcCharacteristics.tsx";
 import WorkstationsPage from "./components/workstation/WorkstationsPage.tsx";
 import WorkstationsCharacteristicsPage from "./components/workstation/WorkstationCharacteristicsPage.tsx";
-import ConfiguratorPage from "./components/configurator/ConfiguratorPage.tsx";
 import UserPcsPage from "./components/configurator/UserPcsPage.tsx";
-import TryPage from "./components/configurator/TryPage.tsx";
+import Confi from "./components/configurator/Confi.tsx";
+
 
 export default function App() {
 
@@ -39,8 +39,7 @@ export default function App() {
             <Route path="/" element={<GamingPCsPage/>}/>
             <Route path="/*" element={<NoMatch/>}/>
 
-
-            <Route path="/configurator" element={<ConfiguratorPage/>}/>
+            <Route path="/configurator" element={<Confi/>}/>
 
             <Route path="/pc" element={<GamingPCsPage/>}/>
             <Route path="/pc/:id" element={<PcCharacteristics/>}/>
@@ -67,9 +66,6 @@ export default function App() {
             <Route path="/hardware/hdd/:id" element={<HddCharacteristics/>}/>
             <Route path="/hardware/psu/:id" element={<PsuCharacteristics/>}/>
             <Route path="/hardware/pc-case/:id" element={<PcCaseCharacteristics/>}/>
-
-            <Route path="/try" element={<TryPage/>}/>
-
 
             <Route path="/basket" element={<BasketPage/>}/>
             <Route path="/order" element={<OrderPage/>}/>

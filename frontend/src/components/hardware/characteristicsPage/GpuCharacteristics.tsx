@@ -2,12 +2,12 @@ import {useEffect, useState} from "react";
 import axios from "axios";
 import {useNavigate, useParams} from "react-router-dom";
 import {GPU} from "../../../model/pc/hardware/GPU.tsx";
-import gpuPhoto from "../../../assets/gpu.png";
 import Photo from "../utils/Photo.tsx";
 import Rating from "../utils/Rating.tsx";
 import {useAuth} from "../../../contexts/AuthContext.tsx";
 import useLoginModal from "../utils/useLoginModal";
 import LoginModal from "../utils/LoginModal";
+import gpuPhoto from "../../../assets/hardware/gpu.png";
 
 export default function GpuCharacteristics() {
     const [gpu, setGpu] = useState<GPU>();
@@ -90,11 +90,11 @@ export default function GpuCharacteristics() {
         }
         const payload = {
             id: gpu?.id,
-            type: "gpu",
             name: gpu?.hardwareSpec.name,
             description: gpu?.hardwareSpec.description,
             price: gpu?.hardwareSpec.price,
-            photos: gpu && (gpu.gpuPhotos?.length ?? 0) > 0 ? gpu.gpuPhotos : ['https://res.cloudinary.com/dmacmrhwq/image/upload/v1708536729/cloudinary_file_test/plain.png.png']
+            photo: gpu?.gpuPhotos && gpu.gpuPhotos.length > 0 ? gpu.gpuPhotos[gpu.gpuPhotos.length - 1] : gpuPhoto,
+            pathToCharacteristicsPage: "/hardware/gpu"
         };
 
         axios.post<void>(`/api/basket/${user?.id}`, payload)

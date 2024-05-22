@@ -1,6 +1,5 @@
 package de.mightypc.backend.service.configurator;
 
-import de.mightypc.backend.model.configurator.ConfiguratorComponents;
 import de.mightypc.backend.service.hardware.CpuService;
 import de.mightypc.backend.service.hardware.GpuService;
 import de.mightypc.backend.service.hardware.HddService;

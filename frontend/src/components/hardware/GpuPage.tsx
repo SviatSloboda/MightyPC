@@ -3,12 +3,12 @@ import axios from 'axios';
 import ProductBox from './utils/ProductBox.tsx';
 import Modal, {useModal} from './utils/Modal.tsx';
 import {useNavigate} from "react-router-dom";
-import gpuPhoto from "../../assets/gpu.png";
 import {GPU} from "../../model/pc/hardware/GPU.tsx";
 import {useAuth} from "../../contexts/AuthContext.tsx";
 import useLoginModal from "./utils/useLoginModal";
 import LoginModal from "./utils/LoginModal";
 import {login} from "../../contexts/authUtils.ts";
+import gpuPhoto from "../../assets/hardware/gpu.png";
 
 export default function GpuPage() {
     const [GPUs, setGPUs] = useState<GPU[]>([]);
@@ -65,11 +65,11 @@ export default function GpuPage() {
         }
         const payload = {
             id: gpu.id,
-            type: "gpu",
             name: gpu.hardwareSpec.name,
             description: gpu.hardwareSpec.description,
             price: gpu.hardwareSpec.price,
-            photos: gpu.gpuPhotos && gpu.gpuPhotos.length > 0 ? gpu.gpuPhotos : [gpuPhoto]
+            photo: gpu.gpuPhotos && gpu.gpuPhotos.length > 0 ? gpu.gpuPhotos[gpu.gpuPhotos.length - 1] : gpuPhoto,
+            pathToCharacteristicsPage: "/hardware/gpu"
         };
 
         axios.post<void>(`/api/basket/${user.id}`, payload)

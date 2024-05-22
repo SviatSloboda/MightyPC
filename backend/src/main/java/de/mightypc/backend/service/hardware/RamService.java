@@ -1,6 +1,11 @@
 package de.mightypc.backend.service.hardware;
 
 import de.mightypc.backend.exception.hardware.RamNotFoundException;
+import de.mightypc.backend.model.configurator.ItemForConfigurator;
+import de.mightypc.backend.model.hardware.GPU;
+import de.mightypc.backend.model.hardware.RAM;
+import de.mightypc.backend.model.hardware.RAM;
+import de.mightypc.backend.model.hardware.RAM;
 import de.mightypc.backend.model.hardware.RAM;
 import de.mightypc.backend.repository.hardware.RamRepository;
 import org.springframework.data.domain.Page;
@@ -48,18 +53,47 @@ public class RamService extends BaseService<RAM, RamRepository, RamNotFoundExcep
         return repository.save(updatedRAM);
     }
 
-    @Override
     @Transactional(readOnly = true)
-    public LinkedHashMap<String, String> getAllNamesWithPrices() {
-        LinkedHashMap<String, String> hashMap = new LinkedHashMap<>();
+    public String getAllNamesWithPrices() {
+        StringBuilder stringBuilder = new StringBuilder("$rams:\n");
+        List<RAM> allRams = getAllWithSortingOfPriceDesc();
+
+        for (RAM ram : allRams) {
+            String ramAsString = "{" + ram.id() + ":" + ram.hardwareSpec().name() + ":($" + ram.hardwareSpec().price() + ")}\n";
+            stringBuilder.append(ramAsString);
+        }
+
+        return stringBuilder.toString();
+    }
+
+    public List<String> getAllIds() {
+        return getAllWithSortingOfPriceDesc().stream().map(RAM::id).toList();
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<ItemForConfigurator> getAllHardwareInfoForConfiguration() {
+        List<ItemForConfigurator> items = new ArrayList<>();
 
         List<RAM> allRams = getAllWithSortingOfPriceDesc();
 
         for (RAM ram : allRams) {
-            hashMap.put(ram.id(), ram.hardwareSpec().name() + " ($" + ram.hardwareSpec().price() + ")");
+            String ramPhoto = "";
+
+            if(!ram.ramPhotos().isEmpty()){
+                ramPhoto = ram.ramPhotos().getFirst();
+            }
+
+            items.add(new ItemForConfigurator(
+                    ram.id(),
+                    ram.hardwareSpec().name(),
+                    ram.hardwareSpec().price(),
+                    ramPhoto,
+                    "ram"
+            ));
         }
 
-        return hashMap;
+        return items;
     }
 
     @Transactional(readOnly = true)
@@ -105,7 +139,7 @@ public class RamService extends BaseService<RAM, RamRepository, RamNotFoundExcep
     private List<RAM> getAllWithSortingOfPriceDesc() {
         return getAll()
                 .stream()
-                .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().price()))
+                .sorted(Comparator.comparing(ram -> ram.hardwareSpec().price()))
                 .toList()
                 .reversed();
     }
@@ -113,14 +147,14 @@ public class RamService extends BaseService<RAM, RamRepository, RamNotFoundExcep
     private List<RAM> getAllWithSortingOfPriceAsc() {
         return getAll()
                 .stream()
-                .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().price()))
+                .sorted(Comparator.comparing(ram -> ram.hardwareSpec().price()))
                 .toList();
     }
 
     private List<RAM> getAllWithSortingOfRatingDesc() {
         return getAll()
                 .stream()
-                .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().rating()))
+                .sorted(Comparator.comparing(ram -> ram.hardwareSpec().rating()))
                 .toList()
                 .reversed();
     }
@@ -128,34 +162,34 @@ public class RamService extends BaseService<RAM, RamRepository, RamNotFoundExcep
     private List<RAM> getAllWithSortingOfRatingAsc() {
         return getAll()
                 .stream()
-                .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().rating()))
+                .sorted(Comparator.comparing(ram -> ram.hardwareSpec().rating()))
                 .toList();
     }
 
     private List<RAM> getAllWithFilteringByPrice(int lowestPrice, int highestPrice) {
         return getAll().stream()
-                .filter(cpu -> cpu.hardwareSpec().price().intValue() >= lowestPrice
-                               && cpu.hardwareSpec().price().intValue() <= highestPrice)
+                .filter(ram -> ram.hardwareSpec().price().intValue() >= lowestPrice
+                               && ram.hardwareSpec().price().intValue() <= highestPrice)
                 .toList();
     }
 
     private List<RAM> getAllWithFilteringByType(String type) {
         return getAll().stream()
-                .filter(cpu -> cpu.type().equals(type))
+                .filter(ram -> ram.type().equals(type))
                 .toList();
     }
 
     private List<RAM> getAllWithFilteringByEnergyConsumption(int lowestEnergyConsumption, int highestEnergyConsumption) {
         return getAll().stream()
-                .filter(cpu -> cpu.energyConsumption() >= lowestEnergyConsumption
-                               && cpu.energyConsumption() <= highestEnergyConsumption)
+                .filter(ram -> ram.energyConsumption() >= lowestEnergyConsumption
+                               && ram.energyConsumption() <= highestEnergyConsumption)
                 .toList();
     }
 
     private List<RAM> getAllWithFilteringByMemorySize(int minimalMemorySize, int maximalMemorySize) {
         return getAll().stream()
-                .filter(cpu -> cpu.memorySize() >= minimalMemorySize
-                               && cpu.memorySize() <= maximalMemorySize)
+                .filter(ram -> ram.memorySize() >= minimalMemorySize
+                               && ram.memorySize() <= maximalMemorySize)
                 .toList();
     }
 }

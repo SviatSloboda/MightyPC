@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import axios from "axios";
 import {useNavigate, useParams} from "react-router-dom";
 import {CPU} from "../../../model/pc/hardware/CPU.tsx";
-import cpuPhoto from "../../../assets/cpu.png";
+import cpuPhoto from "../../../assets/hardware/cpu.png";
 import Photo from "../utils/Photo.tsx";
 import Rating from "../utils/Rating.tsx";
 import {useAuth} from "../../../contexts/AuthContext.tsx";
@@ -96,11 +96,11 @@ export default function CpuCharacteristics() {
         }
         const payload = {
             id: cpu?.id,
-            type: "cpu",
             name: cpu?.hardwareSpec.name,
             description: cpu?.hardwareSpec.description,
             price: cpu?.hardwareSpec.price,
-            photos: cpu && (cpu.cpuPhotos?.length ?? 0) > 0 ? cpu.cpuPhotos : [cpuPhoto]
+            photo: cpu?.cpuPhotos && cpu.cpuPhotos.length > 0 ? cpu.cpuPhotos[cpu.cpuPhotos.length - 1] : cpuPhoto,
+            pathToCharacteristicsPage: "/hardware/cpu"
         };
 
         axios.post<void>(`/api/basket/${user?.id}`, payload)

@@ -42,7 +42,13 @@ public class BasketService {
         userRepository.save(user);
     }
 
-    private Item getItemById(User user, String itemId) {
+    public Item getItemById(String userId, String itemId) {
+        User user = userService.getUserById(userId);
+
+        return getItemById(user, itemId);
+    }
+
+    public Item getItemById(User user, String itemId) {
         return user.getBasket().stream()
                 .filter(item -> item.id().equals(itemId))
                 .findAny()

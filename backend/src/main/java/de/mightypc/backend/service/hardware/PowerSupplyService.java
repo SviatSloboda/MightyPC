@@ -1,6 +1,11 @@
 package de.mightypc.backend.service.hardware;
 
 import de.mightypc.backend.exception.hardware.PowerSupplyNotFoundException;
+import de.mightypc.backend.model.configurator.ItemForConfigurator;
+import de.mightypc.backend.model.hardware.GPU;
+import de.mightypc.backend.model.hardware.PowerSupply;
+import de.mightypc.backend.model.hardware.PowerSupply;
+import de.mightypc.backend.model.hardware.PowerSupply;
 import de.mightypc.backend.model.hardware.PowerSupply;
 import de.mightypc.backend.repository.hardware.PowerSupplyRepository;
 import org.springframework.data.domain.Page;
@@ -50,18 +55,21 @@ public class PowerSupplyService extends BaseService<PowerSupply, PowerSupplyRepo
         return repository.save(updatedPowerSupply);
     }
 
-    @Override
     @Transactional(readOnly = true)
-    public LinkedHashMap<String, String> getAllNamesWithPrices() {
-        LinkedHashMap<String, String> hashMap = new LinkedHashMap<>();
-
+    public String getAllNamesWithPrices() {
+        StringBuilder stringBuilder = new StringBuilder("power-supplies:\n");
         List<PowerSupply> allPowerSupplies = getAllWithSortingOfPriceDesc();
 
-        for (PowerSupply powerSupply : allPowerSupplies) {
-            hashMap.put(powerSupply.id(), powerSupply.hardwareSpec().name() + " ($" + powerSupply.hardwareSpec().price() + ")");
+        for (PowerSupply psu : allPowerSupplies) {
+            String psuAsString = "{" + psu.id() + ":" + psu.hardwareSpec().name() + ":($" + psu.hardwareSpec().price() + ")}\n";
+            stringBuilder.append(psuAsString);
         }
 
-        return hashMap;
+        return stringBuilder.toString();
+    }
+
+    public List<String> getAllIds() {
+        return getAllWithSortingOfPriceDesc().stream().map(PowerSupply::id).toList();
     }
 
     @Transactional(readOnly = true)
@@ -79,6 +87,31 @@ public class PowerSupplyService extends BaseService<PowerSupply, PowerSupplyRepo
         }
 
         return powerSuppliesWithIdsAndNames;
+    }
+
+    @Transactional(readOnly = true)
+    public List<ItemForConfigurator> getAllHardwareInfoForConfiguration() {
+        List<ItemForConfigurator> items = new ArrayList<>();
+
+        List<PowerSupply> allPowerSupplies = getAllWithSortingOfPriceDesc();
+
+        for (PowerSupply powerSupply : allPowerSupplies) {
+            String powerSupplyPhoto = "";
+
+            if(!powerSupply.powerSupplyPhotos().isEmpty()){
+                powerSupplyPhoto = powerSupply.powerSupplyPhotos().getFirst();
+            }
+
+            items.add(new ItemForConfigurator(
+                    powerSupply.id(),
+                    powerSupply.hardwareSpec().name(),
+                    powerSupply.hardwareSpec().price(),
+                    powerSupplyPhoto,
+                    "psu"
+            ));
+        }
+
+        return items;
     }
 
     @Transactional(readOnly = true)

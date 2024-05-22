@@ -18,8 +18,9 @@ public class Order {
     List<Item> items;
     BigDecimal completePrice;
     OrderStatus orderStatus;
+    List<String> itemsPhotos;
 
-    public Order(List<Item> items, BigDecimal completePrice, OrderStatus orderStatus) {
-        this(UUID.randomUUID().toString(), items, completePrice, orderStatus);
+    public Order(List<Item> items, BigDecimal completePrice, OrderStatus orderStatus, List<String> itemsPhotos) {
+        this(UUID.randomUUID().toString(), items, completePrice, orderStatus, itemsPhotos);
     }
 }

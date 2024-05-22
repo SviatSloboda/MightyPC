@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useState} from 'react';
 import axios from 'axios';
 import {useNavigate} from "react-router-dom";
-import workstationPhoto from "../../assets/Workstations.png";
+import workstationPhoto from "../../assets/pc/Workstations.png";
 import {useAuth} from "../../contexts/AuthContext";
 import {Modal} from "react-bootstrap";
 import ProductBox from "../hardware/utils/ProductBox";
@@ -64,7 +64,7 @@ export default function WorkstationsPage() {
                 ssdId: createSpecs.ssdId,
                 hddId: createSpecs.hddId,
                 powerSupplyId: createSpecs.powerSupplyId,
-                pcCaseId: createSpecs.pcCaseId  // Fixed key name here
+                pcCaseId: createSpecs.pcCaseId
             },
             cpuNumber: cpuNumber,
             gpuNumber: gpuNumber
@@ -84,11 +84,11 @@ export default function WorkstationsPage() {
         }
         const payload = {
             id: workstation.id,
-            type: "workstation",
             name: workstation.hardwareSpec.name,
             description: workstation.hardwareSpec.description,
             price: workstation.hardwareSpec.price,
-            photos: workstation && (workstation.photos?.length ?? 0) > 0 ? workstation.photos : [workstationPhoto]
+            photo: workstation?.photos && workstation.photos.length > 0 ? workstation.photos[workstation.photos.length - 1] : workstationPhoto,
+            pathToCharacteristicsPage: "/workstation"
         };
 
         axios.post<void>(`/api/basket/${user?.id}`, payload)

@@ -6,7 +6,7 @@ import useLoginModal from "../hardware/utils/useLoginModal.ts";
 import LoginModal from "../hardware/utils/LoginModal.tsx";
 import Photo from "../hardware/utils/Photo.tsx";
 import Rating from "../hardware/utils/Rating.tsx";
-import workstationPhoto from "../../assets/Workstations.png";
+import workstationPhoto from "../../assets/pc/Workstations.png";
 import {Workstation} from "../../model/pc/Workstation.tsx";
 
 export default function WorkstationCharacteristics() {
@@ -132,11 +132,11 @@ export default function WorkstationCharacteristics() {
         }
         const payload = {
             id: workstation?.id,
-            type: "workstation",
             name: workstation?.hardwareSpec.name,
             description: workstation?.hardwareSpec.description,
             price: workstation?.hardwareSpec.price,
-            photos: workstation && (workstation.photos?.length ?? 0) > 0 ? workstation.photos : [workstationPhoto]
+            photo: workstation?.photos && workstation.photos.length > 0 ? workstation.photos[workstation.photos.length - 1] : workstationPhoto,
+            pathToCharacteristicsPage: "/workstation"
         };
 
         axios.post<void>(`/api/basket/${user?.id}`, payload)

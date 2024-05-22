@@ -1,6 +1,11 @@
 package de.mightypc.backend.service.hardware;
 
 import de.mightypc.backend.exception.hardware.SsdNotFoundException;
+import de.mightypc.backend.model.configurator.ItemForConfigurator;
+import de.mightypc.backend.model.hardware.GPU;
+import de.mightypc.backend.model.hardware.SSD;
+import de.mightypc.backend.model.hardware.SSD;
+import de.mightypc.backend.model.hardware.SSD;
 import de.mightypc.backend.model.hardware.SSD;
 import de.mightypc.backend.repository.hardware.SsdRepository;
 import org.springframework.data.domain.Page;
@@ -48,18 +53,46 @@ public class SsdService extends BaseService<SSD, SsdRepository, SsdNotFoundExcep
         return repository.save(updatedSSD);
     }
 
-    @Override
     @Transactional(readOnly = true)
-    public LinkedHashMap<String, String> getAllNamesWithPrices() {
-        LinkedHashMap<String, String> hashMap = new LinkedHashMap<>();
+    public String getAllNamesWithPrices() {
+        StringBuilder stringBuilder = new StringBuilder("$ssds:\n");
+        List<SSD> allSsds = getAllWithSortingOfPriceDesc();
+
+        for (SSD ssd : allSsds) {
+            String ssdAsString = "{" + ssd.id() + ":" + ssd.hardwareSpec().name() + ":($" + ssd.hardwareSpec().price() + ")}\n";
+            stringBuilder.append(ssdAsString);
+        }
+
+        return stringBuilder.toString();
+    }
+
+    public List<String> getAllIds() {
+        return getAllWithSortingOfPriceDesc().stream().map(SSD::id).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ItemForConfigurator> getAllHardwareInfoForConfiguration() {
+        List<ItemForConfigurator> items = new ArrayList<>();
 
         List<SSD> allSsds = getAllWithSortingOfPriceDesc();
 
         for (SSD ssd : allSsds) {
-            hashMap.put(ssd.id(), ssd.hardwareSpec().name() + " ($" + ssd.hardwareSpec().price() + ")");
+            String ssdPhoto = "";
+
+            if(!ssd.ssdPhotos().isEmpty()){
+                ssdPhoto = ssd.ssdPhotos().getFirst();
+            }
+
+            items.add(new ItemForConfigurator(
+                    ssd.id(),
+                    ssd.hardwareSpec().name(),
+                    ssd.hardwareSpec().price(),
+                    ssdPhoto,
+                    "ssd"
+            ));
         }
 
-        return hashMap;
+        return items;
     }
 
     @Transactional(readOnly = true)

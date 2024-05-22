@@ -1,6 +1,11 @@
 package de.mightypc.backend.service.hardware;
 
 import de.mightypc.backend.exception.hardware.PcCaseNotFoundException;
+import de.mightypc.backend.model.configurator.ItemForConfigurator;
+import de.mightypc.backend.model.hardware.GPU;
+import de.mightypc.backend.model.hardware.PcCase;
+import de.mightypc.backend.model.hardware.PcCase;
+import de.mightypc.backend.model.hardware.PcCase;
 import de.mightypc.backend.model.hardware.PcCase;
 import de.mightypc.backend.repository.hardware.PcCaseRepository;
 import org.springframework.data.domain.Page;
@@ -48,18 +53,47 @@ public class PcCaseService extends BaseService<PcCase, PcCaseRepository, PcCaseN
         return repository.save(updatedPcCase);
     }
 
-    @Override
     @Transactional(readOnly = true)
-    public LinkedHashMap<String, String> getAllNamesWithPrices() {
-        LinkedHashMap<String, String> hashMap = new LinkedHashMap<>();
+    public String getAllNamesWithPrices() {
+        StringBuilder stringBuilder = new StringBuilder("$pcCases:\n");
+        List<PcCase> allPcCases = getAllWithSortingOfPriceDesc();
+
+        for (PcCase pcCase : allPcCases) {
+            String pcCaseAsString = "{" + pcCase.id() + ":" + pcCase.hardwareSpec().name() + ":($" + pcCase.hardwareSpec().price() + ")}\n";
+            stringBuilder.append(pcCaseAsString);
+        }
+
+        return stringBuilder.toString();
+    }
+
+    public List<String> getAllIds() {
+        return getAllWithSortingOfPriceDesc().stream().map(PcCase::id).toList();
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<ItemForConfigurator> getAllHardwareInfoForConfiguration() {
+        List<ItemForConfigurator> items = new ArrayList<>();
 
         List<PcCase> allPcCases = getAllWithSortingOfPriceDesc();
 
         for (PcCase pcCase : allPcCases) {
-            hashMap.put(pcCase.id(), pcCase.hardwareSpec().name() + " ($" + pcCase.hardwareSpec().price() + ")");
+            String pcCasePhoto = "";
+
+            if(!pcCase.pcCasePhotos().isEmpty()){
+                pcCasePhoto = pcCase.pcCasePhotos().getFirst();
+            }
+
+            items.add(new ItemForConfigurator(
+                    pcCase.id(),
+                    pcCase.hardwareSpec().name(),
+                    pcCase.hardwareSpec().price(),
+                    pcCasePhoto,
+                    "pc-case"
+            ));
         }
 
-        return hashMap;
+        return items;
     }
 
     @Transactional(readOnly = true)
@@ -90,7 +124,7 @@ public class PcCaseService extends BaseService<PcCase, PcCaseRepository, PcCaseN
     private List<PcCase> getAllWithSortingOfPriceDesc() {
         return getAll()
                 .stream()
-                .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().price()))
+                .sorted(Comparator.comparing(pcCase -> pcCase.hardwareSpec().price()))
                 .toList()
                 .reversed();
     }
@@ -98,14 +132,14 @@ public class PcCaseService extends BaseService<PcCase, PcCaseRepository, PcCaseN
     private List<PcCase> getAllWithSortingOfPriceAsc() {
         return getAll()
                 .stream()
-                .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().price()))
+                .sorted(Comparator.comparing(pcCase -> pcCase.hardwareSpec().price()))
                 .toList();
     }
 
     private List<PcCase> getAllWithSortingOfRatingDesc() {
         return getAll()
                 .stream()
-                .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().rating()))
+                .sorted(Comparator.comparing(pcCase -> pcCase.hardwareSpec().rating()))
                 .toList()
                 .reversed();
     }
@@ -113,14 +147,14 @@ public class PcCaseService extends BaseService<PcCase, PcCaseRepository, PcCaseN
     private List<PcCase> getAllWithSortingOfRatingAsc() {
         return getAll()
                 .stream()
-                .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().rating()))
+                .sorted(Comparator.comparing(pcCase -> pcCase.hardwareSpec().rating()))
                 .toList();
     }
 
     private List<PcCase> getAllWithFilteringByPrice(int lowestPrice, int highestPrice) {
         return getAll().stream()
-                .filter(cpu -> cpu.hardwareSpec().price().intValue() >= lowestPrice
-                               && cpu.hardwareSpec().price().intValue() <= highestPrice)
+                .filter(pcCase -> pcCase.hardwareSpec().price().intValue() >= lowestPrice
+                               && pcCase.hardwareSpec().price().intValue() <= highestPrice)
                 .toList();
     }
 }

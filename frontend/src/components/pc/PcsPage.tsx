@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useState} from 'react';
 import axios from 'axios';
 import {useNavigate} from "react-router-dom";
-import pcPhoto from "../../assets/Pc.png";
+import pcPhoto from "../../assets/pc/Pc.png";
 import {useAuth} from "../../contexts/AuthContext";
 import {Modal} from "react-bootstrap";
 import ProductBox from "../hardware/utils/ProductBox";
@@ -80,11 +80,11 @@ export default function PcsPage() {
         }
         const payload = {
             id: pc.id,
-            type: "pc",
             name: pc.hardwareSpec.name,
             description: pc.hardwareSpec.description,
             price: pc.hardwareSpec.price,
-            photos: pc && (pc.photos?.length ?? 0) > 0 ? pc.photos : [pcPhoto]
+            photo: pc?.photos && pc.photos.length > 0 ? pc.photos[pc.photos.length - 1] : pcPhoto,
+            pathToCharacteristicsPage: "/pc"
         };
 
         axios.post<void>(`/api/basket/${user?.id}`, payload)

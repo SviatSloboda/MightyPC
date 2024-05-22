@@ -2,12 +2,12 @@ import {useEffect, useState} from "react";
 import axios from "axios";
 import {useNavigate, useParams} from "react-router-dom";
 import {PSU} from "../../../model/pc/hardware/PSU.tsx";
-import psuPhoto from "../../../assets/psu.png";
 import Photo from "../utils/Photo.tsx";
 import Rating from "../utils/Rating.tsx";
 import {useAuth} from "../../../contexts/AuthContext.tsx";
 import useLoginModal from "../utils/useLoginModal";
 import LoginModal from "../utils/LoginModal";
+import psuPhoto from "../../../assets/hardware/psu.png";
 
 export default function PsuCharacteristics() {
     const [psu, setPsu] = useState<PSU>();
@@ -89,11 +89,11 @@ export default function PsuCharacteristics() {
 
         const payload = {
             id: psu?.id,
-            type: "psu",
             name: psu?.hardwareSpec.name,
             description: psu?.hardwareSpec.description,
             price: psu?.hardwareSpec.price,
-            photos: psu && (psu.psuPhotos?.length ?? 0) > 0 ? psu.psuPhotos : ['https://res.cloudinary.com/dmacmrhwq/image/upload/v1708536729/cloudinary_file_test/plain.png.png']
+            photo: psu?.psuPhotos && psu.psuPhotos.length > 0 ? psu.psuPhotos[psu.psuPhotos.length - 1] : psuPhoto,
+            pathToCharacteristicsPage: "/hardware/psu"
         };
 
         axios.post<void>(`/api/basket/${user?.id}`, payload)

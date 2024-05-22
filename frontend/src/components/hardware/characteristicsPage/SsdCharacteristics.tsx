@@ -2,12 +2,12 @@ import {useEffect, useState} from "react";
 import axios from "axios";
 import {useNavigate, useParams} from "react-router-dom";
 import {SSD} from "../../../model/pc/hardware/SSD.tsx";
-import ssdPhoto from "../../../assets/ssd.png";
 import Photo from "../utils/Photo.tsx";
 import Rating from "../utils/Rating.tsx";
 import {useAuth} from "../../../contexts/AuthContext.tsx";
 import useLoginModal from "../utils/useLoginModal";
 import LoginModal from "../utils/LoginModal";
+import ssdPhoto from "../../../assets/hardware/ssd.png";
 
 export default function SsdCharacteristics() {
     const [ssd, setSsd] = useState<SSD>();
@@ -81,11 +81,11 @@ export default function SsdCharacteristics() {
 
         const payload = {
             id: ssd?.id,
-            type: "ssd",
             name: ssd?.hardwareSpec.name,
             description: ssd?.hardwareSpec.description,
             price: ssd?.hardwareSpec.price,
-            photos: ssd && (ssd.ssdPhotos?.length ?? 0) > 0 ? ssd.ssdPhotos : ['https://res.cloudinary.com/dmacmrhwq/image/upload/v1708536729/cloudinary_file_test/plain.png.png']
+            photo: ssd?.ssdPhotos && ssd.ssdPhotos.length > 0 ? ssd.ssdPhotos[ssd.ssdPhotos.length - 1] : ssdPhoto,
+            pathToCharacteristicsPage: "/hardware/ssd"
         };
 
         axios.post<void>(`/api/basket/${user?.id}`, payload)
@@ -200,4 +200,3 @@ export default function SsdCharacteristics() {
         </>)}
     </>);
 }
-

@@ -2,7 +2,7 @@ import {useEffect, useState} from 'react';
 import axios from 'axios';
 import {useAuth} from "../../contexts/AuthContext.tsx";
 import Photo from "../hardware/utils/Photo.tsx";
-import user_image from "../../assets/user_image.png";
+import user_image from "../../assets/shop/user_image.png";
 
 export default function ProfilePage() {
     const {user, isSuperUser} = useAuth();

@@ -6,7 +6,7 @@ import useLoginModal from "../hardware/utils/useLoginModal.ts";
 import LoginModal from "../hardware/utils/LoginModal.tsx";
 import Photo from "../hardware/utils/Photo.tsx";
 import Rating from "../hardware/utils/Rating.tsx";
-import pcPhoto from "../../assets/Pc.png"
+import pcPhoto from "../../assets/pc/Pc.png"
 import {PC} from "../../model/pc/PC.tsx";
 
 export default function PcCharacteristics() {
@@ -153,11 +153,11 @@ export default function PcCharacteristics() {
 
         const payload = {
             id: pc?.id,
-            type: "pc",
             name: pc?.hardwareSpec.name,
             description: pc?.hardwareSpec.description,
             price: pc?.hardwareSpec.price,
-            photos: pc && (pc.photos?.length ?? 0) > 0 ? pc.photos : [pcPhoto]
+            photo: pc?.photos && pc.photos.length > 0 ? pc.photos[pc.photos.length - 1] : pcPhoto,
+            pathToCharacteristicsPage: "/pc"
         };
 
         axios.post<void>(`/api/basket/${user?.id}`, payload)
