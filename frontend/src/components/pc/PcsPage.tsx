@@ -11,7 +11,6 @@ import {useModal} from "../hardware/utils/Modal";
 import {HardwareSpec} from "../../model/pc/hardware/HardwareSpec.tsx";
 import {SpecsIds} from "../../model/pc/SpecsIds.tsx";
 import {PC} from "../../model/pc/PC.tsx";
-import {login} from "../../contexts/authUtils.ts";
 
 export default function PcsPage() {
     const [PCs, setPCs] = useState<PC[]>([]);
@@ -25,7 +24,7 @@ export default function PcsPage() {
     });
     const navigate = useNavigate();
     const {user, isSuperUser} = useAuth();
-    const {isLoginModalOpen, showLoginModal, hideLoginModal} = useLoginModal();
+    const {isLoginModalOpen, showLoginModal, hideLoginModal, handleLogin} = useLoginModal();
 
     useEffect(() => {
         const fetchPCs = async () => {
@@ -193,7 +192,7 @@ export default function PcsPage() {
                 ))}
             </div>
 
-            <LoginModal isOpen={isLoginModalOpen} onLogin={login} onClose={hideLoginModal}/>
+            <LoginModal isOpen={isLoginModalOpen} onLogin={handleLogin} onClose={hideLoginModal}/>
         </>
     );
 }

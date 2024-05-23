@@ -7,7 +7,6 @@ import {GPU} from "../../model/pc/hardware/GPU.tsx";
 import {useAuth} from "../../contexts/AuthContext.tsx";
 import useLoginModal from "./utils/useLoginModal";
 import LoginModal from "./utils/LoginModal";
-import {login} from "../../contexts/authUtils.ts";
 import gpuPhoto from "../../assets/hardware/gpu.png";
 
 export default function GpuPage() {
@@ -23,7 +22,7 @@ export default function GpuPage() {
     const [energyConsumption, setEnergyConsumption] = useState(0);
     const navigate = useNavigate();
     const {user, isSuperUser} = useAuth();
-    const {isLoginModalOpen, showLoginModal, hideLoginModal} = useLoginModal();
+    const {isLoginModalOpen, showLoginModal, hideLoginModal, handleLogin} = useLoginModal();
 
     useEffect(() => {
         async function fetchGpus() {
@@ -132,6 +131,6 @@ export default function GpuPage() {
             </button>))}
         </div>
 
-        <LoginModal isOpen={isLoginModalOpen} onLogin={login} onClose={() => hideLoginModal()}/>
+        <LoginModal isOpen={isLoginModalOpen} onLogin={handleLogin} onClose={hideLoginModal}/>
     </>);
 }

@@ -1,5 +1,4 @@
-import {useState} from 'react';
-import {login} from "../../../contexts/authUtils.ts";
+import { useState } from 'react';
 
 export default function useLoginModal() {
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -8,9 +7,9 @@ export default function useLoginModal() {
     const hideLoginModal = () => setIsLoginModalOpen(false);
 
     const handleLogin = () => {
-        login();
         hideLoginModal();
+        window.location.href = "/user/login";
     };
 
-    return {isLoginModalOpen, showLoginModal, hideLoginModal, handleLogin};
+    return { isLoginModalOpen, showLoginModal, hideLoginModal, handleLogin };
 }

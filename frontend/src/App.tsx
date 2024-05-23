@@ -28,6 +28,7 @@ import WorkstationsPage from "./components/workstation/WorkstationsPage.tsx";
 import WorkstationsCharacteristicsPage from "./components/workstation/WorkstationCharacteristicsPage.tsx";
 import UserPcsPage from "./components/configurator/UserPcsPage.tsx";
 import Confi from "./components/configurator/Confi.tsx";
+import LoginPage from "./components/hardware/utils/LoginPage.tsx";
 
 
 export default function App() {
@@ -69,7 +70,10 @@ export default function App() {
 
             <Route path="/basket" element={<BasketPage/>}/>
             <Route path="/order" element={<OrderPage/>}/>
+
             <Route path="/user" element={<ProfilePage/>}/>
+            <Route path="/user/login" element={<LoginPage/>}/>
+
             <Route path="/user-pcs" element={<UserPcsPage/>}/>
 
         </Routes>

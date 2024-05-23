@@ -7,7 +7,7 @@ import Photo from "../utils/Photo.tsx";
 import Rating from "../utils/Rating.tsx";
 import {useAuth} from "../../../contexts/AuthContext.tsx";
 import useLoginModal from "../utils/useLoginModal";
-import LoginModal from "../utils/LoginModal";
+import LoginModal from "../utils/LoginModal.tsx";
 
 export default function CpuCharacteristics() {
     const [cpu, setCpu] = useState<CPU>();

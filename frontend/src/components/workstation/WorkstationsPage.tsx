@@ -8,7 +8,6 @@ import ProductBox from "../hardware/utils/ProductBox";
 import useLoginModal from "../hardware/utils/useLoginModal";
 import LoginModal from "../hardware/utils/LoginModal";
 import {useModal} from "../hardware/utils/Modal";
-import {login} from "../../contexts/authUtils.ts";
 import {Workstation} from "../../model/pc/Workstation.tsx";
 import {HardwareSpec} from "../../model/pc/hardware/HardwareSpec.tsx";
 import {SpecsIds} from "../../model/pc/SpecsIds.tsx";
@@ -27,7 +26,7 @@ export default function WorkstationsPage() {
     const [gpuNumber, setGpuNumber] = useState<number>(1);
     const navigate = useNavigate();
     const {user, isSuperUser} = useAuth();
-    const {isLoginModalOpen, showLoginModal, hideLoginModal} = useLoginModal();
+    const {isLoginModalOpen, showLoginModal, hideLoginModal, handleLogin} = useLoginModal();
 
     useEffect(() => {
         const fetchWorkstations = async () => {
@@ -219,7 +218,7 @@ export default function WorkstationsPage() {
                 ))}
             </div>
 
-            <LoginModal isOpen={isLoginModalOpen} onLogin={login} onClose={hideLoginModal}/>
+            <LoginModal isOpen={isLoginModalOpen} onLogin={handleLogin} onClose={hideLoginModal}/>
         </>
     );
 }

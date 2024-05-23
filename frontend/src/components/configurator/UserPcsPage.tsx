@@ -7,7 +7,6 @@ import {useAuth} from "../../contexts/AuthContext.tsx";
 import useLoginModal from "../hardware/utils/useLoginModal.ts";
 import LoginModal from "../hardware/utils/LoginModal.tsx";
 import {PC} from "../../model/pc/PC.tsx";
-import {login} from "../../contexts/authUtils.ts";
 import UserProductBox from "../hardware/utils/UserProductBox.tsx";
 
 export default function UserPcsPage() {
@@ -16,7 +15,7 @@ export default function UserPcsPage() {
     const [totalPages, setTotalPages] = useState(0);
     const pcsPerPage = 8;
     const {user} = useAuth();
-    const {isLoginModalOpen, showLoginModal, hideLoginModal} = useLoginModal();
+    const {isLoginModalOpen, showLoginModal, hideLoginModal, handleLogin} = useLoginModal();
     const navigate = useNavigate();
 
     const fetchPcs = useCallback(async () => {
@@ -94,7 +93,7 @@ export default function UserPcsPage() {
                     </div>
                 </>
             )}
-            <LoginModal isOpen={isLoginModalOpen} onLogin={login} onClose={hideLoginModal}/>
+            <LoginModal isOpen={isLoginModalOpen} onLogin={handleLogin} onClose={hideLoginModal}/>
         </>
     );
 }

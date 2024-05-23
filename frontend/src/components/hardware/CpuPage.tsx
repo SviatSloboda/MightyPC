@@ -8,7 +8,6 @@ import {CPU} from "../../model/pc/hardware/CPU.tsx";
 import {useAuth} from "../../contexts/AuthContext.tsx";
 import useLoginModal from "./utils/useLoginModal";
 import LoginModal from "./utils/LoginModal";
-import {login} from "../../contexts/authUtils.ts";
 
 export default function CpuPage() {
     const [cpus, setCpus] = useState<CPU[]>([]);
@@ -24,7 +23,8 @@ export default function CpuPage() {
     const [energyConsumption, setEnergyConsumption] = useState(0);
     const navigate = useNavigate();
     const {user, isSuperUser} = useAuth();
-    const {isLoginModalOpen, showLoginModal, hideLoginModal} = useLoginModal();
+
+    const {isLoginModalOpen, showLoginModal, hideLoginModal, handleLogin} = useLoginModal();
 
     useEffect(() => {
         async function fetchCpus() {
@@ -62,8 +62,8 @@ export default function CpuPage() {
     const handleAddToBasket = (cpu: CPU) => {
         if (!user) {
             showLoginModal();
-            return;
         }
+
         const payload = {
             id: cpu.id,
             name: cpu.hardwareSpec.name,
@@ -73,7 +73,7 @@ export default function CpuPage() {
             pathToCharacteristicsPage: "/hardware/cpu"
         };
 
-        axios.post<void>(`/api/basket/${user.id}`, payload)
+        axios.post<void>(`/api/basket/${user?.id}`, payload)
             .then(() => {
                 navigate("../basket/");
             })
@@ -139,6 +139,6 @@ export default function CpuPage() {
             </button>))}
         </div>
 
-        <LoginModal isOpen={isLoginModalOpen} onLogin={login} onClose={() => hideLoginModal()}/>
+        <LoginModal isOpen={isLoginModalOpen} onLogin={handleLogin} onClose={hideLoginModal}/>
     </>);
 }

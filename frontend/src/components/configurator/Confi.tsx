@@ -5,7 +5,6 @@ import {HardwareSpec} from "../../model/pc/hardware/HardwareSpec";
 import {SpecsIds} from "../../model/pc/SpecsIds";
 import useLoginModal from "../hardware/utils/useLoginModal.ts";
 import LoginModal from "../hardware/utils/LoginModal.tsx";
-import {login} from "../../contexts/authUtils.ts";
 import chatGptIcon from "../../assets/icon/chatGpt-icon-link.png";
 
 import {toast, ToastContainer} from 'react-toastify';
@@ -78,7 +77,7 @@ export default function ConfiguratorPage() {
         cpuId: '', gpuId: '', motherboardId: '', ramId: '', ssdId: '', hddId: '', powerSupplyId: '', pcCaseId: ''
     });
     const {user} = useAuth();
-    const {isLoginModalOpen, showLoginModal, hideLoginModal} = useLoginModal();
+    const {isLoginModalOpen, showLoginModal, hideLoginModal, handleLogin} = useLoginModal();
 
     const navigate = useNavigate();
 
@@ -364,7 +363,7 @@ export default function ConfiguratorPage() {
             </section>
         </main>
 
-        <LoginModal isOpen={isLoginModalOpen} onLogin={login} onClose={hideLoginModal}/>
+        <LoginModal isOpen={isLoginModalOpen} onLogin={handleLogin} onClose={hideLoginModal}/>
         <ToastContainer position="top-center"/>
         <CreatePCModal
             isOpen={isModalOpen}
