@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { googleLogin } from '../../../contexts/authUtils.ts';
-import { useAuth } from '../../../contexts/AuthContext.tsx';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import RegisterModal from './RegisterModal';
+import { useAuth } from '../../contexts/AuthContext.tsx';
+import { googleLogin } from '../../contexts/authUtils.ts'; // Import the external modal
 
 export default function LoginPage() {
     const { updateUser } = useAuth();
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
     const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value);
     const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value);
@@ -37,10 +39,41 @@ export default function LoginPage() {
     };
 
     const handleGoogleLogin = () => googleLogin();
+    const handleGitHubLogin = () => {
+        window.location.href = "http://localhost:8080/oauth2/authorization/github";
+    };
+
+    const handleRegisterOpen = () => setIsRegisterModalOpen(true);
+    const handleRegisterClose = () => setIsRegisterModalOpen(false);
+    const handleRegisterSave = async (email: string, password: string) => {
+        try {
+            const response = await axios.post('/api/user/register', { email, password });
+            if (response.status === 201) {
+                toast.success('Registration successful. Please log in.');
+            } else {
+                toast.error('Registration failed. Please try again.');
+            }
+        } catch (error: unknown) {
+            toast.error('Registration failed. Please try again later.');
+            console.error('Registration failed', error);
+        }
+    };
 
     return (
         <div className="login-page">
-            <ToastContainer />
+            <div className="toast-container">
+                <ToastContainer
+                    position="top-center"
+                    autoClose={5000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                />
+            </div>
             <div className="login-container">
                 <h1 className="login-title">Sign in</h1>
                 <form className="login-form" onSubmit={handleLogin}>
@@ -73,13 +106,14 @@ export default function LoginPage() {
                 </div>
                 <div className="login-text-links">
                     <button className="login-text-link" onClick={handleGoogleLogin}>with Google</button>
-                    <button className="login-text-link">with GitHub</button>
+                    <button className="login-text-link" onClick={handleGitHubLogin}>with GitHub</button>
                 </div>
                 <div className="login-links">
-                    <a href="/register" className="login-link">Register</a>
-                    <a href="/reset-password" className="login-link">Forgot password?</a>
+                    <button className="login-link" onClick={handleRegisterOpen}>Register</button>
+                    <button className="login-link" onClick={() => navigate('/reset-password')}>Forgot password?</button>
                 </div>
             </div>
+            <RegisterModal isOpen={isRegisterModalOpen} onClose={handleRegisterClose} onSave={handleRegisterSave} />
         </div>
     );
 }

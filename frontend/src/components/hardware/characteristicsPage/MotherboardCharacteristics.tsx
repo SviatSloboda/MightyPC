@@ -5,8 +5,8 @@ import {Motherboard} from "../../../model/pc/hardware/Motherboard.tsx";
 import Photo from "../utils/Photo.tsx";
 import Rating from "../utils/Rating.tsx";
 import {useAuth} from "../../../contexts/AuthContext.tsx";
-import useLoginModal from "../utils/useLoginModal";
-import LoginModal from "../utils/LoginModal";
+import useLoginModal from "../../login/useLoginModal.ts";
+import LoginModal from "../../login/LoginModal.tsx";
 import motherboardPhoto from "../../../assets/hardware/motherboard.png";
 
 export default function MotherboardCharacteristics() {

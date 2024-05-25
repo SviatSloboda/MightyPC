@@ -3,8 +3,8 @@ import axios from 'axios';
 import {useAuth} from "../../contexts/AuthContext";
 import {HardwareSpec} from "../../model/pc/hardware/HardwareSpec";
 import {SpecsIds} from "../../model/pc/SpecsIds";
-import useLoginModal from "../hardware/utils/useLoginModal.ts";
-import LoginModal from "../hardware/utils/LoginModal.tsx";
+import useLoginModal from "../login/useLoginModal.ts";
+import LoginModal from "../login/LoginModal.tsx";
 import chatGptIcon from "../../assets/icon/chatGpt-icon-link.png";
 
 import {toast, ToastContainer} from 'react-toastify';

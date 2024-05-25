@@ -2042,8 +2042,12 @@ a.nav__link {
 
 .login-link {
     color: #fff;
-    text-decoration: none;
+    background: none;
+    border: none;
     font-weight: bold;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: none;
 }
 
 .login-link:active {
@@ -2052,4 +2056,62 @@ a.nav__link {
 
 .login-link:hover {
     opacity: 0.8;
+}
+
+.password-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-toggle-button {
+    position: absolute;
+    right: 0.75rem;
+    background: none;
+    border: none;
+    color: #d0ff00;
+    cursor: pointer;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.password-toggle-button::before {
+    content: '\1F441';
+    font-size: 1.25rem;
+}
+
+.password-toggle-button:hover {
+    opacity: 0.8;
+}
+
+.create-pc-modal__input {
+    width: calc(100% - 2.5rem);
+    padding: 0.75rem;
+    background: #333;
+    border: 1px solid #777;
+    border-radius: 4px;
+    color: #fff;
+}
+
+.create-pc-modal__input:focus {
+    outline: none;
+    border-color: #d0ff00;
+}
+
+.toast-container {
+    position: absolute;
+    top: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1002;
+}
+
+.error-message {
+    color: red;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
 }

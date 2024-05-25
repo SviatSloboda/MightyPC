@@ -28,7 +28,7 @@ import WorkstationsPage from "./components/workstation/WorkstationsPage.tsx";
 import WorkstationsCharacteristicsPage from "./components/workstation/WorkstationCharacteristicsPage.tsx";
 import UserPcsPage from "./components/configurator/UserPcsPage.tsx";
 import Confi from "./components/configurator/Confi.tsx";
-import LoginPage from "./components/hardware/utils/LoginPage.tsx";
+import LoginPage from "./components/login/LoginPage.tsx";
 
 
 export default function App() {

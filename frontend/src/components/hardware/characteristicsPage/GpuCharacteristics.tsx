@@ -5,8 +5,8 @@ import {GPU} from "../../../model/pc/hardware/GPU.tsx";
 import Photo from "../utils/Photo.tsx";
 import Rating from "../utils/Rating.tsx";
 import {useAuth} from "../../../contexts/AuthContext.tsx";
-import useLoginModal from "../utils/useLoginModal";
-import LoginModal from "../utils/LoginModal";
+import useLoginModal from "../../login/useLoginModal.ts";
+import LoginModal from "../../login/LoginModal.tsx";
 import gpuPhoto from "../../../assets/hardware/gpu.png";
 
 export default function GpuCharacteristics() {

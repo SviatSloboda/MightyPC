@@ -4,8 +4,8 @@ import {useNavigate} from "react-router-dom";
 import pcPhoto from "../../assets/pc/Pc.png";
 import nothingImage from "../../assets/pc/noPC.png";
 import {useAuth} from "../../contexts/AuthContext.tsx";
-import useLoginModal from "../hardware/utils/useLoginModal.ts";
-import LoginModal from "../hardware/utils/LoginModal.tsx";
+import useLoginModal from "../login/useLoginModal.ts";
+import LoginModal from "../login/LoginModal.tsx";
 import {PC} from "../../model/pc/PC.tsx";
 import UserProductBox from "../hardware/utils/UserProductBox.tsx";
 

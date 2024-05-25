@@ -5,8 +5,8 @@ import Modal, {useModal} from './utils/Modal.tsx';
 import {useNavigate} from "react-router-dom";
 import {PcCase} from "../../model/pc/hardware/PcCase.tsx";
 import {useAuth} from "../../contexts/AuthContext.tsx";
-import useLoginModal from "./utils/useLoginModal";
-import LoginModal from "./utils/LoginModal";
+import useLoginModal from "../login/useLoginModal.ts";
+import LoginModal from "../login/LoginModal.tsx";
 import pcCasePhoto from "../../assets/hardware/pcCase.png";
 
 export default function PcCasePage() {

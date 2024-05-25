@@ -6,8 +6,8 @@ import {useNavigate} from "react-router-dom";
 import cpuPhoto from "../../assets/hardware/cpu.png";
 import {CPU} from "../../model/pc/hardware/CPU.tsx";
 import {useAuth} from "../../contexts/AuthContext.tsx";
-import useLoginModal from "./utils/useLoginModal";
-import LoginModal from "./utils/LoginModal";
+import useLoginModal from "../login/useLoginModal.ts";
+import LoginModal from "../login/LoginModal.tsx";
 
 export default function CpuPage() {
     const [cpus, setCpus] = useState<CPU[]>([]);

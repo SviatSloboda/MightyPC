@@ -14,6 +14,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.web.SecurityFilterChain;
 
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -44,7 +45,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, CustomOAuth2UserService customOAuth2UserService) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
@@ -55,14 +56,22 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
                 .httpBasic(withDefaults())
-                .oauth2Login(oauth -> {
-                    oauth.loginPage("/oauth2/authorization/google");
-                    if ("prod".equals(environment)) {
-                        oauth.defaultSuccessUrl("/", true);
-                    } else {
-                        oauth.defaultSuccessUrl("http://localhost:5173", true);
-                    }
-                })
+                .oauth2Login(oauth -> oauth
+                        .loginPage("/oauth2/authorization/google")
+                        .defaultSuccessUrl(environment.equals("prod") ? "/" : "http://localhost:5173", true)
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .oidcUserService(new OidcUserService())
+                                .userService(customOAuth2UserService)
+                        )
+                )
+                .oauth2Login(oauth -> oauth
+                        .loginPage("/oauth2/authorization/github")
+                        .defaultSuccessUrl(environment.equals("prod") ? "/" : "http://localhost:5173", true)
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .oidcUserService(new OidcUserService())
+                                .userService(customOAuth2UserService)
+                        )
+                )
                 .logout(logout -> logout
                         .logoutUrl("/api/logout")
                         .logoutSuccessHandler((request, response, authentication) -> response.setStatus(HttpServletResponse.SC_OK))

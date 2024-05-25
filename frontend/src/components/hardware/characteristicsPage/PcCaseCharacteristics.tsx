@@ -4,8 +4,8 @@ import {useNavigate, useParams} from "react-router-dom";
 import {PcCase} from "../../../model/pc/hardware/PcCase.tsx";
 import Photo from "../utils/Photo.tsx";
 import {useAuth} from "../../../contexts/AuthContext.tsx";
-import useLoginModal from "../utils/useLoginModal";
-import LoginModal from "../utils/LoginModal";
+import useLoginModal from "../../login/useLoginModal.ts";
+import LoginModal from "../../login/LoginModal.tsx";
 import Rating from "../utils/Rating.tsx";
 import pcCasePhoto from "../../../assets/hardware/pcCase.png";
 

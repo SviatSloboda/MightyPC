@@ -5,8 +5,8 @@ import Modal, {useModal} from './utils/Modal.tsx';
 import {useNavigate} from "react-router-dom";
 import {SSD} from "../../model/pc/hardware/SSD.tsx";
 import {useAuth} from "../../contexts/AuthContext.tsx";
-import useLoginModal from "./utils/useLoginModal";
-import LoginModal from "./utils/LoginModal";
+import useLoginModal from "../login/useLoginModal.ts";
+import LoginModal from "../login/LoginModal.tsx";
 import ssdPhoto from "../../assets/hardware/ssd.png";
 
 export default function SsdPage() {

@@ -5,8 +5,8 @@ import {RAM} from "../../../model/pc/hardware/RAM.tsx";
 import Photo from "../utils/Photo.tsx";
 import Rating from "../utils/Rating.tsx";
 import {useAuth} from "../../../contexts/AuthContext.tsx";
-import useLoginModal from "../utils/useLoginModal";
-import LoginModal from "../utils/LoginModal";
+import useLoginModal from "../../login/useLoginModal.ts";
+import LoginModal from "../../login/LoginModal.tsx";
 import ramPhoto from "../../../assets/hardware/ram.png";
 
 export default function RamCharacteristics() {

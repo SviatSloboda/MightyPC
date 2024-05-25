@@ -5,8 +5,8 @@ import Modal, {useModal} from './utils/Modal.tsx';
 import {useNavigate} from "react-router-dom";
 import {HDD} from "../../model/pc/hardware/HDD.tsx";
 import {useAuth} from "../../contexts/AuthContext.tsx";
-import useLoginModal from "./utils/useLoginModal";
-import LoginModal from "./utils/LoginModal";
+import useLoginModal from "../login/useLoginModal.ts";
+import LoginModal from "../login/LoginModal.tsx";
 import hddPhoto from "../../assets/hardware/hdd.png";
 
 export default function HddPage() {

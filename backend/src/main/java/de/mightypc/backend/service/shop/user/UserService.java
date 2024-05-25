@@ -14,7 +14,6 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 
-import java.security.Principal;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -43,7 +42,19 @@ public class UserService {
         }
         boolean isReturningUser = userRepository.existsByEmail(userEmail.trim());
         if (!isReturningUser) {
-            return new UserResponse(userRepository.save(new User(UUID.randomUUID().toString(), userEmail, "", new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), true, "default", ZonedDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.FULL)), "")));
+            return new UserResponse(
+                    userRepository.save(new User(
+                            UUID.randomUUID().toString(),
+                            userEmail,
+                            "",
+                            new ArrayList<>(),
+                            new ArrayList<>(),
+                            new ArrayList<>(),
+                            false,
+                            "CUSTOMER",
+                            ZonedDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.FULL)
+                            ), "")
+                    ));
         }
         return new UserResponse(userRepository.getUserByEmail(userEmail));
     }
@@ -58,14 +69,27 @@ public class UserService {
         }
         boolean isReturningUser = userRepository.existsByEmail(userEmail.trim());
         if (!isReturningUser) {
-            return new UserResponse(userRepository.save(new User(UUID.randomUUID().toString(), userEmail, "", new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), true, "default", ZonedDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.FULL)), "")));
+            return new UserResponse(
+                    userRepository.save(new User(
+                            UUID.randomUUID().toString(),
+                            userEmail,
+                            "",
+                            new ArrayList<>(),
+                            new ArrayList<>(),
+                            new ArrayList<>(),
+                            true,
+                            "default",
+                            ZonedDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.FULL)),
+                            "")));
         }
         return new UserResponse(userRepository.getUserByEmail(userEmail));
     }
 
     public void registerUserWithEmailAndPassword(CreateUser createuser) {
         if (createuser == null) throw new IllegalStateException("User data can't be null!");
-        if (userRepository.existsByEmail(createuser.email()))
+
+        boolean existsByEmail = userRepository.existsByEmail(createuser.email());
+        if (existsByEmail)
             throw new IllegalStateException("User is already registered");
 
         userRepository.save(new User(
@@ -76,7 +100,7 @@ public class UserService {
                 new ArrayList<>(),
                 new ArrayList<>(),
                 false,
-                "default",
+                "CUSTOMER",
                 ZonedDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.FULL)
                 ), "")
         );
@@ -112,8 +136,13 @@ public class UserService {
 
     public void setPassword(String userId, String password) {
         User user = getUserById(userId);
+
+        if (!user.getPassword().isEmpty()) throw new IllegalStateException("Password is already set!!!");
+
         user.setPassword(passwordEncoder.encode(password));
+
         userRepository.save(user);
+
     }
 
     public void changeUserPassword(String userId, String[] passwords) {

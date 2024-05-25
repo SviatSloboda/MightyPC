@@ -2,8 +2,8 @@ import {useEffect, useState} from "react";
 import axios from "axios";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {useAuth} from "../../contexts/AuthContext.tsx";
-import useLoginModal from "../hardware/utils/useLoginModal.ts";
-import LoginModal from "../hardware/utils/LoginModal.tsx";
+import useLoginModal from "../login/useLoginModal.ts";
+import LoginModal from "../login/LoginModal.tsx";
 import Photo from "../hardware/utils/Photo.tsx";
 import Rating from "../hardware/utils/Rating.tsx";
 import pcPhoto from "../../assets/pc/Pc.png"
