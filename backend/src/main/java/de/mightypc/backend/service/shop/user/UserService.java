@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -32,11 +33,26 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public UserResponse getLoggedInUser(OAuth2User user) {
-        if (user == null) {
+    public UserResponse getLoggedInUser(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
             return null;
         }
-        String userEmail = user.getAttribute("email");
+        String userEmail = authentication.getName();
+        if (userEmail == null || userEmail.isEmpty()) {
+            return null;
+        }
+        boolean isReturningUser = userRepository.existsByEmail(userEmail.trim());
+        if (!isReturningUser) {
+            return new UserResponse(userRepository.save(new User(UUID.randomUUID().toString(), userEmail, "", new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), true, "default", ZonedDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.FULL)), "")));
+        }
+        return new UserResponse(userRepository.getUserByEmail(userEmail));
+    }
+
+    public UserResponse getLoggedInUser(OAuth2User oauth2User) {
+        if (oauth2User == null) {
+            return null;
+        }
+        String userEmail = oauth2User.getAttribute("email");
         if (userEmail == null || userEmail.isEmpty()) {
             return null;
         }
@@ -96,15 +112,12 @@ public class UserService {
 
     public void setPassword(String userId, String password) {
         User user = getUserById(userId);
-
         user.setPassword(passwordEncoder.encode(password));
-
         userRepository.save(user);
     }
 
     public void changeUserPassword(String userId, String[] passwords) {
         User user = getUserById(userId);
-
         if (passwordEncoder.matches(passwords[0], user.getPassword())) {
             user.setPassword(passwordEncoder.encode(passwords[1]));
             userRepository.save(user);

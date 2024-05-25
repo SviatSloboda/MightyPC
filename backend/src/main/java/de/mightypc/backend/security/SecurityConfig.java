@@ -25,7 +25,6 @@ public class SecurityConfig {
     @Value("${app.environment}")
     private String environment;
 
-
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -52,6 +51,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "api/**").hasRole("MANAGER")
                         .requestMatchers(HttpMethod.DELETE, "api/**").hasRole("ADMIN")
                         .requestMatchers("/api/user/**").permitAll()
+                        .requestMatchers("/api/login").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
                 .httpBasic(withDefaults())

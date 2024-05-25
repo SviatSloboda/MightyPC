@@ -1,6 +1,6 @@
-import React, {createContext, ReactNode, useContext, useEffect, useState} from 'react';
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
-import {User} from "../model/shop/User.tsx";
+import { User } from '../model/shop/User.tsx';
 
 interface AuthContextType {
     user: User | null;
@@ -22,11 +22,11 @@ interface AuthProviderProps {
     children: ReactNode;
 }
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
 
     useEffect(() => {
-        axios.get<User>('/api/user', {withCredentials: true})
+        axios.get<User>('/api/user', { withCredentials: true })
             .then((response) => setUser(response.data ?? null))
             .catch(() => setUser(null));
     }, []);
@@ -37,7 +37,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
         return user?.role === 'superuser';
     };
 
-    return (<AuthContext.Provider value={{user, updateUser, isSuperUser}}>
-        {children}
-    </AuthContext.Provider>);
+    return (
+        <AuthContext.Provider value={{ user, updateUser, isSuperUser }}>
+            {children}
+        </AuthContext.Provider>
+    );
 };

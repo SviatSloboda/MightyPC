@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { googleLogin } from '../../../contexts/authUtils.ts';
 import { useAuth } from '../../../contexts/AuthContext.tsx';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function LoginPage() {
     const { updateUser } = useAuth();
+    const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -15,9 +19,20 @@ export default function LoginPage() {
         e.preventDefault();
         try {
             const response = await axios.post('/api/user/login', { email, password }, { withCredentials: true });
-            updateUser(response.data);
-        } catch (error) {
-            console.error('Login failed', error);
+            if (response.status === 200) {
+                updateUser(response.data);
+                navigate('/');
+            } else {
+                console.error('Login failed with status', response.status);
+                toast.error('Login failed. Please check your credentials.');
+            }
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error) && error.response && error.response.status === 401) {
+                toast.error('Invalid credentials. Please try again.');
+            } else {
+                toast.error('Login failed. Please try again later.');
+                console.error('Login failed', error);
+            }
         }
     };
 
@@ -25,6 +40,7 @@ export default function LoginPage() {
 
     return (
         <div className="login-page">
+            <ToastContainer />
             <div className="login-container">
                 <h1 className="login-title">Sign in</h1>
                 <form className="login-form" onSubmit={handleLogin}>
