@@ -1,16 +1,24 @@
 import React, { useState } from 'react';
 import { googleLogin } from '../../../contexts/authUtils.ts';
+import { useAuth } from '../../../contexts/AuthContext.tsx';
+import axios from 'axios';
 
 export default function LoginPage() {
+    const { updateUser } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value);
     const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value);
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Add login logic here
+        try {
+            const response = await axios.post('/api/user/login', { email, password }, { withCredentials: true });
+            updateUser(response.data);
+        } catch (error) {
+            console.error('Login failed', error);
+        }
     };
 
     const handleGoogleLogin = () => googleLogin();
