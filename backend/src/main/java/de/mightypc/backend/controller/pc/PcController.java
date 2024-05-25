@@ -101,9 +101,4 @@ public class PcController {
                                                         @RequestParam(value = "highest", defaultValue = "999999") int highestEnergyConsumption) {
         return service.getAllWithFilteringByEnergyConsumptionAsPages(pageable, lowestEnergyConsumption, highestEnergyConsumption);
     }
-
-    @PatchMapping
-    public String wow(){
-        return "works!";
-    }
 }
