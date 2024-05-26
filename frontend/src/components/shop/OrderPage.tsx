@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import axios from 'axios';
-import { useAuth } from '../../contexts/AuthContext';
-import { Order } from '../../model/shop/Order';
+import {useAuth} from '../../contexts/AuthContext';
+import {Order} from '../../model/shop/Order';
 import OrderInfoModal from './OrderInfoModal';
 import empty_box from "../../assets/shop/empty_box.png";
 
@@ -9,7 +9,7 @@ export default function OrderPage() {
     const [orders, setOrders] = useState<Order[]>([]);
     const [showModal, setShowModal] = useState<boolean>(false);
     const [selectedOrderId, setSelectedOrderId] = useState<string>('');
-    const { user } = useAuth();
+    const {user} = useAuth();
 
     useEffect(() => {
         if (user?.id) {
@@ -35,7 +35,7 @@ export default function OrderPage() {
         <div className="order-page">
             {orders.length === 0 ? (
                 <div className="order-page__basket-empty">
-                    <img src={empty_box} alt="Empty Basket" className="order-page__image" />
+                    <img src={empty_box} alt="Empty Basket" className="order-page__image"/>
                     <p className="order-page__basket-empty-message">There are no orders!</p>
                 </div>
             ) : (
@@ -43,7 +43,8 @@ export default function OrderPage() {
                     <div key={order.id} className="order-page__item">
                         <div className="order-page__item-photos">
                             {order.items.slice(0, 4).map((item) => (
-                                <img key={item.id} src={item.photo} alt={`Item ${item.id}`} className="order-page__item-photo" />
+                                <img key={item.id} src={item.photo} alt={`Item ${item.id}`}
+                                     className="order-page__item-photo"/>
                             ))}
                         </div>
                         <div className="order-page__item-info">
@@ -51,8 +52,11 @@ export default function OrderPage() {
                             <p className="order-page__item-total">Total: {order.completePrice} €</p>
                         </div>
                         <div className="order-page__item-actions">
-                            <button className="order-page__item-button" onClick={() => handleOpenInfoModal(order.id)}>Info</button>
-                            {order.orderStatus === 'PENDING' && <button className="order-page__item-button">Pay</button>}
+                            <button className="order-page__item-button"
+                                    onClick={() => handleOpenInfoModal(order.id)}>Info
+                            </button>
+                            {order.orderStatus === 'PENDING' &&
+                                <button className="order-page__item-button">Pay</button>}
                         </div>
                     </div>
                 ))

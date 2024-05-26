@@ -91,7 +91,7 @@ public abstract class PcBaseService<T, R extends MongoRepository<T, String>> {
     public List<T> getAll() {
         List<T> entities = repository.findAll();
 
-        if(entities.isEmpty()) {
+        if (entities.isEmpty()) {
             throw new PcNotFoundException("No entities found!");
         }
 

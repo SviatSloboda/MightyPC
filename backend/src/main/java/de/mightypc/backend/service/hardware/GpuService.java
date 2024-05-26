@@ -2,10 +2,6 @@ package de.mightypc.backend.service.hardware;
 
 import de.mightypc.backend.exception.hardware.GpuNotFoundException;
 import de.mightypc.backend.model.configurator.ItemForConfigurator;
-import de.mightypc.backend.model.hardware.CPU;
-import de.mightypc.backend.model.hardware.GPU;
-import de.mightypc.backend.model.hardware.GPU;
-import de.mightypc.backend.model.hardware.GPU;
 import de.mightypc.backend.model.hardware.GPU;
 import de.mightypc.backend.repository.hardware.GpuRepository;
 import org.springframework.data.domain.Page;
@@ -16,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 @Service
@@ -78,7 +73,7 @@ public class GpuService extends BaseService<GPU, GpuRepository, GpuNotFoundExcep
         for (GPU gpu : allGpus) {
             String gpuPhoto = "";
 
-            if(!gpu.gpuPhotos().isEmpty()){
+            if (!gpu.gpuPhotos().isEmpty()) {
                 gpuPhoto = gpu.gpuPhotos().getFirst();
             }
 

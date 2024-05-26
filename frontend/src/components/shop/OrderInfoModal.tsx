@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import axios from 'axios';
-import { Order } from "../../model/shop/Order.tsx";
+import {Order} from "../../model/shop/Order.tsx";
 import {useNavigate} from "react-router-dom";
 
 interface OrderInfoModalProps {
@@ -10,7 +10,7 @@ interface OrderInfoModalProps {
     userId: string;
 }
 
-const OrderInfoModal: React.FC<OrderInfoModalProps> = ({ showModal, setShowModal, orderId, userId }) => {
+const OrderInfoModal: React.FC<OrderInfoModalProps> = ({showModal, setShowModal, orderId, userId}) => {
     const [orderDetails, setOrderDetails] = useState<Order | null>(null);
     const navigate = useNavigate();
 

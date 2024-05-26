@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import {useState} from 'react';
+import {Link, useNavigate} from 'react-router-dom';
 import logo from '../../assets/logo.jpg';
-import { useAuth } from "../../contexts/AuthContext.tsx";
+import {useAuth} from "../../contexts/AuthContext.tsx";
 
 export default function NavigationBar() {
-    const { user, logout, isLoading } = useAuth();
+    const {user, logout, isLoading} = useAuth();
     const navigate = useNavigate();
 
     const [accountMenuOpen, setAccountMenuOpen] = useState(false);
@@ -71,7 +71,7 @@ export default function NavigationBar() {
     return (
         <nav className="nav">
             <Link to="/" className="nav__link">
-                <img className="nav__img-logo" src={logo} alt="logo" />
+                <img className="nav__img-logo" src={logo} alt="logo"/>
             </Link>
             <Link to="/configurator" className="nav__link">Configurator</Link>
             <Link to="/pc" className="nav__link">Gaming PCs</Link>

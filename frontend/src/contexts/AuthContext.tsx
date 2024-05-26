@@ -1,7 +1,7 @@
-import React, { createContext, ReactNode, useContext, useEffect, useState, useMemo } from 'react';
+import React, {createContext, ReactNode, useContext, useEffect, useMemo, useState} from 'react';
 import axios from 'axios';
-import { User } from '../model/shop/User.tsx';
-import { isSuperUser } from './isSuperUser';
+import {User} from '../model/shop/User.tsx';
+import {isSuperUser} from './isSuperUser';
 
 interface AuthContextType {
     user: User | null;
@@ -25,12 +25,12 @@ interface AuthProviderProps {
     children: ReactNode;
 }
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        axios.get('/api/user', { withCredentials: true })
+        axios.get('/api/user', {withCredentials: true})
             .then((response) => {
                 if (response.headers['content-type']?.includes('application/json')) {
                     setUser(response.data ?? null);
@@ -52,7 +52,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const logout = async () => {
         try {
-            await axios.post('/api/logout', {}, { withCredentials: true });
+            await axios.post('/api/logout', {}, {withCredentials: true});
             setUser(null);
         } catch (error) {
             console.error('Logout failed', error);

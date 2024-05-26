@@ -2,7 +2,6 @@ package de.mightypc.backend.service.configurator;
 
 import de.mightypc.backend.model.configurator.ConfiguratorItems;
 import de.mightypc.backend.model.configurator.ItemForConfigurator;
-import de.mightypc.backend.model.shop.order.Item;
 import de.mightypc.backend.service.hardware.GpuService;
 import de.mightypc.backend.service.hardware.HddService;
 import de.mightypc.backend.service.hardware.PowerSupplyService;

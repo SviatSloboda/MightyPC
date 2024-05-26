@@ -2,7 +2,6 @@ package de.mightypc.backend.service.hardware;
 
 import de.mightypc.backend.exception.hardware.HddNotFoundException;
 import de.mightypc.backend.model.configurator.ItemForConfigurator;
-import de.mightypc.backend.model.hardware.GPU;
 import de.mightypc.backend.model.hardware.HDD;
 import de.mightypc.backend.repository.hardware.HddRepository;
 
@@ -77,7 +76,7 @@ public class HddService extends BaseService<HDD, HddRepository, HddNotFoundExcep
         for (HDD hdd : allHdds) {
             String hddPhoto = "";
 
-            if(!hdd.hddPhotos().isEmpty()){
+            if (!hdd.hddPhotos().isEmpty()) {
                 hddPhoto = hdd.hddPhotos().getFirst();
             }
 

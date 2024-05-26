@@ -34,30 +34,30 @@ public class ChatGptService {
         String componentsList = configuratorService.getAllComponentsIdsAndNamesWithPrices();
 
         String prompt = """
-        Role: Professional PC Configurator.
-        Task: Configure the best PC within this price category: %s.
-        Computer type: %s.
+                Role: Professional PC Configurator.
+                Task: Configure the best PC within this price category: %s.
+                Computer type: %s.
 
-        Instructions:
-        1. Use only the provided list of PC components.
-        2. Ensure exactly 8 components are used: 1 CPU, 1 GPU, 1 Motherboard, 1 RAM, 1 SSD, 1 HDD, 1 Power Supply, and 1 PC Case.
-        3. Return only the component IDs separated by commas, without spaces or additional characters.
-        4. The order of IDs should follow: CPU, GPU, Motherboard, RAM, SSD, HDD, Power Supply, PC Case.
-        5. Ensure all IDs exist in the provided list.
-        6. Verify compatibility:
-           - The motherboard must match the CPU socket type.
-           - The power supply must support the energy consumption of all selected components.
-        7. Use the format:
-           "$componentType:\\n{componentId:componentName:(componentPrice)}\\n".
-        8. Do not add any comments or explanations.
-        9. If an error is detected, retry until the output meets the requirements.
+                Instructions:
+                1. Use only the provided list of PC components.
+                2. Ensure exactly 8 components are used: 1 CPU, 1 GPU, 1 Motherboard, 1 RAM, 1 SSD, 1 HDD, 1 Power Supply, and 1 PC Case.
+                3. Return only the component IDs separated by commas, without spaces or additional characters.
+                4. The order of IDs should follow: CPU, GPU, Motherboard, RAM, SSD, HDD, Power Supply, PC Case.
+                5. Ensure all IDs exist in the provided list.
+                6. Verify compatibility:
+                   - The motherboard must match the CPU socket type.
+                   - The power supply must support the energy consumption of all selected components.
+                7. Use the format:
+                   "$componentType:\\n{componentId:componentName:(componentPrice)}\\n".
+                8. Do not add any comments or explanations.
+                9. If an error is detected, retry until the output meets the requirements.
 
-        Provided components:
-        %s
+                Provided components:
+                %s
 
-        Example of valid response format:
-        066f2ab9-314b-4428-8f5a-9a44e14c5b2c,d4e5c0e6-a8c6-4f95-9c58-1b13a8ba7a6b,42fa1b8e-4cbd-4e86-852b-2771ef267865,75394d25-2ae2-479b-b32b-7bc442208d1f,720c9f40-4446-4899-8036-5930c63d3310,39932c24-d430-4265-856a-2a3bedf212ad,299a1d37-8c70-46aa-88b8-9df81eb0de39,4a90e0fe-f8fe-4858-9632-08c72232aab6
-        """.formatted(price, computerType, componentsList);
+                Example of valid response format:
+                066f2ab9-314b-4428-8f5a-9a44e14c5b2c,d4e5c0e6-a8c6-4f95-9c58-1b13a8ba7a6b,42fa1b8e-4cbd-4e86-852b-2771ef267865,75394d25-2ae2-479b-b32b-7bc442208d1f,720c9f40-4446-4899-8036-5930c63d3310,39932c24-d430-4265-856a-2a3bedf212ad,299a1d37-8c70-46aa-88b8-9df81eb0de39,4a90e0fe-f8fe-4858-9632-08c72232aab6
+                """.formatted(price, computerType, componentsList);
 
         ChatGptResponse response = restClient.post()
                 .uri("/completions")

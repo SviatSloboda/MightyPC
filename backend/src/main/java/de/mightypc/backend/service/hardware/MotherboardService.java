@@ -2,10 +2,6 @@ package de.mightypc.backend.service.hardware;
 
 import de.mightypc.backend.exception.hardware.MotherboardNotFoundException;
 import de.mightypc.backend.model.configurator.ItemForConfigurator;
-import de.mightypc.backend.model.hardware.GPU;
-import de.mightypc.backend.model.hardware.Motherboard;
-import de.mightypc.backend.model.hardware.Motherboard;
-import de.mightypc.backend.model.hardware.Motherboard;
 import de.mightypc.backend.model.hardware.Motherboard;
 import de.mightypc.backend.repository.hardware.MotherboardRepository;
 import org.springframework.data.domain.Page;
@@ -96,7 +92,7 @@ public class MotherboardService extends BaseService<Motherboard, MotherboardRepo
         for (Motherboard motherboard : allMotherboards) {
             String motherboardPhoto = "";
 
-            if(!motherboard.motherboardPhotos().isEmpty()){
+            if (!motherboard.motherboardPhotos().isEmpty()) {
                 motherboardPhoto = motherboard.motherboardPhotos().getFirst();
             }
 

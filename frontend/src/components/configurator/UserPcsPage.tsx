@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import axios from 'axios';
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import pcPhoto from "../../assets/pc/Pc.png";
 import nothingImage from "../../assets/pc/noPC.png";
-import { useAuth } from "../../contexts/AuthContext.tsx";
+import {useAuth} from "../../contexts/AuthContext.tsx";
 import useLoginModal from "../login/useLoginModal.ts";
 import LoginModal from "../login/LoginModal.tsx";
-import { PC } from "../../model/pc/PC.tsx";
+import {PC} from "../../model/pc/PC.tsx";
 import UserProductBox from "./UserProductBox.tsx";
 
 export default function UserPcsPage() {
@@ -14,8 +14,8 @@ export default function UserPcsPage() {
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const pcsPerPage = 8;
-    const { user } = useAuth();
-    const { isLoginModalOpen, showLoginModal, hideLoginModal, handleLogin } = useLoginModal();
+    const {user} = useAuth();
+    const {isLoginModalOpen, showLoginModal, hideLoginModal, handleLogin} = useLoginModal();
     const navigate = useNavigate();
 
     const fetchPcs = useCallback(async () => {
@@ -69,7 +69,7 @@ export default function UserPcsPage() {
         <>
             {pcs.length === 0 ? (
                 <div className="basket-empty">
-                    <img className={"basket-empty__image"} src={nothingImage} alt="No Pcs found" />
+                    <img className={"basket-empty__image"} src={nothingImage} alt="No Pcs found"/>
                     <p className={"basket-empty__message"}>You have not configured your own PC yet!</p>
                 </div>
             ) : (
@@ -80,20 +80,20 @@ export default function UserPcsPage() {
                                 key={pc.id}
                                 product={pc}
                                 imgSrc={pc.photos?.[0] ?? pcPhoto}
-                                toCharacteristicsPage={() => navigate(`/pc/${pc.id}`, { state: { isUserPc: true } })}
+                                toCharacteristicsPage={() => navigate(`/pc/${pc.id}`, {state: {isUserPc: true}})}
                                 onAddToBasket={() => handleAddToBasket(pc)}
                             />
                         ))}
                     </div>
                     <div className="product-list__pagination">
-                        {Array.from({ length: totalPages }, (_, i) => (
+                        {Array.from({length: totalPages}, (_, i) => (
                             <button key={i} onClick={() => paginate(i + 1)}
                                     className={`pagination__button ${currentPage === i ? 'pagination__button--active' : ''}`}>{i + 1}</button>
                         ))}
                     </div>
                 </>
             )}
-            <LoginModal isOpen={isLoginModalOpen} onLogin={handleLogin} onClose={hideLoginModal} />
+            <LoginModal isOpen={isLoginModalOpen} onLogin={handleLogin} onClose={hideLoginModal}/>
         </>
     );
 }

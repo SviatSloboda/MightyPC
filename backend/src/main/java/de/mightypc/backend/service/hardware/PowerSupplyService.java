@@ -2,10 +2,6 @@ package de.mightypc.backend.service.hardware;
 
 import de.mightypc.backend.exception.hardware.PowerSupplyNotFoundException;
 import de.mightypc.backend.model.configurator.ItemForConfigurator;
-import de.mightypc.backend.model.hardware.GPU;
-import de.mightypc.backend.model.hardware.PowerSupply;
-import de.mightypc.backend.model.hardware.PowerSupply;
-import de.mightypc.backend.model.hardware.PowerSupply;
 import de.mightypc.backend.model.hardware.PowerSupply;
 import de.mightypc.backend.repository.hardware.PowerSupplyRepository;
 import org.springframework.data.domain.Page;
@@ -16,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,7 +93,7 @@ public class PowerSupplyService extends BaseService<PowerSupply, PowerSupplyRepo
         for (PowerSupply powerSupply : allPowerSupplies) {
             String powerSupplyPhoto = "";
 
-            if(!powerSupply.powerSupplyPhotos().isEmpty()){
+            if (!powerSupply.powerSupplyPhotos().isEmpty()) {
                 powerSupplyPhoto = powerSupply.powerSupplyPhotos().getFirst();
             }
 

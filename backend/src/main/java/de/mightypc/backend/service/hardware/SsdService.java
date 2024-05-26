@@ -2,10 +2,6 @@ package de.mightypc.backend.service.hardware;
 
 import de.mightypc.backend.exception.hardware.SsdNotFoundException;
 import de.mightypc.backend.model.configurator.ItemForConfigurator;
-import de.mightypc.backend.model.hardware.GPU;
-import de.mightypc.backend.model.hardware.SSD;
-import de.mightypc.backend.model.hardware.SSD;
-import de.mightypc.backend.model.hardware.SSD;
 import de.mightypc.backend.model.hardware.SSD;
 import de.mightypc.backend.repository.hardware.SsdRepository;
 import org.springframework.data.domain.Page;
@@ -16,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 @Service
@@ -79,7 +74,7 @@ public class SsdService extends BaseService<SSD, SsdRepository, SsdNotFoundExcep
         for (SSD ssd : allSsds) {
             String ssdPhoto = "";
 
-            if(!ssd.ssdPhotos().isEmpty()){
+            if (!ssd.ssdPhotos().isEmpty()) {
                 ssdPhoto = ssd.ssdPhotos().getFirst();
             }
 

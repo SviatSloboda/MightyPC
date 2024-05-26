@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 
 interface RegisterModalProps {
     isOpen: boolean;
@@ -6,7 +6,7 @@ interface RegisterModalProps {
     onSave: (email: string, password: string) => void;
 }
 
-const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, onSave }) => {
+const RegisterModal: React.FC<RegisterModalProps> = ({isOpen, onClose, onSave}) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);

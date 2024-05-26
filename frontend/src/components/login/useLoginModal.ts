@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {useState} from 'react';
 
 export default function useLoginModal() {
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -11,5 +11,5 @@ export default function useLoginModal() {
         window.location.href = "/user/login";
     };
 
-    return { isLoginModalOpen, showLoginModal, hideLoginModal, handleLogin };
+    return {isLoginModalOpen, showLoginModal, hideLoginModal, handleLogin};
 }

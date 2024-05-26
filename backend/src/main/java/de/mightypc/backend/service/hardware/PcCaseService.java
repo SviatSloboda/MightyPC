@@ -2,10 +2,6 @@ package de.mightypc.backend.service.hardware;
 
 import de.mightypc.backend.exception.hardware.PcCaseNotFoundException;
 import de.mightypc.backend.model.configurator.ItemForConfigurator;
-import de.mightypc.backend.model.hardware.GPU;
-import de.mightypc.backend.model.hardware.PcCase;
-import de.mightypc.backend.model.hardware.PcCase;
-import de.mightypc.backend.model.hardware.PcCase;
 import de.mightypc.backend.model.hardware.PcCase;
 import de.mightypc.backend.repository.hardware.PcCaseRepository;
 import org.springframework.data.domain.Page;
@@ -16,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 @Service
@@ -80,7 +75,7 @@ public class PcCaseService extends BaseService<PcCase, PcCaseRepository, PcCaseN
         for (PcCase pcCase : allPcCases) {
             String pcCasePhoto = "";
 
-            if(!pcCase.pcCasePhotos().isEmpty()){
+            if (!pcCase.pcCasePhotos().isEmpty()) {
                 pcCasePhoto = pcCase.pcCasePhotos().getFirst();
             }
 
@@ -154,7 +149,7 @@ public class PcCaseService extends BaseService<PcCase, PcCaseRepository, PcCaseN
     private List<PcCase> getAllWithFilteringByPrice(int lowestPrice, int highestPrice) {
         return getAll().stream()
                 .filter(pcCase -> pcCase.hardwareSpec().price().intValue() >= lowestPrice
-                               && pcCase.hardwareSpec().price().intValue() <= highestPrice)
+                                  && pcCase.hardwareSpec().price().intValue() <= highestPrice)
                 .toList();
     }
 }

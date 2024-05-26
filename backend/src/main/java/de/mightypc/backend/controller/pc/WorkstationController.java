@@ -76,16 +76,16 @@ public class WorkstationController {
 
     @GetMapping("/filter/price")
     public Page<Workstation> getFilteredWorkstationsByPrice(Pageable pageable,
-                                            @RequestParam(value = "lowest", defaultValue = "0") int lowestPrice,
-                                            @RequestParam(value = "highest", defaultValue = "999999") int highestPrice
+                                                            @RequestParam(value = "lowest", defaultValue = "0") int lowestPrice,
+                                                            @RequestParam(value = "highest", defaultValue = "999999") int highestPrice
     ) {
         return service.getAllWithFilteringByPriceAsPages(pageable, lowestPrice, highestPrice);
     }
 
     @GetMapping("/filter/energy-consumption")
     public Page<Workstation> getFilteredWorkstationsByEnergyConsumption(Pageable pageable,
-                                                        @RequestParam(value = "lowest", defaultValue = "0") int lowestEnergyConsumption,
-                                                        @RequestParam(value = "highest", defaultValue = "999999") int highestEnergyConsumption) {
+                                                                        @RequestParam(value = "lowest", defaultValue = "0") int lowestEnergyConsumption,
+                                                                        @RequestParam(value = "highest", defaultValue = "999999") int highestEnergyConsumption) {
         return service.getAllWithFilteringByEnergyConsumptionAsPages(pageable, lowestEnergyConsumption, highestEnergyConsumption);
     }
 }

@@ -3,7 +3,6 @@ package de.mightypc.backend.service.hardware;
 import de.mightypc.backend.exception.hardware.CpuNotFoundException;
 import de.mightypc.backend.model.configurator.ItemForConfigurator;
 import de.mightypc.backend.model.hardware.CPU;
-import de.mightypc.backend.model.shop.order.Item;
 import de.mightypc.backend.repository.hardware.CpuRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -13,9 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class CpuService extends BaseService<CPU, CpuRepository, CpuNotFoundException> {
@@ -78,7 +75,7 @@ public class CpuService extends BaseService<CPU, CpuRepository, CpuNotFoundExcep
         for (CPU cpu : allCpus) {
             String cpuPhoto = "";
 
-            if(!cpu.cpuPhotos().isEmpty()){
+            if (!cpu.cpuPhotos().isEmpty()) {
                 cpuPhoto = cpu.cpuPhotos().getFirst();
             }
 

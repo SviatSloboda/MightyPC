@@ -63,7 +63,7 @@ public class BasketService {
         userRepository.save(user);
     }
 
-    public void deleteItemByUserIdAndItemId(String userId, String itemId){
+    public void deleteItemByUserIdAndItemId(String userId, String itemId) {
         User user = userService.getUserById(userId);
 
         deleteItem(user, itemId);

@@ -2,10 +2,6 @@ package de.mightypc.backend.service.hardware;
 
 import de.mightypc.backend.exception.hardware.RamNotFoundException;
 import de.mightypc.backend.model.configurator.ItemForConfigurator;
-import de.mightypc.backend.model.hardware.GPU;
-import de.mightypc.backend.model.hardware.RAM;
-import de.mightypc.backend.model.hardware.RAM;
-import de.mightypc.backend.model.hardware.RAM;
 import de.mightypc.backend.model.hardware.RAM;
 import de.mightypc.backend.repository.hardware.RamRepository;
 import org.springframework.data.domain.Page;
@@ -16,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 @Service
@@ -80,7 +75,7 @@ public class RamService extends BaseService<RAM, RamRepository, RamNotFoundExcep
         for (RAM ram : allRams) {
             String ramPhoto = "";
 
-            if(!ram.ramPhotos().isEmpty()){
+            if (!ram.ramPhotos().isEmpty()) {
                 ramPhoto = ram.ramPhotos().getFirst();
             }
 
