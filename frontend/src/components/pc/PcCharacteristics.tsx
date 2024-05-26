@@ -208,11 +208,15 @@ export default function PcCharacteristics() {
 
             {pc && (<div className="product-characteristics__details pc-details">
                 <div className={"product-characteristics--nameAndBuy"}>
-                    <div className={"product-characteristics--nameAndRating"}>
+                    <div className="product-characteristics--nameAndRating">
                         <h1 className="product-characteristics__name pcCharacteristic__name">{pc?.hardwareSpec.name}</h1>
                         <div className="product-characteristics__info">
-                            <Rating rating={pc?.hardwareSpec.rating ?? 0}/>
-                            <span className="product-characteristics__rating">{pc?.hardwareSpec.rating}/5</span>
+                            {!isUserPc && (
+                                <>
+                                    <Rating rating={pc?.hardwareSpec.rating ?? 0}/>
+                                    <span className="product-characteristics__rating">{pc?.hardwareSpec.rating}/5</span>
+                                </>
+                            )}
                         </div>
                     </div>
 

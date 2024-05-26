@@ -10,7 +10,7 @@ import LoginModal from "../login/LoginModal.tsx";
 import psuPhoto from "../../assets/hardware/psu.png";
 
 export default function PowerSupplyPage() {
-    const [PSUs, setPSUs] = useState<PSU[]>([]);
+    const [psus, setPsus] = useState<PSU[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const psusPerPage = 8;
@@ -29,10 +29,10 @@ export default function PowerSupplyPage() {
         async function fetchPsus() {
             try {
                 const response = await axios.get(`/api/hardware/psu/page?page=${currentPage}&size=${psusPerPage}`);
-                setPSUs(response.data.content);
+                setPsus(response.data.content);
                 setTotalPages(response.data.totalPages);
             } catch (error) {
-                console.error("Failed to fetch PSUs:", error);
+                console.error("Failed to fetch psus:", error);
             }
         }
 
@@ -56,7 +56,7 @@ export default function PowerSupplyPage() {
 
         axios.post('/api/hardware/psu', payload)
             .then(response => {
-                setPSUs(prevPSUs => [...prevPSUs, response.data]);
+                setPsus(prevpsus => [...prevpsus, response.data]);
                 toggleModal();
             })
             .catch(error => console.error('Failed to add PSU:', error));
@@ -118,7 +118,7 @@ export default function PowerSupplyPage() {
             </Modal>
 
             <div className="product-list">
-                {PSUs.map(psu => (
+                {psus.map(psu => (
                     <ProductBox
                         key={psu.id}
                         product={psu}

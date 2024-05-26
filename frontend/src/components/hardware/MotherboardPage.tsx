@@ -10,7 +10,7 @@ import LoginModal from "../login/LoginModal.tsx";
 import motherboardPhoto from "../../assets/hardware/motherboard.png";
 
 export default function MotherboardPage() {
-    const [Motherboards, setMotherboards] = useState<Motherboard[]>([]);
+    const [motherboards, setMotherboards] = useState<Motherboard[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const motherboardsPerPage = 8;
@@ -26,17 +26,17 @@ export default function MotherboardPage() {
     const {isLoginModalOpen, showLoginModal, hideLoginModal, handleLogin} = useLoginModal();
 
     useEffect(() => {
-        async function fetchMotherboards() {
+        async function fetchmotherboards() {
             try {
                 const response = await axios.get(`/api/hardware/motherboard/page?page=${currentPage}&size=${motherboardsPerPage}`);
                 setMotherboards(response.data.content);
                 setTotalPages(response.data.totalPages);
             } catch (error) {
-                console.error("Failed to fetch Motherboards:", error);
+                console.error("Failed to fetch motherboards:", error);
             }
         }
 
-        fetchMotherboards();
+        fetchmotherboards();
     }, [currentPage, motherboardsPerPage]);
 
     function paginate(pageNumber: number) {
@@ -53,7 +53,7 @@ export default function MotherboardPage() {
         axios.post('/api/hardware/motherboard', payload)
             .then(response => {
                 console.log('Motherboard added:', response.data);
-                setMotherboards(prevMotherboards => [...prevMotherboards, response.data]);
+                setMotherboards(prevmotherboards => [...prevmotherboards, response.data]);
                 toggleModal();
             })
             .catch(error => console.error('Failed to add Motherboard:', error));
@@ -122,7 +122,7 @@ export default function MotherboardPage() {
         </Modal>
 
         <div className="product-list">
-            {Motherboards.map(motherboard => (<ProductBox
+            {motherboards.map(motherboard => (<ProductBox
                 key={motherboard.id}
                 product={motherboard}
                 imgSrc={motherboard.motherboardPhotos && motherboard.motherboardPhotos.length > 0 ? motherboard.motherboardPhotos[0] : motherboardPhoto}

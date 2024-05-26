@@ -10,7 +10,7 @@ import LoginModal from "../login/LoginModal.tsx";
 import ssdPhoto from "../../assets/hardware/ssd.png";
 
 export default function SsdPage() {
-    const [SSDs, setSSDs] = useState<SSD[]>([]);
+    const [ssds, setSsds] = useState<SSD[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const ssdsPerPage = 8;
@@ -30,7 +30,7 @@ export default function SsdPage() {
         async function fetchSsds() {
             try {
                 const response = await axios.get(`/api/hardware/ssd/page?page=${currentPage}&size=${ssdsPerPage}`);
-                setSSDs(response.data.content);
+                setSsds(response.data.content);
                 setTotalPages(response.data.totalPages);
             } catch (error) {
                 console.error("Failed to fetch SSDs:", error);
@@ -53,7 +53,7 @@ export default function SsdPage() {
 
         axios.post('/api/hardware/ssd', payload)
             .then(response => {
-                setSSDs([...SSDs, response.data]);
+                setSsds([...ssds, response.data]);
                 toggleModal();
             })
             .catch(error => console.error('Failed to add SSD:', error));
@@ -119,7 +119,7 @@ export default function SsdPage() {
         </Modal>
 
         <div className="product-list">
-            {SSDs.map(ssd => (<ProductBox
+            {ssds.map(ssd => (<ProductBox
                 key={ssd.id}
                 product={ssd}
                 imgSrc={ssd.ssdPhotos && ssd.ssdPhotos.length > 0 ? ssd.ssdPhotos[0] : ssdPhoto}

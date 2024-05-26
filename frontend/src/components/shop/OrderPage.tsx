@@ -62,7 +62,7 @@ export default function OrderPage() {
                     showModal={showModal}
                     setShowModal={setShowModal}
                     orderId={selectedOrderId}
-                    userId={user?.id || ''}
+                    userId={user?.id ?? ''}
                 />
             )}
         </div>

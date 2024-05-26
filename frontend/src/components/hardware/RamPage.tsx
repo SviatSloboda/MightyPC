@@ -10,7 +10,7 @@ import LoginModal from "../login/LoginModal.tsx";
 import ramPhoto from "../../assets/hardware/ram.png";
 
 export default function RamPage() {
-    const [RAMs, setRAMs] = useState<RAM[]>([]);
+    const [rams, setRams] = useState<RAM[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const ramsPerPage = 8;
@@ -31,10 +31,10 @@ export default function RamPage() {
         async function fetchRams() {
             try {
                 const response = await axios.get(`/api/hardware/ram/page?page=${currentPage}&size=${ramsPerPage}`);
-                setRAMs(response.data.content);
+                setRams(response.data.content);
                 setTotalPages(response.data.totalPages);
             } catch (error) {
-                console.error("Failed to fetch RAMs:", error);
+                console.error("Failed to fetch rams:", error);
             }
         }
 
@@ -54,7 +54,7 @@ export default function RamPage() {
 
         axios.post('/api/hardware/ram', payload)
             .then(response => {
-                setRAMs(prevRAMs => [...prevRAMs, response.data]);
+                setRams(prevrams => [...prevrams, response.data]);
                 toggleModal();
             })
             .catch(error => console.error('Failed to add RAM:', error));
@@ -126,7 +126,7 @@ export default function RamPage() {
         </Modal>
 
         <div className="product-list">
-            {RAMs.map(ram => (<ProductBox
+            {rams.map(ram => (<ProductBox
                 key={ram.id}
                 product={ram}
                 imgSrc={ram.ramPhotos && ram.ramPhotos.length > 0 ? ram.ramPhotos[0] : ramPhoto}

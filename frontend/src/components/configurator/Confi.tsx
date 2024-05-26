@@ -1,16 +1,16 @@
-import {ChangeEvent, useCallback, useEffect, useState} from 'react';
+import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
-import {useAuth} from "../../contexts/AuthContext";
-import {HardwareSpec} from "../../model/pc/hardware/HardwareSpec";
-import {SpecsIds} from "../../model/pc/SpecsIds";
+import { useAuth } from "../../contexts/AuthContext";
+import { HardwareSpec } from "../../model/pc/hardware/HardwareSpec";
+import { SpecsIds } from "../../model/pc/SpecsIds";
 import useLoginModal from "../login/useLoginModal.ts";
 import LoginModal from "../login/LoginModal.tsx";
 import chatGptIcon from "../../assets/icon/chatGpt-icon-link.png";
 
-import {toast, ToastContainer} from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import {useNavigate} from "react-router-dom";
-import {SpecsIdsForEnergyConsumption} from "../../model/pc/SpecsIdsForEnergyConsumption.tsx";
+import { useNavigate } from "react-router-dom";
+import { SpecsIdsForEnergyConsumption } from "../../model/pc/SpecsIdsForEnergyConsumption.tsx";
 import ItemDetails from "./ItemDetails.tsx";
 
 import gpuIcon from "../../assets/icon/gpu-icon-link.png";
@@ -57,27 +57,27 @@ interface SelectOption {
 
 const componentTypes = [{
     key: "cpuId", icon: cpuIcon, text: "CPU", defaultImage: cpuPhoto, path: "/hardware/cpu"
-}, {key: "gpuId", icon: gpuIcon, text: "GPU", defaultImage: gpuPhoto, path: "/hardware/gpu"}, {
+}, { key: "gpuId", icon: gpuIcon, text: "GPU", defaultImage: gpuPhoto, path: "/hardware/gpu" }, {
     key: "motherboardId",
     icon: motherboardIcon,
     text: "Motherboard",
     defaultImage: motherboardPhoto,
     path: "/hardware/motherboard"
-}, {key: "ramId", icon: ramIcon, text: "RAM", defaultImage: ramPhoto, path: "/hardware/ram"}, {
+}, { key: "ramId", icon: ramIcon, text: "RAM", defaultImage: ramPhoto, path: "/hardware/ram" }, {
     key: "ssdId", icon: ssdIcon, text: "SSD", defaultImage: ssdPhoto, path: "/hardware/ssd"
-}, {key: "hddId", icon: hddIcon, text: "HDD", defaultImage: hddPhoto, path: "/hardware/hdd"}, {
+}, { key: "hddId", icon: hddIcon, text: "HDD", defaultImage: hddPhoto, path: "/hardware/hdd" }, {
     key: "powerSupplyId", icon: psuIcon, text: "Power Supply", defaultImage: psuPhoto, path: "/hardware/psu"
-}, {key: "pcCaseId", icon: pcCaseIcon, text: "PC Case", defaultImage: pcCasePhoto, path: "/hardware/pc-case"}];
+}, { key: "pcCaseId", icon: pcCaseIcon, text: "PC Case", defaultImage: pcCasePhoto, path: "/hardware/pc-case" }];
 
 export default function ConfiguratorPage() {
     const [components, setComponents] = useState<SelectOption[][]>([]);
     const [fetchedComponents, setFetchedComponents] = useState<ConfiguratorItem[][]>([]);
-    const [hardwareSpec, setHardwareSpec] = useState<HardwareSpec>({name: '', description: '', price: '0', rating: 0});
+    const [hardwareSpec, setHardwareSpec] = useState<HardwareSpec>({ name: '', description: '', price: '0', rating: 0 });
     const [createSpecs, setCreateSpecs] = useState<SpecsIds>({
         cpuId: '', gpuId: '', motherboardId: '', ramId: '', ssdId: '', hddId: '', powerSupplyId: '', pcCaseId: ''
     });
-    const {user} = useAuth();
-    const {isLoginModalOpen, showLoginModal, hideLoginModal, handleLogin} = useLoginModal();
+    const { user } = useAuth();
+    const { isLoginModalOpen, showLoginModal, hideLoginModal, handleLogin } = useLoginModal();
 
     const navigate = useNavigate();
 
@@ -125,7 +125,7 @@ export default function ConfiguratorPage() {
                 const initialCreateSpecs = {} as SpecsIds;
                 const initialSelectedItems = {} as { [key in keyof SpecsIds]: ConfiguratorItem | null };
 
-                componentTypes.forEach(({key}) => {
+                componentTypes.forEach(({ key }) => {
                     initialCreateSpecs[key] = '';
                     initialSelectedItems[key] = null;
                 });
@@ -141,10 +141,6 @@ export default function ConfiguratorPage() {
         fetchComponents();
     }, []);
 
-    const handleGeneratePC = useCallback(() => {
-        setIsPreferencesModalOpen(true);
-    }, []);
-
     const handlePreferencesSave = async (type: string, price: string) => {
         if (!user) {
             showLoginModal();
@@ -157,8 +153,8 @@ export default function ConfiguratorPage() {
             const response = await axios.post<SpecsIds>('/api/configurator/gpt', [type, price]);
             const specsIds = response.data;
 
-            const updatedSelectedItems = {...selectedItems};
-            componentTypes.forEach(({key}) => {
+            const updatedSelectedItems = { ...selectedItems };
+            componentTypes.forEach(({ key }) => {
                 const item = fetchedComponents.flat().find(item => item.id === specsIds[key as keyof SpecsIds]);
                 if (item) {
                     updatedSelectedItems[key as keyof SpecsIds] = item;
@@ -177,10 +173,21 @@ export default function ConfiguratorPage() {
         }
     };
 
-    const saveValues = useCallback(() => {
+    const handleGeneratePC = useCallback(() => {
+        if (!user) {
+            showLoginModal();
+            return;
+        }
+        setIsPreferencesModalOpen(true);
+    }, [user, showLoginModal]);
 
+    const saveValues = useCallback(() => {
         const allValuesSelected = Object.values(createSpecs).every(value => value !== '');
-        if (!user || !allValuesSelected) {
+        if (!user) {
+            showLoginModal();
+            return;
+        }
+        if (!allValuesSelected) {
             toast.error('Please choose all values before saving!', {
                 position: 'top-center'
             });
@@ -271,8 +278,12 @@ export default function ConfiguratorPage() {
     }, [createSpecs.cpuId, createSpecs.gpuId, createSpecs.motherboardId, createSpecs.ramId, createSpecs.ssdId, createSpecs.hddId, isGeneratedByGPT]);
 
     const handleSelectChange = useCallback((e: ChangeEvent<HTMLSelectElement>, componentType: keyof SpecsIds) => {
-        const {value} = e.target;
-        setCreateSpecs(prev => ({...prev, [componentType]: value}));
+        const { value } = e.target;
+        if (!user) {
+            showLoginModal();
+            return;
+        }
+        setCreateSpecs(prev => ({ ...prev, [componentType]: value }));
         const selectedComponentData = components[componentTypes.findIndex(ct => ct.key === componentType)]?.find(item => item.id === value);
         if (selectedComponentData) {
             const selectedComponentItem = fetchedComponents[componentTypes.findIndex(ct => ct.key === componentType)]?.find(item => item.id === value);
@@ -288,7 +299,7 @@ export default function ConfiguratorPage() {
                 }));
             }
         }
-    }, [components, fetchedComponents]);
+    }, [components, fetchedComponents, user, showLoginModal]);
 
     useEffect(() => {
         const handleHashChange = () => {
@@ -316,12 +327,12 @@ export default function ConfiguratorPage() {
             <section className="left-section">
                 <h2>Hardware</h2>
                 <ul>
-                    {componentTypes.map(({key, icon, text}, index) => (
+                    {componentTypes.map(({ key, icon, text }, index) => (
                         <li className={`left-section__item${index === 1 ? " left-section__item--active" : ""}`}
                             key={key}>
                             <a href={`#${key}`}>
                                 <span className="left-section__icon">
-                                    <img src={icon} alt={text} className="left-section__img"/>
+                                    <img src={icon} alt={text} className="left-section__img" />
                                 </span>
                                 <span className="left-section__text">{text}</span>
                             </a>
@@ -330,7 +341,7 @@ export default function ConfiguratorPage() {
             </section>
 
             <article className="main-section">
-                {componentTypes.map(({key, text, defaultImage, path}) => (<div id={key} key={key}>
+                {componentTypes.map(({ key, text, defaultImage, path }) => (<div id={key} key={key}>
                     <ItemDetails
                         title={text}
                         selectedItem={selectedItems[key]}
@@ -355,7 +366,7 @@ export default function ConfiguratorPage() {
                 <h2 className="right-section__title">Do you have a problem creating your own PC?</h2>
                 <p className="right-section__text">Ask ChatGPT to create the best PC for you.</p>
                 <div className="right-section__icon">
-                    <img src={chatGptIcon} alt="ChatGPT Icon" className="right-section__img"/>
+                    <img src={chatGptIcon} alt="ChatGPT Icon" className="right-section__img" />
                 </div>
                 <button className="right-section__button" onClick={handleGeneratePC} disabled={isLoading}>
                     {isLoading ? 'Generating...' : 'Generate PC for me!!!'}
@@ -363,8 +374,8 @@ export default function ConfiguratorPage() {
             </section>
         </main>
 
-        <LoginModal isOpen={isLoginModalOpen} onLogin={handleLogin} onClose={hideLoginModal}/>
-        <ToastContainer position="top-center"/>
+        <LoginModal isOpen={isLoginModalOpen} onLogin={handleLogin} onClose={hideLoginModal} />
+        <ToastContainer position="top-center" />
         <CreatePCModal
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}

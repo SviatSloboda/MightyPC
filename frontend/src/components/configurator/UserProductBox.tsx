@@ -1,4 +1,4 @@
-import {Product} from "../../../model/pc/Product.tsx";
+import {Product} from "../../model/pc/Product.tsx";
 
 interface ProductBoxProps {
     product: Product;

@@ -10,7 +10,7 @@ import LoginModal from "../login/LoginModal.tsx";
 import gpuPhoto from "../../assets/hardware/gpu.png";
 
 export default function GpuPage() {
-    const [GPUs, setGPUs] = useState<GPU[]>([]);
+    const [gpus, setGpus] = useState<GPU[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const gpusPerPage = 8;
@@ -28,7 +28,7 @@ export default function GpuPage() {
         async function fetchGpus() {
             try {
                 const response = await axios.get(`/api/hardware/gpu/page?page=${currentPage}&size=${gpusPerPage}`);
-                setGPUs(response.data.content);
+                setGpus(response.data.content);
                 setTotalPages(response.data.totalPages);
             } catch (error) {
                 console.error("Failed to fetch GPUs:", error);
@@ -51,7 +51,7 @@ export default function GpuPage() {
         axios.post('/api/hardware/gpu', payload)
             .then(response => {
                 console.log('GPU added:', response.data);
-                setGPUs(prevGPUs => [...prevGPUs, response.data]);
+                setGpus(prevGPUs => [...prevGPUs, response.data]);
                 toggleModal();
             })
             .catch(error => console.error('Failed to add GPU:', error));
@@ -112,7 +112,7 @@ export default function GpuPage() {
         </Modal>
 
         <div className="product-list">
-            {GPUs.map(gpu => (<ProductBox
+            {gpus.map(gpu => (<ProductBox
                 key={gpu.id}
                 product={gpu}
                 imgSrc={gpu.gpuPhotos && gpu.gpuPhotos.length > 0 ? gpu.gpuPhotos[0] : gpuPhoto}

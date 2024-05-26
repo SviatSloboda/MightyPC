@@ -13,7 +13,7 @@ import {SpecsIds} from "../../model/pc/SpecsIds.tsx";
 import {PC} from "../../model/pc/PC.tsx";
 
 export default function PcsPage() {
-    const [PCs, setPCs] = useState<PC[]>([]);
+    const [pcs, setPcs] = useState<PC[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const pcsPerPage = 8;
@@ -27,18 +27,18 @@ export default function PcsPage() {
     const {isLoginModalOpen, showLoginModal, hideLoginModal, handleLogin} = useLoginModal();
 
     useEffect(() => {
-        const fetchPCs = async () => {
+        const fetchpcs = async () => {
             try {
                 const response = await axios.get(`/api/pc/page`, {
                     params: {page: currentPage, size: pcsPerPage}
                 });
-                setPCs(response.data.content);
+                setPcs(response.data.content);
                 setTotalPages(response.data.totalPages);
             } catch (error) {
-                console.error("Failed to fetch PCs:", error);
+                console.error("Failed to fetch pcs:", error);
             }
         };
-        fetchPCs();
+        fetchpcs();
     }, [currentPage, pcsPerPage]);
 
     const paginate = useCallback((pageNumber: number) => {
@@ -66,7 +66,7 @@ export default function PcsPage() {
         };
         axios.post('/api/pc', payload)
             .then(response => {
-                setPCs(prevPCs => [...prevPCs, response.data]);
+                setPcs(prevpcs => [...prevpcs, response.data]);
                 toggleModal();
             })
             .catch(error => console.error('Failed to add PC:', error));
@@ -95,7 +95,7 @@ export default function PcsPage() {
 
     return (
         <>
-            <h1 className="body--product-page">PCs List</h1>
+            <h1 className="body--product-page">pcs List</h1>
             {isSuperUser() && <button className="default-button" onClick={toggleModal}>Add PC</button>}
 
             <Modal show={modalOpen} onHide={toggleModal}>
@@ -169,7 +169,7 @@ export default function PcsPage() {
             </Modal>
 
             <div className="product-list">
-                {PCs.map(pc => (
+                {pcs.map(pc => (
                     <ProductBox
                         key={pc.id}
                         product={pc}

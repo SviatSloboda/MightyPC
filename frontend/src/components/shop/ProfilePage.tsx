@@ -75,10 +75,7 @@ export default function ProfilePage() {
             <h1 className="profile__email">Account created at: </h1>
             <span className="profile__creation-date">{user?.dateOfAccountCreation}</span>
 
-            {isSuperUser() &&
-                <>
-                    <h1 className="profile__email">You are super user! </h1>
-                </>}
+            {isSuperUser() && <h1 className="profile__email">You are super user! </h1>}
 
         </div>
 

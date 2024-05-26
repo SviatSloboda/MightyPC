@@ -10,7 +10,7 @@ import LoginModal from "../login/LoginModal.tsx";
 import pcCasePhoto from "../../assets/hardware/pcCase.png";
 
 export default function PcCasePage() {
-    const [PcCases, setPcCases] = useState<PcCase[]>([]);
+    const [pcCases, setPcCases] = useState<PcCase[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const pcCasesPerPage = 8;
@@ -26,17 +26,17 @@ export default function PcCasePage() {
     const [dimensions, setDimensions] = useState("");
 
     useEffect(() => {
-        async function fetchPcCases() {
+        async function fetchpcCases() {
             try {
                 const response = await axios.get(`/api/hardware/pc-case/page?page=${currentPage}&size=${pcCasesPerPage}`);
                 setPcCases(response.data.content);
                 setTotalPages(response.data.totalPages);
             } catch (error) {
-                console.error("Failed to fetch PcCases:", error);
+                console.error("Failed to fetch pcCases:", error);
             }
         }
 
-        fetchPcCases();
+        fetchpcCases();
     }, [currentPage, pcCasesPerPage]);
 
     function paginate(pageNumber: number) {
@@ -52,7 +52,7 @@ export default function PcCasePage() {
 
         axios.post('/api/hardware/pc-case', payload)
             .then(response => {
-                setPcCases(prevPcCases => [...prevPcCases, response.data]);
+                setPcCases(prevpcCases => [...prevpcCases, response.data]);
                 toggleModal();
             })
             .catch(error => console.error('Failed to add PcCase:', error));
@@ -114,7 +114,7 @@ export default function PcCasePage() {
 
 
         <div className="product-list">
-            {PcCases.map(pcCase => (<ProductBox
+            {pcCases.map(pcCase => (<ProductBox
                 key={pcCase.id}
                 product={pcCase}
                 imgSrc={pcCase.pcCasePhotos && pcCase.pcCasePhotos.length > 0 ? pcCase.pcCasePhotos[0] : pcCasePhoto}

@@ -10,7 +10,7 @@ import LoginModal from "../login/LoginModal.tsx";
 import hddPhoto from "../../assets/hardware/hdd.png";
 
 export default function HddPage() {
-    const [HDDs, setHDDs] = useState<HDD[]>([]);
+    const [hdds, setHdds] = useState<HDD[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const hddsPerPage = 8;
@@ -29,10 +29,10 @@ export default function HddPage() {
         async function fetchHdds() {
             try {
                 const response = await axios.get(`/api/hardware/hdd/page?page=${currentPage}&size=${hddsPerPage}`);
-                setHDDs(response.data.content);
+                setHdds(response.data.content);
                 setTotalPages(response.data.totalPages);
             } catch (error) {
-                console.error("Failed to fetch HDDs:", error);
+                console.error("Failed to fetch hdds:", error);
             }
         }
 
@@ -53,7 +53,7 @@ export default function HddPage() {
         axios.post('/api/hardware/hdd', payload)
             .then(response => {
                 console.log('HDD added:', response.data);
-                setHDDs(prevHDDs => [...prevHDDs, response.data]);
+                setHdds(prevhdds => [...prevhdds, response.data]);
                 toggleModal();
             })
             .catch(error => console.error('Failed to add HDD:', error));
@@ -119,7 +119,7 @@ export default function HddPage() {
         </Modal>
 
         <div className="product-list">
-            {HDDs.map(hdd => (<ProductBox
+            {hdds.map(hdd => (<ProductBox
                 key={hdd.id}
                 product={hdd}
                 imgSrc={hdd.hddPhotos && hdd.hddPhotos.length > 0 ? hdd.hddPhotos[0] : hddPhoto}
