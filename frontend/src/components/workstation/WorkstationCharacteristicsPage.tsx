@@ -149,13 +149,16 @@ export default function WorkstationCharacteristics() {
     return (<>
         <div className="product-characteristics">
             <div className="product-characteristics__slideshow-container">
-                {photos.map((photo, index) => (<div
-                    className={`product-characteristics__slide ${index === currentSlideIndex ? 'product-characteristics__slide--active' : ''}`}
-                    key={index}
-                >
-                    <div className="product-characteristics__number-text">{index + 1} / {photos.length}</div>
-                    <img src={photo} alt="Workstation" className="product-characteristics__photo-img"/>
-                </div>))}
+                {photos.map((photo) => (
+                    <div
+                        className={`product-characteristics__slide ${photos.indexOf(photo) === currentSlideIndex ? 'product-characteristics__slide--active' : ''}`}
+                        key={photo}
+                    >
+                        <div
+                            className="product-characteristics__number-text">{photos.indexOf(photo) + 1} / {photos.length}</div>
+                        <img src={photo} alt="WORKSTATION" className="product-characteristics__photo-img"/>
+                    </div>
+                ))}
                 {!photos.length &&
                     <img src={workstationPhoto} alt="Workstation" className="product-characteristics__photo-img"/>}
                 {photos.length >= 2 && (<>

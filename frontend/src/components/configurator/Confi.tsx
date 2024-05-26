@@ -1,16 +1,16 @@
-import { ChangeEvent, useCallback, useEffect, useState } from 'react';
+import {ChangeEvent, useCallback, useEffect, useState} from 'react';
 import axios from 'axios';
-import { useAuth } from "../../contexts/AuthContext";
-import { HardwareSpec } from "../../model/pc/hardware/HardwareSpec";
-import { SpecsIds } from "../../model/pc/SpecsIds";
+import {useAuth} from "../../contexts/AuthContext";
+import {HardwareSpec} from "../../model/pc/hardware/HardwareSpec";
+import {SpecsIds} from "../../model/pc/SpecsIds";
 import useLoginModal from "../login/useLoginModal.ts";
 import LoginModal from "../login/LoginModal.tsx";
 import chatGptIcon from "../../assets/icon/chatGpt-icon-link.png";
 
-import { toast, ToastContainer } from 'react-toastify';
+import {toast, ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useNavigate } from "react-router-dom";
-import { SpecsIdsForEnergyConsumption } from "../../model/pc/SpecsIdsForEnergyConsumption.tsx";
+import {useNavigate} from "react-router-dom";
+import {SpecsIdsForEnergyConsumption} from "../../model/pc/SpecsIdsForEnergyConsumption.tsx";
 import ItemDetails from "./ItemDetails.tsx";
 
 import gpuIcon from "../../assets/icon/gpu-icon-link.png";
@@ -57,27 +57,27 @@ interface SelectOption {
 
 const componentTypes = [{
     key: "cpuId", icon: cpuIcon, text: "CPU", defaultImage: cpuPhoto, path: "/hardware/cpu"
-}, { key: "gpuId", icon: gpuIcon, text: "GPU", defaultImage: gpuPhoto, path: "/hardware/gpu" }, {
+}, {key: "gpuId", icon: gpuIcon, text: "GPU", defaultImage: gpuPhoto, path: "/hardware/gpu"}, {
     key: "motherboardId",
     icon: motherboardIcon,
     text: "Motherboard",
     defaultImage: motherboardPhoto,
     path: "/hardware/motherboard"
-}, { key: "ramId", icon: ramIcon, text: "RAM", defaultImage: ramPhoto, path: "/hardware/ram" }, {
+}, {key: "ramId", icon: ramIcon, text: "RAM", defaultImage: ramPhoto, path: "/hardware/ram"}, {
     key: "ssdId", icon: ssdIcon, text: "SSD", defaultImage: ssdPhoto, path: "/hardware/ssd"
-}, { key: "hddId", icon: hddIcon, text: "HDD", defaultImage: hddPhoto, path: "/hardware/hdd" }, {
+}, {key: "hddId", icon: hddIcon, text: "HDD", defaultImage: hddPhoto, path: "/hardware/hdd"}, {
     key: "powerSupplyId", icon: psuIcon, text: "Power Supply", defaultImage: psuPhoto, path: "/hardware/psu"
-}, { key: "pcCaseId", icon: pcCaseIcon, text: "PC Case", defaultImage: pcCasePhoto, path: "/hardware/pc-case" }];
+}, {key: "pcCaseId", icon: pcCaseIcon, text: "PC Case", defaultImage: pcCasePhoto, path: "/hardware/pc-case"}];
 
 export default function ConfiguratorPage() {
     const [components, setComponents] = useState<SelectOption[][]>([]);
     const [fetchedComponents, setFetchedComponents] = useState<ConfiguratorItem[][]>([]);
-    const [hardwareSpec, setHardwareSpec] = useState<HardwareSpec>({ name: '', description: '', price: '0', rating: 0 });
+    const [hardwareSpec, setHardwareSpec] = useState<HardwareSpec>({name: '', description: '', price: '0', rating: 0});
     const [createSpecs, setCreateSpecs] = useState<SpecsIds>({
         cpuId: '', gpuId: '', motherboardId: '', ramId: '', ssdId: '', hddId: '', powerSupplyId: '', pcCaseId: ''
     });
-    const { user } = useAuth();
-    const { isLoginModalOpen, showLoginModal, hideLoginModal, handleLogin } = useLoginModal();
+    const {user} = useAuth();
+    const {isLoginModalOpen, showLoginModal, hideLoginModal, handleLogin} = useLoginModal();
 
     const navigate = useNavigate();
 
@@ -99,45 +99,46 @@ export default function ConfiguratorPage() {
 
     const totalPrice = Object.values(selectedItems).reduce((acc, item) => acc + (item ? parseFloat(item.price) : 0), 0);
 
-    useEffect(() => {
-        const fetchComponents = async () => {
-            try {
-                const response = await axios.get<ConfiguratorItems>('/api/configurator/items');
-                const fetchedComponents = response.data.itemsForConfigurator.map(componentCategory => componentCategory.map(item => ({
-                    id: item.id,
-                    displayValue: `${item.name} ($${item.price})`,
-                    name: item.name,
-                    price: item.price,
-                    image: item.image,
-                    pathNameForItemDetailsPage: item.pathNameForItemDetailsPage
-                })));
-                setComponents(fetchedComponents.map(componentCategory => componentCategory.map(({
-                                                                                                    id,
-                                                                                                    name,
-                                                                                                    price,
-                                                                                                    image,
-                                                                                                    pathNameForItemDetailsPage
-                                                                                                }) => ({
+    const fetchComponents = async () => {
+        try {
+            const response = await axios.get<ConfiguratorItems>('/api/configurator/items');
+            const fetchedComponents = response.data.itemsForConfigurator.map(componentCategory => componentCategory.map(item => ({
+                id: item.id,
+                displayValue: `${item.name} ($${item.price})`,
+                name: item.name,
+                price: item.price,
+                image: item.image,
+                pathNameForItemDetailsPage: item.pathNameForItemDetailsPage
+            })));
+            setComponents(fetchedComponents.map(componentCategory =>
+                componentCategory.map(({
+                                           id,
+                                           name,
+                                           price,
+                                           image,
+                                           pathNameForItemDetailsPage
+                                       }) => ({
                     id, displayValue: `${name} ($${price})`, name, price, image, pathNameForItemDetailsPage
                 }))));
-                setFetchedComponents(fetchedComponents as ConfiguratorItem[][]);
+            setFetchedComponents(fetchedComponents as ConfiguratorItem[][]);
 
-                const initialCreateSpecs = {} as SpecsIds;
-                const initialSelectedItems = {} as { [key in keyof SpecsIds]: ConfiguratorItem | null };
+            const initialCreateSpecs = {} as SpecsIds;
+            const initialSelectedItems = {} as { [key in keyof SpecsIds]: ConfiguratorItem | null };
 
-                componentTypes.forEach(({ key }) => {
-                    initialCreateSpecs[key] = '';
-                    initialSelectedItems[key] = null;
-                });
+            componentTypes.forEach(({key}) => {
+                initialCreateSpecs[key] = '';
+                initialSelectedItems[key] = null;
+            });
 
-                setCreateSpecs(initialCreateSpecs);
-                setSelectedItems(initialSelectedItems);
+            setCreateSpecs(initialCreateSpecs);
+            setSelectedItems(initialSelectedItems);
 
-            } catch (error) {
-                console.error('Failed to fetch components:', error);
-            }
-        };
+        } catch (error) {
+            console.error('Failed to fetch components:', error);
+        }
+    };
 
+    useEffect(() => {
         fetchComponents();
     }, []);
 
@@ -153,8 +154,8 @@ export default function ConfiguratorPage() {
             const response = await axios.post<SpecsIds>('/api/configurator/gpt', [type, price]);
             const specsIds = response.data;
 
-            const updatedSelectedItems = { ...selectedItems };
-            componentTypes.forEach(({ key }) => {
+            const updatedSelectedItems = {...selectedItems};
+            componentTypes.forEach(({key}) => {
                 const item = fetchedComponents.flat().find(item => item.id === specsIds[key as keyof SpecsIds]);
                 if (item) {
                     updatedSelectedItems[key as keyof SpecsIds] = item;
@@ -224,66 +225,66 @@ export default function ConfiguratorPage() {
         }
     };
 
-    useEffect(() => {
-        const fetchMotherboards = async () => {
-            if (createSpecs.cpuId && !isGeneratedByGPT) {
-                try {
-                    const cpuSocketResponse = await axios.get<string>(`/api/hardware/cpu/socket/${createSpecs.cpuId}`);
-                    const cpuSocket = cpuSocketResponse.data;
-                    const response = await axios.get<{
-                        [key: string]: string
-                    }>(`/api/configurator/motherboard/socket/${cpuSocket}`);
-                    const motherboardOptions: SelectOption[] = Object.entries(response.data).map(([id, name]) => ({
-                        id, displayValue: name, name, price: '', image: '', pathNameForItemDetailsPage: ''
-                    }));
-                    setComponents((prevComponents) => prevComponents.map((componentCategory, index) => Object.keys(createSpecs)[index] === 'motherboardId' ? motherboardOptions : componentCategory,));
-                } catch (error) {
-                    console.error('Failed to fetch motherboards:', error);
-                }
+    const fetchMotherboards = async () => {
+        if (createSpecs.cpuId && !isGeneratedByGPT) {
+            try {
+                const cpuSocketResponse = await axios.get<string>(`/api/hardware/cpu/socket/${createSpecs.cpuId}`);
+                const cpuSocket = cpuSocketResponse.data;
+                const response = await axios.get<{
+                    [key: string]: string
+                }>(`/api/configurator/motherboard/socket/${cpuSocket}`);
+                const motherboardOptions: SelectOption[] = Object.entries(response.data).map(([id, name]) => ({
+                    id, displayValue: name, name, price: '', image: '', pathNameForItemDetailsPage: ''
+                }));
+                setComponents((prevComponents) => prevComponents.map((componentCategory, index) => Object.keys(createSpecs)[index] === 'motherboardId' ? motherboardOptions : componentCategory));
+            } catch (error) {
+                console.error('Failed to fetch motherboards:', error);
             }
-        };
+        }
+    };
 
+    useEffect(() => {
         fetchMotherboards();
     }, [createSpecs.cpuId, isGeneratedByGPT]);
 
-    useEffect(() => {
-        const fetchPowerSupplies = async () => {
-            if (createSpecs.powerSupplyId && !isGeneratedByGPT) {
-                try {
-                    const payload: SpecsIdsForEnergyConsumption = {
-                        cpuId: createSpecs.cpuId,
-                        gpuId: createSpecs.gpuId,
-                        motherboardId: createSpecs.motherboardId,
-                        ramId: createSpecs.ramId,
-                        ssdId: createSpecs.ssdId,
-                        hddId: createSpecs.hddId,
-                    };
+    const fetchPowerSupplies = async () => {
+        if (createSpecs.powerSupplyId && !isGeneratedByGPT) {
+            try {
+                const payload: SpecsIdsForEnergyConsumption = {
+                    cpuId: createSpecs.cpuId,
+                    gpuId: createSpecs.gpuId,
+                    motherboardId: createSpecs.motherboardId,
+                    ramId: createSpecs.ramId,
+                    ssdId: createSpecs.ssdId,
+                    hddId: createSpecs.hddId,
+                };
 
-                    const response = await axios.post<{
-                        [key: string]: string
-                    }>(`/api/pc/configuration/calculate-energy-consumption`, payload);
+                const response = await axios.post<{
+                    [key: string]: string
+                }>(`/api/pc/configuration/calculate-energy-consumption`, payload);
 
-                    const powerSupplyOptions: SelectOption[] = Object.entries(response.data).map(([id, name]) => ({
-                        id, displayValue: name, name, price: '', image: '', pathNameForItemDetailsPage: ''
-                    }));
+                const powerSupplyOptions: SelectOption[] = Object.entries(response.data).map(([id, name]) => ({
+                    id, displayValue: name, name, price: '', image: '', pathNameForItemDetailsPage: ''
+                }));
 
-                    setComponents((prevComponents) => prevComponents.map((componentCategory, index) => Object.keys(createSpecs)[index] === 'powerSupplyId' ? powerSupplyOptions : componentCategory,));
-                } catch (error) {
-                    console.error('Failed to fetch power supplies!:', error);
-                }
+                setComponents((prevComponents) => prevComponents.map((componentCategory, index) => Object.keys(createSpecs)[index] === 'powerSupplyId' ? powerSupplyOptions : componentCategory));
+            } catch (error) {
+                console.error('Failed to fetch power supplies!:', error);
             }
-        };
+        }
+    };
 
+    useEffect(() => {
         fetchPowerSupplies();
     }, [createSpecs.cpuId, createSpecs.gpuId, createSpecs.motherboardId, createSpecs.ramId, createSpecs.ssdId, createSpecs.hddId, isGeneratedByGPT]);
 
     const handleSelectChange = useCallback((e: ChangeEvent<HTMLSelectElement>, componentType: keyof SpecsIds) => {
-        const { value } = e.target;
+        const {value} = e.target;
         if (!user) {
             showLoginModal();
             return;
         }
-        setCreateSpecs(prev => ({ ...prev, [componentType]: value }));
+        setCreateSpecs(prev => ({...prev, [componentType]: value}));
         const selectedComponentData = components[componentTypes.findIndex(ct => ct.key === componentType)]?.find(item => item.id === value);
         if (selectedComponentData) {
             const selectedComponentItem = fetchedComponents[componentTypes.findIndex(ct => ct.key === componentType)]?.find(item => item.id === value);
@@ -301,38 +302,38 @@ export default function ConfiguratorPage() {
         }
     }, [components, fetchedComponents, user, showLoginModal]);
 
+    const handleHashChange = useCallback(() => {
+        const element = document.getElementById(window.location.hash.replace('#', ''));
+        if (element) {
+            const headerOffset = 80;
+            const elementPosition = element.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.scrollY - headerOffset;
+
+            window.scrollTo({
+                top: offsetPosition, behavior: "smooth",
+            });
+        }
+    }, []);
+
     useEffect(() => {
-        const handleHashChange = () => {
-            const element = document.getElementById(window.location.hash.replace('#', ''));
-            if (element) {
-                const headerOffset = 80;
-                const elementPosition = element.getBoundingClientRect().top;
-                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-                window.scrollTo({
-                    top: offsetPosition, behavior: "smooth",
-                });
-            }
-        };
-
         window.addEventListener('hashchange', handleHashChange, false);
 
         return () => {
             window.removeEventListener('hashchange', handleHashChange, false);
         };
-    }, []);
+    }, [handleHashChange]);
 
     return (<>
         <main className="main-container">
             <section className="left-section">
                 <h2>Hardware</h2>
                 <ul>
-                    {componentTypes.map(({ key, icon, text }, index) => (
+                    {componentTypes.map(({key, icon, text}, index) => (
                         <li className={`left-section__item${index === 1 ? " left-section__item--active" : ""}`}
                             key={key}>
                             <a href={`#${key}`}>
                                 <span className="left-section__icon">
-                                    <img src={icon} alt={text} className="left-section__img" />
+                                    <img src={icon} alt={text} className="left-section__img"/>
                                 </span>
                                 <span className="left-section__text">{text}</span>
                             </a>
@@ -341,7 +342,7 @@ export default function ConfiguratorPage() {
             </section>
 
             <article className="main-section">
-                {componentTypes.map(({ key, text, defaultImage, path }) => (<div id={key} key={key}>
+                {componentTypes.map(({key, text, defaultImage, path}) => (<div id={key} key={key}>
                     <ItemDetails
                         title={text}
                         selectedItem={selectedItems[key]}
@@ -366,7 +367,7 @@ export default function ConfiguratorPage() {
                 <h2 className="right-section__title">Do you have a problem creating your own PC?</h2>
                 <p className="right-section__text">Ask ChatGPT to create the best PC for you.</p>
                 <div className="right-section__icon">
-                    <img src={chatGptIcon} alt="ChatGPT Icon" className="right-section__img" />
+                    <img src={chatGptIcon} alt="ChatGPT Icon" className="right-section__img"/>
                 </div>
                 <button className="right-section__button" onClick={handleGeneratePC} disabled={isLoading}>
                     {isLoading ? 'Generating...' : 'Generate PC for me!!!'}
@@ -374,8 +375,8 @@ export default function ConfiguratorPage() {
             </section>
         </main>
 
-        <LoginModal isOpen={isLoginModalOpen} onLogin={handleLogin} onClose={hideLoginModal} />
-        <ToastContainer position="top-center" />
+        <LoginModal isOpen={isLoginModalOpen} onLogin={handleLogin} onClose={hideLoginModal}/>
+        <ToastContainer position="top-center"/>
         <CreatePCModal
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}

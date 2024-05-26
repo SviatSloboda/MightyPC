@@ -112,12 +112,13 @@ export default function PcCaseCharacteristics() {
         <>
             <div className="product-characteristics">
                 <div className="product-characteristics__slideshow-container">
-                    {photos.map((photo, index) => (
+                    {photos.map((photo) => (
                         <div
-                            className={`product-characteristics__slide ${index === currentSlideIndex ? 'product-characteristics__slide--active' : ''}`}
-                            key={index}
+                            className={`product-characteristics__slide ${photos.indexOf(photo) === currentSlideIndex ? 'product-characteristics__slide--active' : ''}`}
+                            key={photo}
                         >
-                            <div className="product-characteristics__number-text">{index + 1} / {photos.length}</div>
+                            <div
+                                className="product-characteristics__number-text">{photos.indexOf(photo) + 1} / {photos.length}</div>
                             <img src={photo} alt="PcCase" className="product-characteristics__photo-img"/>
                         </div>
                     ))}
