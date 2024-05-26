@@ -48,8 +48,10 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http, CustomOAuth2UserService customOAuth2UserService) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/configurator/**").hasAnyRole("CUSTOMER", "ADMIN", "MANAGER")
-                        .requestMatchers("/api/user-pcs/**").hasAnyRole("CUSTOMER", "ADMIN", "MANAGER")
+                        .requestMatchers(HttpMethod.GET, "/api/configurator/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/configurator/**").authenticated()
+
+                        .requestMatchers("/api/user-pcs/**").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/user-pcs/{userId}/{pcId}/promote").hasAnyRole("MANAGER", "ADMIN")
 
                         .requestMatchers(HttpMethod.GET, "/api/hardware/**").permitAll()
@@ -72,14 +74,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/user/{userId}/set-password").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/user/{userId}/set-password").authenticated()
 
-                        .requestMatchers(HttpMethod.GET,"/api/basket/**").authenticated()
-                        .requestMatchers(HttpMethod.GET,"/api/basket/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE,"/api/basket/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/basket/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/basket/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/basket/**").authenticated()
 
-                        .requestMatchers(HttpMethod.GET,"/api/order/**").authenticated()
-                        .requestMatchers(HttpMethod.POST,"/api/order/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE,"/api/order/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE,"/api/order/**").hasAnyRole("MANAGER","ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/order/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/order/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/order/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/order/**").hasAnyRole("MANAGER", "ADMIN")
 
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))

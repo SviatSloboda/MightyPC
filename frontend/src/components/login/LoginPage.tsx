@@ -5,7 +5,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import RegisterModal from './RegisterModal';
 import { useAuth } from '../../contexts/AuthContext.tsx';
-import { googleLogin } from '../../contexts/authUtils.ts'; // Import the external modal
 
 export default function LoginPage() {
     const { updateUser } = useAuth();
@@ -38,7 +37,9 @@ export default function LoginPage() {
         }
     };
 
-    const handleGoogleLogin = () => googleLogin();
+    const handleGoogleLogin = () => {
+        window.location.href = "http://localhost:8080/oauth2/authorization/google"
+    }
     const handleGitHubLogin = () => {
         window.location.href = "http://localhost:8080/oauth2/authorization/github";
     };

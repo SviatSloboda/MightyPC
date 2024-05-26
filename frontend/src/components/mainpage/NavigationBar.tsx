@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo.jpg';
-import axios from "axios";
 import { useAuth } from "../../contexts/AuthContext.tsx";
 
 export default function NavigationBar() {
-    const { user, updateUser } = useAuth();
+    const { user, logout, isLoading } = useAuth();
     const navigate = useNavigate();
 
     const [accountMenuOpen, setAccountMenuOpen] = useState(false);
@@ -18,14 +17,55 @@ export default function NavigationBar() {
         setAccountMenuOpen(false);
     };
 
-    const logout = async () => {
-        try {
-            await axios.post('/api/logout', {}, { withCredentials: true });
-            updateUser(null);
-            window.location.href = '/';
-        } catch (error) {
-            console.error('Logout failed', error);
+    const handleLogout = async () => {
+        await logout();
+        navigate('/');
+    };
+
+    const renderAccountDropdown = () => {
+        if (isLoading) {
+            return <div>Loading...</div>;
         }
+
+        if (user) {
+            return (
+                <>
+                    <Link to="/user" className="nav__account-dropdown-link" onClick={closeAccountMenu}>
+                        Profile
+                    </Link>
+                    <Link to="/user-pcs" className="nav__account-dropdown-link" onClick={closeAccountMenu}>
+                        My PCs
+                    </Link>
+                    <Link to="/order" className="nav__account-dropdown-link" onClick={closeAccountMenu}>
+                        Orders
+                    </Link>
+                    <Link to="/basket" className="nav__account-dropdown-link" onClick={closeAccountMenu}>
+                        Basket
+                    </Link>
+                    <button
+                        className="nav__account-dropdown-link"
+                        onClick={() => {
+                            handleLogout();
+                            closeAccountMenu();
+                        }}
+                    >
+                        Logout
+                    </button>
+                </>
+            );
+        }
+
+        return (
+            <button
+                className="nav__account-dropdown-link"
+                onClick={() => {
+                    navigate("/user/login");
+                    closeAccountMenu();
+                }}
+            >
+                Login
+            </button>
+        );
     };
 
     return (
@@ -48,42 +88,7 @@ export default function NavigationBar() {
 
             {accountMenuOpen && (
                 <div className="nav__account-dropdown">
-                    {!user && (
-                        <button
-                            className="nav__account-dropdown-link"
-                            onClick={() => {
-                                navigate("/user/login");
-                                closeAccountMenu();
-                            }}
-                        >
-                            Login
-                        </button>
-                    )}
-                    {user && (
-                        <>
-                            <Link to="/user" className="nav__account-dropdown-link" onClick={closeAccountMenu}>
-                                Profile
-                            </Link>
-                            <Link to="/user-pcs" className="nav__account-dropdown-link" onClick={closeAccountMenu}>
-                                My PCs
-                            </Link>
-                            <Link to="/order" className="nav__account-dropdown-link" onClick={closeAccountMenu}>
-                                Orders
-                            </Link>
-                            <Link to="/basket" className="nav__account-dropdown-link" onClick={closeAccountMenu}>
-                                Basket
-                            </Link>
-                            <button
-                                className="nav__account-dropdown-link"
-                                onClick={() => {
-                                    logout();
-                                    closeAccountMenu();
-                                }}
-                            >
-                                Logout
-                            </button>
-                        </>
-                    )}
+                    {renderAccountDropdown()}
                 </div>
             )}
         </nav>
