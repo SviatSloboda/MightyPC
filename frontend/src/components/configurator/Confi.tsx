@@ -1,7 +1,7 @@
 import {ChangeEvent, useCallback, useEffect, useState} from 'react';
 import axios from 'axios';
 import {useAuth} from "../../contexts/AuthContext";
-import {HardwareSpec} from "../../model/pc/hardware/HardwareSpec";
+import {HardwareSpec} from "../../model/hardware/HardwareSpec";
 import {SpecsIds} from "../../model/pc/SpecsIds";
 import useLoginModal from "../login/useLoginModal.ts";
 import LoginModal from "../login/LoginModal.tsx";
@@ -33,18 +33,8 @@ import psuPhoto from "../../assets/hardware/psu.png";
 import pcCasePhoto from "../../assets/hardware/pcCase.png";
 import CreatePCModal from "./CreatePcModal.tsx";
 import PreferencesModal from "./PrefencesModal.tsx";
-
-interface ConfiguratorItem {
-    id: string;
-    name: string;
-    price: string;
-    image: string;
-    pathNameForItemDetailsPage: string;
-}
-
-interface ConfiguratorItems {
-    itemsForConfigurator: ConfiguratorItem[][];
-}
+import {ConfiguratorItem} from "../../model/configurator/ConfiguratorItem.tsx";
+import {ConfiguratorItems} from "../../model/configurator/ConfiguratorItems.tsx";
 
 interface SelectOption {
     id: string;

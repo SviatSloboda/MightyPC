@@ -1,4 +1,4 @@
-import {HardwareSpec} from "./hardware/HardwareSpec.tsx";
+import {HardwareSpec} from "../hardware/HardwareSpec.tsx";
 import {SpecsNames} from "./SpecsNames.tsx";
 import {SpecsIds} from "./SpecsIds.tsx";
 

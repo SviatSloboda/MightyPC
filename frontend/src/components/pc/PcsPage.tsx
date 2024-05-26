@@ -8,7 +8,7 @@ import ProductBox from "../hardware/utils/ProductBox";
 import useLoginModal from "../login/useLoginModal.ts";
 import LoginModal from "../login/LoginModal.tsx";
 import {useModal} from "../hardware/utils/Modal";
-import {HardwareSpec} from "../../model/pc/hardware/HardwareSpec.tsx";
+import {HardwareSpec} from "../../model/hardware/HardwareSpec.tsx";
 import {SpecsIds} from "../../model/pc/SpecsIds.tsx";
 import {PC} from "../../model/pc/PC.tsx";
 

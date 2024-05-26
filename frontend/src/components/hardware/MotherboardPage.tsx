@@ -3,7 +3,7 @@ import axios from 'axios';
 import ProductBox from './utils/ProductBox.tsx';
 import Modal, {useModal} from './utils/Modal.tsx';
 import {useNavigate} from "react-router-dom";
-import {Motherboard} from "../../model/pc/hardware/Motherboard.tsx";
+import {Motherboard} from "../../model/hardware/Motherboard.tsx";
 import {useAuth} from "../../contexts/AuthContext.tsx";
 import useLoginModal from "../login/useLoginModal.ts";
 import LoginModal from "../login/LoginModal.tsx";

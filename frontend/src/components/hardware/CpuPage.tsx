@@ -4,7 +4,7 @@ import ProductBox from './utils/ProductBox.tsx';
 import Modal, {useModal} from './utils/Modal.tsx';
 import {useNavigate} from "react-router-dom";
 import cpuPhoto from "../../assets/hardware/cpu.png";
-import {CPU} from "../../model/pc/hardware/CPU.tsx";
+import {CPU} from "../../model/hardware/CPU.tsx";
 import {useAuth} from "../../contexts/AuthContext.tsx";
 import useLoginModal from "../login/useLoginModal.ts";
 import LoginModal from "../login/LoginModal.tsx";

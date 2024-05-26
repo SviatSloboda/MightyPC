@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
 import {useNavigate, useParams} from "react-router-dom";
-import {PcCase} from "../../../model/pc/hardware/PcCase.tsx";
+import {PcCase} from "../../../model/hardware/PcCase.tsx";
 import Photo from "../utils/Photo.tsx";
 import {useAuth} from "../../../contexts/AuthContext.tsx";
 import useLoginModal from "../../login/useLoginModal.ts";

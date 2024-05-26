@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
 import {useNavigate, useParams} from "react-router-dom";
-import {CPU} from "../../../model/pc/hardware/CPU.tsx";
+import {CPU} from "../../../model/hardware/CPU.tsx";
 import cpuPhoto from "../../../assets/hardware/cpu.png";
 import Photo from "../utils/Photo.tsx";
 import Rating from "../utils/Rating.tsx";
