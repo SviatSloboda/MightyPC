@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/ssd/upload")
+@RequestMapping("/api/hardware/ssd/upload")
 public class SsdUploadController {
     private final CloudinaryService cloudinaryService;
     private final SsdService ssdService;

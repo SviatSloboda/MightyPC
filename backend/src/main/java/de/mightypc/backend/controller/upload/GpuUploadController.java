@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/gpu/upload")
+@RequestMapping("/api/hardware/gpu/upload")
 public class GpuUploadController {
     private final CloudinaryService cloudinaryService;
     private final GpuService gpuService;

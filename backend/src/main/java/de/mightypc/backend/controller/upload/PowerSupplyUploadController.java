@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/psu/upload")
+@RequestMapping("/api/hardware/psu/upload")
 public class PowerSupplyUploadController {
     private final CloudinaryService cloudinaryService;
     private final PowerSupplyService powerSupplyService;

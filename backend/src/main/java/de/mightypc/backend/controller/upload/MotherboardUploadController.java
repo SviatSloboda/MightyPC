@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/motherboard/upload")
+@RequestMapping("/api/hardware/motherboard/upload")
 public class MotherboardUploadController {
     private final CloudinaryService cloudinaryService;
     private final MotherboardService motherboardService;

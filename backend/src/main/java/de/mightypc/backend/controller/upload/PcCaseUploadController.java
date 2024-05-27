@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/pc-case/upload")
+@RequestMapping("/api/hardware/pc-case/upload")
 public class PcCaseUploadController {
     private final CloudinaryService cloudinaryService;
     private final PcCaseService pcCaseService;

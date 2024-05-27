@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/ram/upload")
+@RequestMapping("/api/hardware/ram/upload")
 public class RamUploadController {
     private final CloudinaryService cloudinaryService;
     private final RamService ramService;

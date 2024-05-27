@@ -18,7 +18,7 @@ const hardwareItems = [{name: 'CPU', image: cpu, path: '/hardware/cpu'}, {
     name: 'PC Case', image: pcCase, path: '/hardware/pc-case'
 },];
 
-export default function HardwarePage() {
+export default function HardwareNavigationPage() {
     return (<section className="hardware-section">
             {hardwareItems.map((item) => (<Link to={item.path} className="hardware-item" key={item.name}>
                 <img src={`${item.image}`} alt={`${item.name}`} className="hardware-item__image"/>

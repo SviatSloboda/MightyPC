@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/hdd/upload")
+@RequestMapping("/api/hardware/hdd/upload")
 public class HddUploadController {
     private final CloudinaryService cloudinaryService;
     private final HddService hddService;
