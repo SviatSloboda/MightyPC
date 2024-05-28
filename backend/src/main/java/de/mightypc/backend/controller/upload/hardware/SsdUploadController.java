@@ -1,7 +1,7 @@
-package de.mightypc.backend.controller.upload;
+package de.mightypc.backend.controller.upload.hardware;
 
 import de.mightypc.backend.service.CloudinaryService;
-import de.mightypc.backend.service.hardware.PcCaseService;
+import de.mightypc.backend.service.hardware.SsdService;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,14 +16,14 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/hardware/pc-case/upload")
-public class PcCaseUploadController {
+@RequestMapping("/api/hardware/ssd/upload")
+public class SsdUploadController {
     private final CloudinaryService cloudinaryService;
-    private final PcCaseService pcCaseService;
+    private final SsdService ssdService;
 
-    public PcCaseUploadController(CloudinaryService cloudinaryService, PcCaseService pcCaseService) {
+    public SsdUploadController(CloudinaryService cloudinaryService, SsdService ssdService) {
         this.cloudinaryService = cloudinaryService;
-        this.pcCaseService = pcCaseService;
+        this.ssdService = ssdService;
     }
 
     @PostMapping("/image/{id}")
@@ -31,7 +31,7 @@ public class PcCaseUploadController {
     public String uploadImage(@RequestPart(name = "file") MultipartFile file,
                               @PathVariable String id) throws IOException {
         String photoUrl = cloudinaryService.uploadFile(file);
-        pcCaseService.attachPhoto(id, photoUrl);
+        ssdService.attachPhoto(id, photoUrl);
         return photoUrl;
     }
 }

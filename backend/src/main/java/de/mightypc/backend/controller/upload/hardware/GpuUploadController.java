@@ -1,7 +1,7 @@
-package de.mightypc.backend.controller.upload;
+package de.mightypc.backend.controller.upload.hardware;
 
 import de.mightypc.backend.service.CloudinaryService;
-import de.mightypc.backend.service.hardware.MotherboardService;
+import de.mightypc.backend.service.hardware.GpuService;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,14 +16,14 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/hardware/motherboard/upload")
-public class MotherboardUploadController {
+@RequestMapping("/api/hardware/gpu/upload")
+public class GpuUploadController {
     private final CloudinaryService cloudinaryService;
-    private final MotherboardService motherboardService;
+    private final GpuService gpuService;
 
-    public MotherboardUploadController(CloudinaryService cloudinaryService, MotherboardService motherboardService) {
+    public GpuUploadController(CloudinaryService cloudinaryService, GpuService gpuService) {
         this.cloudinaryService = cloudinaryService;
-        this.motherboardService = motherboardService;
+        this.gpuService = gpuService;
     }
 
     @PostMapping("/image/{id}")
@@ -31,7 +31,7 @@ public class MotherboardUploadController {
     public String uploadImage(@RequestPart(name = "file") MultipartFile file,
                               @PathVariable String id) throws IOException {
         String photoUrl = cloudinaryService.uploadFile(file);
-        motherboardService.attachPhoto(id, photoUrl);
+        gpuService.attachPhoto(id, photoUrl);
         return photoUrl;
     }
 }

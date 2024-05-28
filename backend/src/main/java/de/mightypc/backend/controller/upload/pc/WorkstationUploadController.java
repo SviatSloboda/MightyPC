@@ -1,8 +1,7 @@
-package de.mightypc.backend.controller.upload;
+package de.mightypc.backend.controller.upload.pc;
 
 import de.mightypc.backend.service.CloudinaryService;
-
-import de.mightypc.backend.service.pc.PcService;
+import de.mightypc.backend.service.pc.WorkstationService;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,14 +16,14 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/pc/upload")
-public class PcUploadController {
+@RequestMapping("/api/workstation/upload")
+public class WorkstationUploadController {
     private final CloudinaryService cloudinaryService;
-    private final PcService pcService;
+    private final WorkstationService workstationService;
 
-    public PcUploadController(CloudinaryService cloudinaryService, PcService pcService) {
+    public WorkstationUploadController(CloudinaryService cloudinaryService, WorkstationService workstationService) {
         this.cloudinaryService = cloudinaryService;
-        this.pcService = pcService;
+        this.workstationService = workstationService;
     }
 
     @PostMapping("/image/{id}")
@@ -32,7 +31,7 @@ public class PcUploadController {
     public String uploadImage(@RequestPart(name = "file") MultipartFile file,
                               @PathVariable String id) throws IOException {
         String photoUrl = cloudinaryService.uploadFile(file);
-        pcService.attachPhoto(id, photoUrl);
+        workstationService.attachPhoto(id, photoUrl);
         return photoUrl;
     }
 }

@@ -1,7 +1,7 @@
-package de.mightypc.backend.controller.upload;
+package de.mightypc.backend.controller.upload.hardware;
 
 import de.mightypc.backend.service.CloudinaryService;
-import de.mightypc.backend.service.hardware.RamService;
+import de.mightypc.backend.service.hardware.PcCaseService;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,14 +16,14 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/hardware/ram/upload")
-public class RamUploadController {
+@RequestMapping("/api/hardware/pc-case/upload")
+public class PcCaseUploadController {
     private final CloudinaryService cloudinaryService;
-    private final RamService ramService;
+    private final PcCaseService pcCaseService;
 
-    public RamUploadController(CloudinaryService cloudinaryService, RamService ramService) {
+    public PcCaseUploadController(CloudinaryService cloudinaryService, PcCaseService pcCaseService) {
         this.cloudinaryService = cloudinaryService;
-        this.ramService = ramService;
+        this.pcCaseService = pcCaseService;
     }
 
     @PostMapping("/image/{id}")
@@ -31,7 +31,7 @@ public class RamUploadController {
     public String uploadImage(@RequestPart(name = "file") MultipartFile file,
                               @PathVariable String id) throws IOException {
         String photoUrl = cloudinaryService.uploadFile(file);
-        ramService.attachPhoto(id, photoUrl);
+        pcCaseService.attachPhoto(id, photoUrl);
         return photoUrl;
     }
 }

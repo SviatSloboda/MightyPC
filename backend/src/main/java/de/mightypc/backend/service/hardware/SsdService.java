@@ -35,16 +35,12 @@ public class SsdService extends BaseService<SSD, SsdRepository, SsdNotFoundExcep
         return entity.hardwareSpec().name();
     }
 
-    @Override
     @Transactional
     public SSD attachPhoto(String id, String photoUrl) {
         SSD currSSD = getById(id);
-
         ArrayList<String> photos = new ArrayList<>(currSSD.ssdPhotos());
-
         photos.addFirst(photoUrl);
         SSD updatedSSD = currSSD.withPhotos(photos);
-
         return repository.save(updatedSSD);
     }
 
@@ -52,15 +48,14 @@ public class SsdService extends BaseService<SSD, SsdRepository, SsdNotFoundExcep
     public String getAllNamesWithPrices() {
         StringBuilder stringBuilder = new StringBuilder("$ssds:\n");
         List<SSD> allSsds = getAllWithSortingOfPriceDesc();
-
         for (SSD ssd : allSsds) {
             String ssdAsString = "{" + ssd.id() + ":" + ssd.hardwareSpec().name() + ":($" + ssd.hardwareSpec().price() + ")}\n";
             stringBuilder.append(ssdAsString);
         }
-
         return stringBuilder.toString();
     }
 
+    @Transactional(readOnly = true)
     public List<String> getAllIds() {
         return getAllWithSortingOfPriceDesc().stream().map(SSD::id).toList();
     }
@@ -68,16 +63,12 @@ public class SsdService extends BaseService<SSD, SsdRepository, SsdNotFoundExcep
     @Transactional(readOnly = true)
     public List<ItemForConfigurator> getAllHardwareInfoForConfiguration() {
         List<ItemForConfigurator> items = new ArrayList<>();
-
         List<SSD> allSsds = getAllWithSortingOfPriceDesc();
-
         for (SSD ssd : allSsds) {
             String ssdPhoto = "";
-
             if (!ssd.ssdPhotos().isEmpty()) {
                 ssdPhoto = ssd.ssdPhotos().getFirst();
             }
-
             items.add(new ItemForConfigurator(
                     ssd.id(),
                     ssd.hardwareSpec().name(),
@@ -86,93 +77,62 @@ public class SsdService extends BaseService<SSD, SsdRepository, SsdNotFoundExcep
                     "ssd"
             ));
         }
-
         return items;
     }
 
     @Transactional(readOnly = true)
-    public Page<SSD> getAllWithSortingOfPriceDescAsPages(Pageable pageable) {
-        return new PageImpl<>(getAllWithSortingOfPriceDesc(), pageable, 8);
+    public Page<SSD> getSsds(Pageable pageable, String sortType, Integer lowestPrice, Integer highestPrice, Integer minimalCapacity, Integer maximalCapacity) {
+        List<SSD> ssds = getAll();
+
+        if (lowestPrice != null && highestPrice != null) {
+            ssds = ssds.stream()
+                    .filter(ssd -> ssd.hardwareSpec().price().intValue() >= lowestPrice &&
+                                   ssd.hardwareSpec().price().intValue() <= highestPrice)
+                    .toList();
+        }
+
+        if (minimalCapacity != null && maximalCapacity != null) {
+            ssds = ssds.stream()
+                    .filter(ssd -> ssd.capacity() >= minimalCapacity &&
+                                   ssd.capacity() <= maximalCapacity)
+                    .toList();
+        }
+
+        switch (sortType) {
+            case "price-asc":
+                ssds = ssds.stream()
+                        .sorted(Comparator.comparing(ssd -> ssd.hardwareSpec().price()))
+                        .toList();
+                break;
+            case "price-desc":
+                ssds = ssds.stream()
+                        .sorted(Comparator.comparing((SSD ssd) -> ssd.hardwareSpec().price()).reversed())
+                        .toList();
+                break;
+            case "rating-asc":
+                ssds = ssds.stream()
+                        .sorted(Comparator.comparing(ssd -> ssd.hardwareSpec().rating()))
+                        .toList();
+                break;
+            case "rating-desc":
+                ssds = ssds.stream()
+                        .sorted(Comparator.comparing((SSD ssd) -> ssd.hardwareSpec().rating()).reversed())
+                        .toList();
+                break;
+            default:
+                break;
+        }
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), ssds.size());
+        return new PageImpl<>(ssds.subList(start, end), pageable, ssds.size());
     }
 
-    @Transactional(readOnly = true)
-    public Page<SSD> getAllWithSortingOfPriceAscAsPages(Pageable pageable) {
-        return new PageImpl<>(getAllWithSortingOfPriceAsc(), pageable, 8);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<SSD> getAllWithSortingOfRatingDescAsPages(Pageable pageable) {
-        return new PageImpl<>(getAllWithSortingOfRatingDesc(), pageable, 8);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<SSD> getAllWithSortingOfRatingAscAsPages(Pageable pageable) {
-        return new PageImpl<>(getAllWithSortingOfRatingAsc(), pageable, 8);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<SSD> getAllWithFilteringByPriceAsPages(Pageable pageable, int lowestPrice, int highestPrice) {
-        return new PageImpl<>(getAllWithFilteringByPrice(lowestPrice, highestPrice), pageable, 8);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<SSD> getAllWithFilteringByEnergyConsumptionAsPages(Pageable pageable, int lowestEnergyConsumption, int highestEnergyConsumption) {
-        return new PageImpl<>(getAllWithFilteringByEnergyConsumption(lowestEnergyConsumption, highestEnergyConsumption), pageable, 8);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<SSD> getAllWithFilteringByCapacityAsPages(Pageable pageable, int minimalCapacity, int maximalCapacity) {
-        return new PageImpl<>(getAllWithFilteringByCapacity(minimalCapacity, maximalCapacity), pageable, 8);
-    }
 
     private List<SSD> getAllWithSortingOfPriceDesc() {
         return getAll()
                 .stream()
-                .sorted(Comparator.comparing(ssd -> ssd.hardwareSpec().price()))
-                .toList()
-                .reversed();
-    }
-
-    private List<SSD> getAllWithSortingOfPriceAsc() {
-        return getAll()
-                .stream()
-                .sorted(Comparator.comparing(ssd -> ssd.hardwareSpec().price()))
-                .toList();
-    }
-
-    private List<SSD> getAllWithSortingOfRatingDesc() {
-        return getAll()
-                .stream()
-                .sorted(Comparator.comparing(ssd -> ssd.hardwareSpec().rating()))
-                .toList()
-                .reversed();
-    }
-
-    private List<SSD> getAllWithSortingOfRatingAsc() {
-        return getAll()
-                .stream()
-                .sorted(Comparator.comparing(ssd -> ssd.hardwareSpec().rating()))
-                .toList();
-    }
-
-    private List<SSD> getAllWithFilteringByPrice(int lowestPrice, int highestPrice) {
-        return getAll().stream()
-                .filter(ssd -> ssd.hardwareSpec().price().intValue() >= lowestPrice
-                               && ssd.hardwareSpec().price().intValue() <= highestPrice)
-                .toList();
-    }
-
-    private List<SSD> getAllWithFilteringByCapacity(int minimalCapacity, int maximalCapacity) {
-        return getAll().stream()
-                .filter(ssd -> ssd.capacity() >= minimalCapacity
-                               && ssd.capacity() <= maximalCapacity)
-                .toList();
-    }
-
-    private List<SSD> getAllWithFilteringByEnergyConsumption(int lowestEnergyConsumption, int highestEnergyConsumption) {
-        return getAll().stream()
-                .filter(ssd -> ssd.energyConsumption() >= lowestEnergyConsumption
-                               && ssd.energyConsumption() <= highestEnergyConsumption)
+                .sorted(Comparator.comparing((SSD ssd) -> ssd.hardwareSpec().price()).reversed())
                 .toList();
     }
 }

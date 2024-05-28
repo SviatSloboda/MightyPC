@@ -54,40 +54,20 @@ public class PowerSupplyController extends BaseController<PowerSupply, PowerSupp
         }
     }
 
-    @GetMapping("/sort/price")
-    public Page<PowerSupply> getSortedPowerSuppliesByPrice(Pageable pageable, @RequestParam(value = "type", defaultValue = "desc") String type) {
-        if (type.equals("desc")) {
-            return service.getAllWithSortingOfPriceDescAsPages(pageable);
-        } else if (type.equals("asc")) {
-            return service.getAllWithSortingOfPriceAscAsPages(pageable);
-        } else {
-            throw new IllegalStateException("Not matching value! Accepted only desc and asc!!!");
-        }
+    @GetMapping("/page")
+    public Page<PowerSupply> getAllByPage(Pageable pageable) {
+        return service.getAllByPage(pageable);
     }
 
-    @GetMapping("/sort/rating")
-    public Page<PowerSupply> getSortedPowerSuppliesByRating(Pageable pageable, @RequestParam(value = "type", defaultValue = "desc") String type) {
-        if (type.equals("desc")) {
-            return service.getAllWithSortingOfRatingDescAsPages(pageable);
-        } else if (type.equals("asc")) {
-            return service.getAllWithSortingOfRatingAscAsPages(pageable);
-        } else {
-            throw new IllegalStateException("Not matching value! Accepted only desc and asc!!!");
-        }
-    }
+    @GetMapping("/filtered")
+    public Page<PowerSupply> getPowerSupplies(Pageable pageable,
+                                              @RequestParam(value = "sortType", required = false) String sortType,
+                                              @RequestParam(value = "lowestPrice", required = false) Integer lowestPrice,
+                                              @RequestParam(value = "highestPrice", required = false) Integer highestPrice,
+                                              @RequestParam(value = "minimalPower", required = false) Integer minimalPower,
+                                              @RequestParam(value = "maximalPower", required = false) Integer maximalPower) {
 
-    @GetMapping("/filter/price")
-    public Page<PowerSupply> getFilteredPowerSuppliesByPrice(Pageable pageable,
-                                                             @RequestParam(value = "lowest", defaultValue = "0") int lowestPrice,
-                                                             @RequestParam(value = "highest", defaultValue = "999999") int highestPrice
-    ) {
-        return service.getAllWithFilteringByPriceAsPages(pageable, lowestPrice, highestPrice);
-    }
-
-    @GetMapping("/filter/power")
-    public Page<PowerSupply> getFilteredPowerSuppliesByPower(Pageable pageable,
-                                                             @RequestParam(value = "lowest", defaultValue = "0") int minimalPower,
-                                                             @RequestParam(value = "highest", defaultValue = "999999") int maximalPower) {
-        return service.getAllWithFilteringByPowerAsPages(pageable, minimalPower, maximalPower);
+        return service.getPowerSupplies(pageable, sortType, lowestPrice, highestPrice, minimalPower, maximalPower);
     }
 }
+

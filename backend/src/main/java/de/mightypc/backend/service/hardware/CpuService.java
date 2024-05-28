@@ -39,12 +39,9 @@ public class CpuService extends BaseService<CPU, CpuRepository, CpuNotFoundExcep
     @Transactional
     public CPU attachPhoto(String id, String photoUrl) {
         CPU currCpu = getById(id);
-
         ArrayList<String> photos = new ArrayList<>(currCpu.cpuPhotos());
-
         photos.addFirst(photoUrl);
         CPU updatedCpu = currCpu.withPhotos(photos);
-
         return repository.save(updatedCpu);
     }
 
@@ -52,12 +49,10 @@ public class CpuService extends BaseService<CPU, CpuRepository, CpuNotFoundExcep
     public String getAllNamesWithPrices() {
         StringBuilder stringBuilder = new StringBuilder("$cpus:\n");
         List<CPU> allCpus = getAllWithSortingOfPriceDesc();
-
         for (CPU cpu : allCpus) {
             String cpuAsString = "{" + cpu.id() + ":" + cpu.hardwareSpec().name() + ":($" + cpu.hardwareSpec().price() + ")}\n";
             stringBuilder.append(cpuAsString);
         }
-
         return stringBuilder.toString();
     }
 
@@ -69,16 +64,12 @@ public class CpuService extends BaseService<CPU, CpuRepository, CpuNotFoundExcep
     @Transactional(readOnly = true)
     public List<ItemForConfigurator> getAllHardwareInfoForConfiguration() {
         List<ItemForConfigurator> items = new ArrayList<>();
-
         List<CPU> allCpus = getAllWithSortingOfPriceDesc();
-
         for (CPU cpu : allCpus) {
             String cpuPhoto = "";
-
             if (!cpu.cpuPhotos().isEmpty()) {
                 cpuPhoto = cpu.cpuPhotos().getFirst();
             }
-
             items.add(new ItemForConfigurator(
                     cpu.id(),
                     cpu.hardwareSpec().name(),
@@ -87,7 +78,6 @@ public class CpuService extends BaseService<CPU, CpuRepository, CpuNotFoundExcep
                     "cpu"
             ));
         }
-
         return items;
     }
 
@@ -97,87 +87,57 @@ public class CpuService extends BaseService<CPU, CpuRepository, CpuNotFoundExcep
     }
 
     @Transactional(readOnly = true)
-    public Page<CPU> getAllWithSortingOfPriceDescAsPages(Pageable pageable) {
-        return new PageImpl<>(getAllWithSortingOfPriceDesc(), pageable, 8);
+    public Page<CPU> getCpus(Pageable pageable, String sortType, String socket, Integer lowestPrice, Integer highestPrice) {
+        List<CPU> cpus = getAll();
+
+        if (socket != null && !socket.isEmpty()) {
+            cpus = cpus.stream()
+                    .filter(cpu -> cpu.socket().equals(socket))
+                    .toList();
+        }
+
+        if (lowestPrice != null && highestPrice != null) {
+            cpus = cpus.stream()
+                    .filter(cpu -> cpu.hardwareSpec().price().intValue() >= lowestPrice &&
+                                   cpu.hardwareSpec().price().intValue() <= highestPrice)
+                    .toList();
+        }
+
+        switch (sortType) {
+            case "price-asc":
+                cpus = cpus.stream()
+                        .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().price()))
+                        .toList();
+                break;
+            case "price-desc":
+                cpus = cpus.stream()
+                        .sorted(Comparator.comparing((CPU cpu) -> cpu.hardwareSpec().price()).reversed())
+                        .toList();
+                break;
+            case "rating-asc":
+                cpus = cpus.stream()
+                        .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().rating()))
+                        .toList();
+                break;
+            case "rating-desc":
+                cpus = cpus.stream()
+                        .sorted(Comparator.comparing((CPU cpu) -> cpu.hardwareSpec().rating()).reversed())
+                        .toList();
+                break;
+            default:
+                break;
+        }
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), cpus.size());
+        return new PageImpl<>(cpus.subList(start, end), pageable, cpus.size());
     }
 
-    @Transactional(readOnly = true)
-    public Page<CPU> getAllWithSortingOfPriceAscAsPages(Pageable pageable) {
-        return new PageImpl<>(getAllWithSortingOfPriceAsc(), pageable, 8);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<CPU> getAllWithSortingOfRatingDescAsPages(Pageable pageable) {
-        return new PageImpl<>(getAllWithSortingOfRatingDesc(), pageable, 8);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<CPU> getAllWithSortingOfRatingAscAsPages(Pageable pageable) {
-        return new PageImpl<>(getAllWithSortingOfRatingAsc(), pageable, 8);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<CPU> getAllWithFilteringByPriceAsPages(Pageable pageable, int lowestPrice, int highestPrice) {
-        return new PageImpl<>(getAllWithFilteringByPrice(lowestPrice, highestPrice), pageable, 8);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<CPU> getAllWithFilteringByEnergyConsumptionAsPages(Pageable pageable, int lowestEnergyConsumption, int highestEnergyConsumption) {
-        return new PageImpl<>(getAllWithFilteringByEnergyConsumption(lowestEnergyConsumption, highestEnergyConsumption), pageable, 8);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<CPU> getAllWithFilteringBySocketAsPages(Pageable pageable, String socket) {
-        return new PageImpl<>(getAllWithFilteringBySocket(socket), pageable, 8);
-    }
 
     private List<CPU> getAllWithSortingOfPriceDesc() {
         return getAll()
                 .stream()
-                .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().price()))
-                .toList()
-                .reversed();
-    }
-
-    private List<CPU> getAllWithSortingOfPriceAsc() {
-        return getAll()
-                .stream()
-                .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().price()))
-                .toList();
-    }
-
-    private List<CPU> getAllWithSortingOfRatingDesc() {
-        return getAll()
-                .stream()
-                .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().rating()))
-                .toList()
-                .reversed();
-    }
-
-    private List<CPU> getAllWithSortingOfRatingAsc() {
-        return getAll()
-                .stream()
-                .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().rating()))
-                .toList();
-    }
-
-    private List<CPU> getAllWithFilteringByPrice(int lowestPrice, int highestPrice) {
-        return getAll().stream()
-                .filter(cpu -> cpu.hardwareSpec().price().intValue() >= lowestPrice
-                               && cpu.hardwareSpec().price().intValue() <= highestPrice)
-                .toList();
-    }
-
-    private List<CPU> getAllWithFilteringBySocket(String socket) {
-        return getAll().stream()
-                .filter(cpu -> cpu.socket().equals(socket))
-                .toList();
-    }
-
-    private List<CPU> getAllWithFilteringByEnergyConsumption(int lowestEnergyConsumption, int highestEnergyConsumption) {
-        return getAll().stream()
-                .filter(cpu -> cpu.energyConsumption() >= lowestEnergyConsumption
-                               && cpu.energyConsumption() <= highestEnergyConsumption)
+                .sorted(Comparator.comparing((CPU cpu) -> cpu.hardwareSpec().price()).reversed())
                 .toList();
     }
 }

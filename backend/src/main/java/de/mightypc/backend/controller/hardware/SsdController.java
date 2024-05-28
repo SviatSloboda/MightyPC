@@ -55,47 +55,19 @@ public class SsdController extends BaseController<SSD, SsdService> {
         }
     }
 
-    @GetMapping("/sort/price")
-    public Page<SSD> getSortedSsdsByPrice(Pageable pageable, @RequestParam(value = "type", defaultValue = "desc") String type) {
-        if (type.equals("desc")) {
-            return service.getAllWithSortingOfPriceDescAsPages(pageable);
-        } else if (type.equals("asc")) {
-            return service.getAllWithSortingOfPriceAscAsPages(pageable);
-        } else {
-            throw new IllegalStateException("Not matching value! Accepted only desc and asc!!!");
-        }
+    @GetMapping("/page")
+    public Page<SSD> getAllByPage(Pageable pageable) {
+        return service.getAllByPage(pageable);
     }
 
-    @GetMapping("/sort/rating")
-    public Page<SSD> getSortedSsdsByRating(Pageable pageable, @RequestParam(value = "type", defaultValue = "desc") String type) {
-        if (type.equals("desc")) {
-            return service.getAllWithSortingOfRatingDescAsPages(pageable);
-        } else if (type.equals("asc")) {
-            return service.getAllWithSortingOfRatingAscAsPages(pageable);
-        } else {
-            throw new IllegalStateException("Not matching value! Accepted only desc and asc!!!");
-        }
-    }
+    @GetMapping("/filtered")
+    public Page<SSD> getSsds(Pageable pageable,
+                             @RequestParam(value = "sortType", required = false) String sortType,
+                             @RequestParam(value = "lowestPrice", required = false) Integer lowestPrice,
+                             @RequestParam(value = "highestPrice", required = false) Integer highestPrice,
+                             @RequestParam(value = "minimalCapacity", required = false) Integer minimalCapacity,
+                             @RequestParam(value = "maximalCapacity", required = false) Integer maximalCapacity) {
 
-    @GetMapping("/filter/price")
-    public Page<SSD> getFilteredSsdsByPrice(Pageable pageable,
-                                            @RequestParam(value = "lowest", defaultValue = "0") int lowestPrice,
-                                            @RequestParam(value = "highest", defaultValue = "999999") int highestPrice
-    ) {
-        return service.getAllWithFilteringByPriceAsPages(pageable, lowestPrice, highestPrice);
-    }
-
-    @GetMapping("/filter/capacity")
-    public Page<SSD> getFilteredSsdsByCapacity(Pageable pageable,
-                                               @RequestParam(value = "lowest", defaultValue = "0") int minimalCapacity,
-                                               @RequestParam(value = "highest", defaultValue = "999999") int maximalCapacity) {
-        return service.getAllWithFilteringByCapacityAsPages(pageable, minimalCapacity, maximalCapacity);
-    }
-
-    @GetMapping("/filter/energy-consumption")
-    public Page<SSD> getFilteredSsdsByEnergyConsumption(Pageable pageable,
-                                                        @RequestParam(value = "lowest", defaultValue = "0") int lowestEnergyConsumption,
-                                                        @RequestParam(value = "highest", defaultValue = "999999") int highestEnergyConsumption) {
-        return service.getAllWithFilteringByEnergyConsumptionAsPages(pageable, lowestEnergyConsumption, highestEnergyConsumption);
+        return service.getSsds(pageable, sortType, lowestPrice, highestPrice, minimalCapacity, maximalCapacity);
     }
 }
