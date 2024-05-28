@@ -2129,7 +2129,8 @@ a.nav__link {
     padding: 20px;
     width: 15%;
     box-sizing: border-box;
-    height: 100vh;
+    height: auto;
+    max-height: calc(100vh - 2rem);
     position: sticky;
     top: 0;
     overflow-y: auto;
@@ -2356,3 +2357,6 @@ a.nav__link {
     color: #d0ff00;
 }
 
+.filter-section__header{
+    margin-top: 5rem;
+}

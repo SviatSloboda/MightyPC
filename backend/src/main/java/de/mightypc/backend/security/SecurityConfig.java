@@ -14,7 +14,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.web.SecurityFilterChain;
 
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -45,32 +44,16 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, CustomOAuth2UserService customOAuth2UserService) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/configurator/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/configurator/**").authenticated()
-
                         .requestMatchers("/api/user-pcs/**").authenticated()
-                        //.requestMatchers(
-                                //HttpMethod.PUT, "/api/user-pcs/{userId}/{pcId}/promote").hasAnyRole("MANAGER", "ADMIN")
-
                         .requestMatchers(HttpMethod.GET, "/api/hardware/**").permitAll()
-                    //    .requestMatchers(HttpMethod.PUT, "/api/hardware/**").hasAnyRole("ADMIN", "MANAGER")
-                     //   .requestMatchers(HttpMethod.POST, "/api/hardware/**").hasAnyRole("ADMIN", "MANAGER")
-              //          .requestMatchers(HttpMethod.DELETE, "/api/hardware/**").hasRole("ADMIN")
-
                         .requestMatchers(HttpMethod.GET, "/api/pc/**").permitAll()
-              //          .requestMatchers(HttpMethod.PUT, "/api/pc/**").hasAnyRole("ADMIN", "MANAGER")
-               //         .requestMatchers(HttpMethod.POST, "/api/pc/**").hasAnyRole("ADMIN", "MANAGER")
                         .requestMatchers(HttpMethod.POST, "api/configuration/calculate-energy-consumption").authenticated()
-        //                .requestMatchers(HttpMethod.DELETE, "/api/pc/**").hasRole("ADMIN")
-
                         .requestMatchers(HttpMethod.GET, "/api/workstation/**").permitAll()
-                       // .requestMatchers(HttpMethod.PUT, "/api/workstation/**").hasAnyRole("ADMIN", "MANAGER")
-                        //.requestMatchers(HttpMethod.POST, "/api/workstation/**").hasAnyRole("ADMIN", "MANAGER")
-                 //       .requestMatchers(HttpMethod.DELETE, "/api/workstation/**").hasRole("ADMIN")
-
                         .requestMatchers(HttpMethod.POST, "/api/user/{userId}/change-password").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/user/{userId}/set-password").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/user/{userId}/set-password").authenticated()
@@ -81,28 +64,17 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.GET, "/api/order/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/order/**").authenticated()
-           //             .requestMatchers(HttpMethod.DELETE, "/api/order/**").hasRole("ADMIN")
-                    //    .requestMatchers(HttpMethod.DELETE, "/api/order/**").hasAnyRole("MANAGER", "ADMIN")
-
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
                 .httpBasic(withDefaults())
-                .oauth2Login(oauth -> oauth
-                        .loginPage("/oauth2/authorization/google")
-                        .defaultSuccessUrl(environment.equals("prod") ? "/" : "http://localhost:5173", true)
-                        .userInfoEndpoint(userInfo -> userInfo
-                                .oidcUserService(new OidcUserService())
-                                .userService(customOAuth2UserService)
-                        )
-                )
-                .oauth2Login(oauth -> oauth
-                        .loginPage("/oauth2/authorization/github")
-                        .defaultSuccessUrl(environment.equals("prod") ? "/" : "http://localhost:5173", true)
-                        .userInfoEndpoint(userInfo -> userInfo
-                                .oidcUserService(new OidcUserService())
-                                .userService(customOAuth2UserService)
-                        )
-                )
+                .oauth2Login(oauth -> {
+                    oauth.loginPage("/oauth2/authorization/google");
+                    if ("prod".equals(environment)) {
+                        oauth.defaultSuccessUrl("/", true);
+                    } else {
+                        oauth.defaultSuccessUrl("http://localhost:5173", true);
+                    }
+                })
                 .logout(logout -> logout
                         .logoutUrl("/api/logout")
                         .logoutSuccessHandler((request, response, authentication) -> response.setStatus(HttpServletResponse.SC_OK))
