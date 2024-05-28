@@ -1,12 +1,12 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import ProductBox from './utils/ProductBox.tsx';
-import Modal, {useModal} from './utils/Modal.tsx';
-import {useNavigate} from 'react-router-dom';
-import {useAuth} from '../../contexts/AuthContext.tsx';
+import Modal, { useModal } from './utils/Modal.tsx';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext.tsx';
 import useLoginModal from '../login/useLoginModal.ts';
 import LoginModal from '../login/LoginModal.tsx';
-import {Range, getTrackBackground} from 'react-range';
+import { Range, getTrackBackground } from 'react-range';
 import cpuPhoto from '../../assets/hardware/cpu.png';
 import gpuPhoto from '../../assets/hardware/gpu.png';
 import hddPhoto from '../../assets/hardware/hdd.png';
@@ -15,7 +15,7 @@ import pcCasePhoto from '../../assets/hardware/pcCase.png';
 import psuPhoto from '../../assets/hardware/psu.png';
 import ramPhoto from '../../assets/hardware/ram.png';
 import ssdPhoto from '../../assets/hardware/ssd.png';
-import {IThumbProps, ITrackProps} from "react-range/lib/types";
+import { IThumbProps, ITrackProps } from 'react-range/lib/types';
 
 type HardwareType = 'cpu' | 'gpu' | 'hdd' | 'motherboard' | 'pc-case' | 'psu' | 'ram' | 'ssd';
 
@@ -83,7 +83,10 @@ interface HardwareConfig<T extends HardwareItem> {
 }
 
 type FilterField = {
-    label: string; field: string; type: 'text' | 'number'; placeholder: string;
+    label: string;
+    field: string;
+    type: 'text' | 'number';
+    placeholder: string;
 };
 
 const hardwareConfig: Record<HardwareType, HardwareConfig<HardwareItem>> = {
@@ -91,11 +94,11 @@ const hardwareConfig: Record<HardwareType, HardwareConfig<HardwareItem>> = {
         apiPath: '/api/hardware/cpu/filtered',
         addApiPath: '/api/hardware/cpu',
         photo: cpuPhoto,
-        additionalFields: {socket: ''} as Partial<CPU>,
+        additionalFields: { socket: '' } as Partial<CPU>,
         filterFields: [
-            {label: 'Socket', field: 'socket', type: 'text', placeholder: 'Socket'},
-            {label: 'Min Price', field: 'lowestPrice', type: 'number', placeholder: 'Min Price'},
-            {label: 'Max Price', field: 'highestPrice', type: 'number', placeholder: 'Max Price'}
+            { label: 'Socket', field: 'socket', type: 'text', placeholder: 'Socket' },
+            { label: 'Min Price', field: 'lowestPrice', type: 'number', placeholder: 'Min Price' },
+            { label: 'Max Price', field: 'highestPrice', type: 'number', placeholder: 'Max Price' }
         ]
     },
     gpu: {
@@ -104,75 +107,75 @@ const hardwareConfig: Record<HardwareType, HardwareConfig<HardwareItem>> = {
         photo: gpuPhoto,
         additionalFields: {} as Partial<GPU>,
         filterFields: [
-            {label: 'Min Price', field: 'lowestPrice', type: 'number', placeholder: 'Min Price'},
-            {label: 'Max Price', field: 'highestPrice', type: 'number', placeholder: 'Max Price'}
+            { label: 'Min Price', field: 'lowestPrice', type: 'number', placeholder: 'Min Price' },
+            { label: 'Max Price', field: 'highestPrice', type: 'number', placeholder: 'Max Price' }
         ]
     },
     hdd: {
         apiPath: '/api/hardware/hdd/filtered',
         addApiPath: '/api/hardware/hdd',
         photo: hddPhoto,
-        additionalFields: {capacity: ''} as Partial<HDD>,
+        additionalFields: { capacity: '' } as Partial<HDD>,
         filterFields: [
-            {label: 'Capacity', field: 'capacity', type: 'text', placeholder: 'Capacity'},
-            {label: 'Min Price', field: 'lowestPrice', type: 'number', placeholder: 'Min Price'},
-            {label: 'Max Price', field: 'highestPrice', type: 'number', placeholder: 'Max Price'}
+            { label: 'Capacity', field: 'capacity', type: 'text', placeholder: 'Capacity' },
+            { label: 'Min Price', field: 'lowestPrice', type: 'number', placeholder: 'Min Price' },
+            { label: 'Max Price', field: 'highestPrice', type: 'number', placeholder: 'Max Price' }
         ]
     },
     motherboard: {
         apiPath: '/api/hardware/motherboard/filtered',
         addApiPath: '/api/hardware/motherboard',
         photo: motherboardPhoto,
-        additionalFields: {socket: ''} as Partial<Motherboard>,
+        additionalFields: { socket: '' } as Partial<Motherboard>,
         filterFields: [
-            {label: 'Socket', field: 'socket', type: 'text', placeholder: 'Socket'},
-            {label: 'Min Price', field: 'lowestPrice', type: 'number', placeholder: 'Min Price'},
-            {label: 'Max Price', field: 'highestPrice', type: 'number', placeholder: 'Max Price'}
+            { label: 'Socket', field: 'socket', type: 'text', placeholder: 'Socket' },
+            { label: 'Min Price', field: 'lowestPrice', type: 'number', placeholder: 'Min Price' },
+            { label: 'Max Price', field: 'highestPrice', type: 'number', placeholder: 'Max Price' }
         ]
     },
     'pc-case': {
         apiPath: '/api/hardware/pc-case/filtered',
         addApiPath: '/api/hardware/pc-case',
         photo: pcCasePhoto,
-        additionalFields: {dimensions: ''} as Partial<PcCase>,
+        additionalFields: { dimensions: '' } as Partial<PcCase>,
         filterFields: [
-            {label: 'Dimensions', field: 'dimensions', type: 'text', placeholder: 'Dimensions'},
-            {label: 'Min Price', field: 'lowestPrice', type: 'number', placeholder: 'Min Price'},
-            {label: 'Max Price', field: 'highestPrice', type: 'number', placeholder: 'Max Price'}
+            { label: 'Dimensions', field: 'dimensions', type: 'text', placeholder: 'Dimensions' },
+            { label: 'Min Price', field: 'lowestPrice', type: 'number', placeholder: 'Min Price' },
+            { label: 'Max Price', field: 'highestPrice', type: 'number', placeholder: 'Max Price' }
         ]
     },
     psu: {
         apiPath: '/api/hardware/psu/filtered',
         addApiPath: '/api/hardware/psu',
         photo: psuPhoto,
-        additionalFields: {power: 0} as Partial<PSU>,
+        additionalFields: { power: 0 } as Partial<PSU>,
         filterFields: [
-            {label: 'Power', field: 'power', type: 'number', placeholder: 'Power'},
-            {label: 'Min Price', field: 'lowestPrice', type: 'number', placeholder: 'Min Price'},
-            {label: 'Max Price', field: 'highestPrice', type: 'number', placeholder: 'Max Price'}
+            { label: 'Power', field: 'power', type: 'number', placeholder: 'Power' },
+            { label: 'Min Price', field: 'lowestPrice', type: 'number', placeholder: 'Min Price' },
+            { label: 'Max Price', field: 'highestPrice', type: 'number', placeholder: 'Max Price' }
         ]
     },
     ram: {
         apiPath: '/api/hardware/ram/filtered',
         addApiPath: '/api/hardware/ram',
         photo: ramPhoto,
-        additionalFields: {type: '', memorySize: 0} as Partial<RAM>,
+        additionalFields: { type: '', memorySize: 0 } as Partial<RAM>,
         filterFields: [
-            {label: 'Type', field: 'type', type: 'text', placeholder: 'Type'},
-            {label: 'Memory Size', field: 'memorySize', type: 'number', placeholder: 'Memory Size'},
-            {label: 'Min Price', field: 'lowestPrice', type: 'number', placeholder: 'Min Price'},
-            {label: 'Max Price', field: 'highestPrice', type: 'number', placeholder: 'Max Price'}
+            { label: 'Type', field: 'type', type: 'text', placeholder: 'Type' },
+            { label: 'Memory Size', field: 'memorySize', type: 'number', placeholder: 'Memory Size' },
+            { label: 'Min Price', field: 'lowestPrice', type: 'number', placeholder: 'Min Price' },
+            { label: 'Max Price', field: 'highestPrice', type: 'number', placeholder: 'Max Price' }
         ]
     },
     ssd: {
         apiPath: '/api/hardware/ssd/filtered',
         addApiPath: '/api/hardware/ssd',
         photo: ssdPhoto,
-        additionalFields: {capacity: 0} as Partial<SSD>,
+        additionalFields: { capacity: 0 } as Partial<SSD>,
         filterFields: [
-            {label: 'Capacity', field: 'capacity', type: 'number', placeholder: 'Capacity'},
-            {label: 'Min Price', field: 'lowestPrice', type: 'number', placeholder: 'Min Price'},
-            {label: 'Max Price', field: 'highestPrice', type: 'number', placeholder: 'Max Price'}
+            { label: 'Capacity', field: 'capacity', type: 'number', placeholder: 'Capacity' },
+            { label: 'Min Price', field: 'lowestPrice', type: 'number', placeholder: 'Min Price' },
+            { label: 'Max Price', field: 'highestPrice', type: 'number', placeholder: 'Max Price' }
         ]
     }
 };
@@ -185,19 +188,19 @@ interface Filter {
     [key: string]: string | number;
 }
 
-function HardwarePage<T extends HardwareItem>({type}: Readonly<HardwarePageProps>) {
+function HardwarePage<T extends HardwareItem>({ type }: Readonly<HardwarePageProps>) {
     const [items, setItems] = useState<T[]>([]);
     const [currentPage, setCurrentPage] = useState<number>(0);
     const [totalPages, setTotalPages] = useState<number>(0);
     const itemsPerPage = 8;
     const [modalOpen, toggleModal] = useModal();
-    const [hardwareSpec, setHardwareSpec] = useState<HardwareSpec>({name: "", description: "", price: "", rating: 0});
+    const [hardwareSpec, setHardwareSpec] = useState<HardwareSpec>({ name: "", description: "", price: "", rating: 0 });
     const [additionalFields, setAdditionalFields] = useState<Partial<T>>(hardwareConfig[type].additionalFields as Partial<T>);
     const [sortType, setSortType] = useState<string>("desc");
     const [filter, setFilter] = useState<Filter>({});
     const navigate = useNavigate();
-    const {user, isSuperUser} = useAuth();
-    const {isLoginModalOpen, showLoginModal, hideLoginModal, handleLogin} = useLoginModal();
+    const { user, isSuperUser } = useAuth();
+    const { isLoginModalOpen, showLoginModal, hideLoginModal, handleLogin } = useLoginModal();
 
     useEffect(() => {
         const fetchItems = () => {
@@ -264,7 +267,7 @@ function HardwarePage<T extends HardwareItem>({type}: Readonly<HardwarePageProps
     };
 
     const handleFilter = (field: string, value: string | number) => {
-        setFilter(prevFilter => ({...prevFilter, [field]: value}));
+        setFilter(prevFilter => ({ ...prevFilter, [field]: value }));
         setCurrentPage(0);
     };
 
@@ -294,7 +297,7 @@ function HardwarePage<T extends HardwareItem>({type}: Readonly<HardwarePageProps
                                 handleFilter("lowestPrice", values[0]);
                                 handleFilter("highestPrice", values[1]);
                             }}
-                            renderTrack={({props, children}: { props: ITrackProps; children: React.ReactNode }) => (
+                            renderTrack={({ props, children }: { props: ITrackProps; children: React.ReactNode }) => (
                                 <div
                                     {...props}
                                     style={{
@@ -312,7 +315,7 @@ function HardwarePage<T extends HardwareItem>({type}: Readonly<HardwarePageProps
                                     {children}
                                 </div>
                             )}
-                            renderThumb={({props}: { props: IThumbProps }) => (
+                            renderThumb={({ props }: { props: IThumbProps }) => (
                                 <div
                                     {...props}
                                     style={{
@@ -338,7 +341,9 @@ function HardwarePage<T extends HardwareItem>({type}: Readonly<HardwarePageProps
                     <button onClick={() => handleSort("rating-asc")}>Rating Ascending</button>
                     <button onClick={() => handleSort("rating-desc")}>Rating Descending</button>
                 </div>
-                <button className="add-item-button" onClick={toggleModal}>Add {type}</button>
+                {isSuperUser() && (
+                    <button className="add-item-button" onClick={toggleModal}>Add {type}</button>
+                )}
             </div>
             <div className="content-section">
                 <div className="product-list">
@@ -353,7 +358,7 @@ function HardwarePage<T extends HardwareItem>({type}: Readonly<HardwarePageProps
                     ))}
                 </div>
                 <div className="product-list__pagination">
-                    {Array.from({length: totalPages}, (_, i) => (
+                    {Array.from({ length: totalPages }, (_, i) => (
                         <button
                             key={i}
                             onClick={() => paginate(i)}
@@ -363,20 +368,41 @@ function HardwarePage<T extends HardwareItem>({type}: Readonly<HardwarePageProps
                         </button>
                     ))}
                 </div>
-                <LoginModal isOpen={isLoginModalOpen} onLogin={handleLogin} onClose={hideLoginModal}/>
+                <LoginModal isOpen={isLoginModalOpen} onLogin={handleLogin} onClose={hideLoginModal} />
             </div>
+            <Modal isOpen={modalOpen} onClose={toggleModal} onSave={saveValues}>
+                {Object.keys(hardwareSpec).map((key) => (
+                    <div className="modal__form-group" key={key}>
+                        <label htmlFor={`modal-${key}`}
+                               className="modal__form-label">{key.charAt(0).toUpperCase() + key.slice(1)}:</label>
+                        <input id={`modal-${key}`} className="modal__input"
+                               value={hardwareSpec[key as keyof HardwareSpec]}
+                               onChange={(e) => setHardwareSpec({ ...hardwareSpec, [key]: e.target.value })} required />
+                    </div>
+                ))}
+                {Object.keys(additionalFields).map((key) => (
+                    <div className="modal__form-group" key={key}>
+                        <label htmlFor={`modal-${key}`}
+                               className="modal__form-label">{key.charAt(0).toUpperCase() + key.slice(1)}:</label>
+                        <input id={`modal-${key}`} className="modal__input"
+                               value={additionalFields[key as keyof T] as unknown as string | number}
+                               onChange={(e) => setAdditionalFields({ ...additionalFields, [key]: e.target.value })}
+                               required />
+                    </div>
+                ))}
+            </Modal>
         </div>
     );
 }
 
-const CpuPage = () => <HardwarePage<CPU> type="cpu"/>;
-const GpuPage = () => <HardwarePage<GPU> type="gpu"/>;
-const HddPage = () => <HardwarePage<HDD> type="hdd"/>;
-const MotherboardPage = () => <HardwarePage<Motherboard> type="motherboard"/>;
-const PcCasePage = () => <HardwarePage<PcCase> type="pc-case"/>;
-const PowerSupplyPage = () => <HardwarePage<PSU> type="psu"/>;
-const RamPage = () => <HardwarePage<RAM> type="ram"/>;
-const SsdPage = () => <HardwarePage<SSD> type="ssd"/>;
+const CpuPage = () => <HardwarePage<CPU> type="cpu" />;
+const GpuPage = () => <HardwarePage<GPU> type="gpu" />;
+const HddPage = () => <HardwarePage<HDD> type="hdd" />;
+const MotherboardPage = () => <HardwarePage<Motherboard> type="motherboard" />;
+const PcCasePage = () => <HardwarePage<PcCase> type="pc-case" />;
+const PowerSupplyPage = () => <HardwarePage<PSU> type="psu" />;
+const RamPage = () => <HardwarePage<RAM> type="ram" />;
+const SsdPage = () => <HardwarePage<SSD> type="ssd" />;
 
 export {
     CpuPage, GpuPage, HddPage, MotherboardPage, PcCasePage, PowerSupplyPage, RamPage, SsdPage
