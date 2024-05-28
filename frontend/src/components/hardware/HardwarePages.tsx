@@ -16,8 +16,10 @@ import psuPhoto from '../../assets/hardware/psu.png';
 import ramPhoto from '../../assets/hardware/ram.png';
 import ssdPhoto from '../../assets/hardware/ssd.png';
 import { IThumbProps, ITrackProps } from 'react-range/lib/types';
+import pcPhoto from "../../assets/pc/Pc.png";
+import workstationPhoto from "../../assets/pc/Workstations.png";
 
-type HardwareType = 'cpu' | 'gpu' | 'hdd' | 'motherboard' | 'pc-case' | 'psu' | 'ram' | 'ssd';
+type HardwareType = 'cpu' | 'gpu' | 'hdd' | 'motherboard' | 'pc-case' | 'psu' | 'ram' | 'ssd' | 'pc' | 'workstation';
 
 interface HardwareSpec {
     name: string;
@@ -72,7 +74,35 @@ interface SSD extends HardwareItemBase {
     ssdPhotos?: string[];
 }
 
-type HardwareItem = CPU | GPU | HDD | Motherboard | PcCase | PSU | RAM | SSD;
+interface PC extends HardwareItemBase {
+    specsIds: {
+        cpuId: string;
+        gpuId: string;
+        motherboardId: string;
+        ramId: string;
+        ssdId: string;
+        hddId: string;
+        powerSupplyId: string;
+        pcCaseId: string;
+    };
+}
+
+interface Workstation extends HardwareItemBase {
+    specsIds: {
+        cpuId: string;
+        gpuId: string;
+        motherboardId: string;
+        ramId: string;
+        ssdId: string;
+        hddId: string;
+        powerSupplyId: string;
+        pcCaseId: string;
+    };
+    cpuNumber: number;
+    gpuNumber: number;
+}
+
+type HardwareItem = CPU | GPU | HDD | Motherboard | PcCase | PSU | RAM | SSD | PC | Workstation;
 
 interface HardwareConfig<T extends HardwareItem> {
     apiPath: string;
@@ -177,6 +207,26 @@ const hardwareConfig: Record<HardwareType, HardwareConfig<HardwareItem>> = {
             { label: 'Min Price', field: 'lowestPrice', type: 'number', placeholder: 'Min Price' },
             { label: 'Max Price', field: 'highestPrice', type: 'number', placeholder: 'Max Price' }
         ]
+    },
+    pc: {
+        apiPath: '/api/pc/filtered',
+        addApiPath: '/api/pc',
+        photo: pcPhoto,
+        additionalFields: { specsIds: { cpuId: '', gpuId: '', motherboardId: '', ramId: '', ssdId: '', hddId: '', powerSupplyId: '', pcCaseId: '' } } as Partial<PC>,
+        filterFields: [
+            { label: 'Min Price', field: 'lowestPrice', type: 'number', placeholder: 'Min Price' },
+            { label: 'Max Price', field: 'highestPrice', type: 'number', placeholder: 'Max Price' }
+        ]
+    },
+    workstation: {
+        apiPath: '/api/workstation/filtered',
+        addApiPath: '/api/workstation',
+        photo: workstationPhoto,
+        additionalFields: { specsIds: { cpuId: '', gpuId: '', motherboardId: '', ramId: '', ssdId: '', hddId: '', powerSupplyId: '', pcCaseId: '' }, cpuNumber: 1, gpuNumber: 1 } as Partial<Workstation>,
+        filterFields: [
+            { label: 'Min Price', field: 'lowestPrice', type: 'number', placeholder: 'Min Price' },
+            { label: 'Max Price', field: 'highestPrice', type: 'number', placeholder: 'Max Price' }
+        ]
     }
 };
 
@@ -251,8 +301,9 @@ function HardwarePage<T extends HardwareItem>({ type }: Readonly<HardwarePagePro
             description: item.hardwareSpec.description,
             price: item.hardwareSpec.price,
             photo: photos && photos.length > 0 ? photos[0] : hardwareConfig[type].photo,
-            pathToCharacteristicsPage: `/hardware/${type}`
+            pathToCharacteristicsPage: type === 'pc' ? `/pc/${item.id}` : type === 'workstation' ? `/workstation/${item.id}` : `/hardware/${type}/${item.id}`
         };
+
 
         axios.post(`/api/basket/${user.id}`, payload)
             .then(() => {
@@ -352,7 +403,7 @@ function HardwarePage<T extends HardwareItem>({ type }: Readonly<HardwarePagePro
                             key={item.id}
                             product={item}
                             imgSrc={item.photos && item.photos.length > 0 ? item.photos[0] : hardwareConfig[type].photo}
-                            toCharacteristicsPage={() => navigate(`/hardware/${type}/${item.id}`)}
+                            toCharacteristicsPage={() => navigate(type === 'pc' ? `/pc/${item.id}` : type === 'workstation' ? `/workstation/${item.id}` : `/hardware/${type}/${item.id}`)}
                             onAddToBasket={() => handleAddToBasket(item)}
                         />
                     ))}
@@ -403,7 +454,9 @@ const PcCasePage = () => <HardwarePage<PcCase> type="pc-case" />;
 const PowerSupplyPage = () => <HardwarePage<PSU> type="psu" />;
 const RamPage = () => <HardwarePage<RAM> type="ram" />;
 const SsdPage = () => <HardwarePage<SSD> type="ssd" />;
+const PcsPage = () => <HardwarePage<PC> type="pc" />;
+const WorkstationsPage = () => <HardwarePage<Workstation> type="workstation" />;
 
 export {
-    CpuPage, GpuPage, HddPage, MotherboardPage, PcCasePage, PowerSupplyPage, RamPage, SsdPage
+    CpuPage, GpuPage, HddPage, MotherboardPage, PcCasePage, PowerSupplyPage, RamPage, SsdPage, PcsPage, WorkstationsPage
 };

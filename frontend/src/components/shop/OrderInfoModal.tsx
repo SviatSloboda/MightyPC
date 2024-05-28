@@ -51,9 +51,10 @@ const OrderInfoModal: React.FC<OrderInfoModalProps> = ({showModal, setShowModal,
                             </div>
                             <button
                                 className="order-info-modal__item-button"
-                                onClick={() => navigate(`${item.pathToCharacteristicsPage}/${item.id}`)}>
+                                onClick={() => navigate(item.pathToCharacteristicsPage)}>
                                 Detailed Information
                             </button>
+
                         </div>
                     ))}
                     <div className="order-info-modal__total">

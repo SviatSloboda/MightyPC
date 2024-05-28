@@ -1,15 +1,13 @@
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import NavigationBar from "./components/mainpage/NavigationBar.tsx";
 import FooterBar from "./components/mainpage/FooterBar.tsx";
-import GamingPCsPage from "./components/pc/PcsPage.tsx";
 import HardwareNavigationPage from "./components/hardware/HardwareNavigationPage.tsx";
 import ProfilePage from "./components/shop/ProfilePage.tsx";
 import NoMatch from "./components/mainpage/NoMatch.tsx";
 import BasketPage from "./components/shop/BasketPage.tsx";
 import OrderPage from "./components/shop/OrderPage.tsx";
 import PcCharacteristics from "./components/pc/PcCharacteristics.tsx";
-import WorkstationsPage from "./components/workstation/WorkstationsPage.tsx";
-import WorkstationsCharacteristicsPage from "./components/workstation/WorkstationCharacteristicsPage.tsx";
+import WorkstationsCharacteristicsPage from "./components/pc/WorkstationCharacteristicsPage.tsx";
 import UserPcsPage from "./components/configurator/UserPcsPage.tsx";
 import ConfiguratorPage from "./components/configurator/ConfiguratorPage.tsx";
 import LoginPage from "./components/login/LoginPage.tsx";
@@ -17,10 +15,10 @@ import {
     CpuPage,
     GpuPage,
     HddPage,
-    MotherboardPage, PcCasePage,
+    MotherboardPage, PcCasePage, PcsPage,
     PowerSupplyPage,
     RamPage,
-    SsdPage
+    SsdPage, WorkstationsPage
 } from "./components/hardware/HardwarePages.tsx";
 
 import {
@@ -36,12 +34,12 @@ export default function App() {
         <NavigationBar/>
 
         <Routes>
-            <Route path="/" element={<GamingPCsPage/>}/>
+            <Route path="/" element={<PcsPage/>}/>
             <Route path="/*" element={<NoMatch/>}/>
 
             <Route path="/configurator" element={<ConfiguratorPage/>}/>
 
-            <Route path="/pc" element={<GamingPCsPage/>}/>
+            <Route path="/pc" element={<PcsPage/>}/>
             <Route path="/pc/:id" element={<PcCharacteristics/>}/>
 
             <Route path="/workstation" element={<WorkstationsPage/>}/>
