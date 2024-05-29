@@ -1,6 +1,7 @@
 package de.mightypc.backend.service.configurator;
 
-import de.mightypc.backend.model.configurator.ConfiguratorComponents;
+import de.mightypc.backend.model.configurator.ConfiguratorItems;
+import de.mightypc.backend.model.configurator.ItemForConfigurator;
 import de.mightypc.backend.service.hardware.GpuService;
 import de.mightypc.backend.service.hardware.HddService;
 import de.mightypc.backend.service.hardware.PowerSupplyService;
@@ -12,7 +13,6 @@ import de.mightypc.backend.service.hardware.RamService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 @Service
@@ -37,18 +37,33 @@ public class ConfiguratorService {
         this.powerSupplyService = powerSupplyService;
     }
 
-    public ConfiguratorComponents getAllComponentsIdsAndNamesWithPrices() {
-        List<LinkedHashMap<String, String>> allComponentsIdsAndNames = new ArrayList<>();
+    public String getAllComponentsIdsAndNamesWithPricesForChatGpt() {
+        StringBuilder stringBuilder = new StringBuilder();
 
-        allComponentsIdsAndNames.add(cpuService.getAllNamesWithPrices());
-        allComponentsIdsAndNames.add(gpuService.getAllNamesWithPrices());
-        allComponentsIdsAndNames.add(motherboardService.getAllNamesWithPrices());
-        allComponentsIdsAndNames.add(ramService.getAllNamesWithPrices());
-        allComponentsIdsAndNames.add(ssdService.getAllNamesWithPrices());
-        allComponentsIdsAndNames.add(hddService.getAllNamesWithPrices());
-        allComponentsIdsAndNames.add(powerSupplyService.getAllNamesWithPrices());
-        allComponentsIdsAndNames.add(pcCaseService.getAllNamesWithPrices());
+        stringBuilder.append(cpuService.getAllNamesWithPrices());
+        stringBuilder.append(gpuService.getAllNamesWithPrices());
+        stringBuilder.append(motherboardService.getAllNamesWithPrices());
+        stringBuilder.append(ramService.getAllNamesWithPrices());
+        stringBuilder.append(ssdService.getAllNamesWithPrices());
+        stringBuilder.append(hddService.getAllNamesWithPrices());
+        stringBuilder.append(powerSupplyService.getAllNamesWithPrices());
+        stringBuilder.append(pcCaseService.getAllNamesWithPrices());
 
-        return new ConfiguratorComponents(allComponentsIdsAndNames);
+        return new String(stringBuilder).replace(" ", "");
+    }
+
+    public ConfiguratorItems getAllItemsWithInfoForConfigurator() {
+        List<List<ItemForConfigurator>> allItems = new ArrayList<>();
+
+        allItems.add(cpuService.getAllHardwareInfoForConfiguration());
+        allItems.add(gpuService.getAllHardwareInfoForConfiguration());
+        allItems.add(motherboardService.getAllHardwareInfoForConfiguration());
+        allItems.add(ramService.getAllHardwareInfoForConfiguration());
+        allItems.add(ssdService.getAllHardwareInfoForConfiguration());
+        allItems.add(hddService.getAllHardwareInfoForConfiguration());
+        allItems.add(powerSupplyService.getAllHardwareInfoForConfiguration());
+        allItems.add(pcCaseService.getAllHardwareInfoForConfiguration());
+
+        return new ConfiguratorItems(allItems);
     }
 }

@@ -1,34 +1,32 @@
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import NavigationBar from "./components/mainpage/NavigationBar.tsx";
 import FooterBar from "./components/mainpage/FooterBar.tsx";
-import GamingPCsPage from "./components/pc/PcsPage.tsx";
-import HardwarePage from "./components/hardware/HardwarePage.tsx";
+import HardwareNavigationPage from "./components/hardware/HardwareNavigationPage.tsx";
 import ProfilePage from "./components/shop/ProfilePage.tsx";
-import CpuPage from "./components/hardware/CpuPage.tsx";
 import NoMatch from "./components/mainpage/NoMatch.tsx";
-import GpuPage from "./components/hardware/GpuPage.tsx";
-import MotherboardPage from "./components/hardware/MotherboardPage.tsx";
-import RamPage from "./components/hardware/RamPage.tsx";
-import SsdPage from "./components/hardware/SsdPage.tsx";
-import HddPage from "./components/hardware/HddPage.tsx";
-import PowerSupplyPage from "./components/hardware/PowerSupplyPage.tsx";
-import PcCasePage from "./components/hardware/PcCasePage.tsx";
-import CpuCharacteristics from "./components/hardware/characteristicsPage/CpuCharacteristics.tsx";
-import MotherboardCharacteristics from "./components/hardware/characteristicsPage/MotherboardCharacteristics.tsx";
-import GpuCharacteristics from "./components/hardware/characteristicsPage/GpuCharacteristics.tsx";
-import RamCharacteristics from "./components/hardware/characteristicsPage/RamCharacteristics.tsx";
-import SsdCharacteristics from "./components/hardware/characteristicsPage/SsdCharacteristics.tsx";
-import HddCharacteristics from "./components/hardware/characteristicsPage/HddCharacteristics.tsx";
-import PsuCharacteristics from "./components/hardware/characteristicsPage/PsuCharacteristics.tsx";
-import PcCaseCharacteristics from "./components/hardware/characteristicsPage/PcCaseCharacteristics.tsx";
 import BasketPage from "./components/shop/BasketPage.tsx";
 import OrderPage from "./components/shop/OrderPage.tsx";
 import PcCharacteristics from "./components/pc/PcCharacteristics.tsx";
-import WorkstationsPage from "./components/workstation/WorkstationsPage.tsx";
-import WorkstationsCharacteristicsPage from "./components/workstation/WorkstationCharacteristicsPage.tsx";
-import ConfiguratorPage from "./components/configurator/ConfiguratorPage.tsx";
+import WorkstationsCharacteristicsPage from "./components/pc/WorkstationCharacteristicsPage.tsx";
 import UserPcsPage from "./components/configurator/UserPcsPage.tsx";
-import TryPage from "./components/configurator/TryPage.tsx";
+import ConfiguratorPage from "./components/configurator/ConfiguratorPage.tsx";
+import LoginPage from "./components/login/LoginPage.tsx";
+import {
+    CpuPage,
+    GpuPage,
+    HddPage,
+    MotherboardPage, PcCasePage, PcsPage,
+    PowerSupplyPage,
+    RamPage,
+    SsdPage, WorkstationsPage
+} from "./components/hardware/HardwarePages.tsx";
+
+import {
+    CpuCharacteristics,
+    GpuCharacteristics, HddCharacteristics,
+    MotherboardCharacteristics, PcCaseCharacteristics, PsuCharacteristics, RamCharacteristics, SsdCharacteristics
+} from "./components/hardware/Characteristics.tsx";
+
 
 export default function App() {
 
@@ -36,19 +34,18 @@ export default function App() {
         <NavigationBar/>
 
         <Routes>
-            <Route path="/" element={<GamingPCsPage/>}/>
+            <Route path="/" element={<PcsPage/>}/>
             <Route path="/*" element={<NoMatch/>}/>
-
 
             <Route path="/configurator" element={<ConfiguratorPage/>}/>
 
-            <Route path="/pc" element={<GamingPCsPage/>}/>
+            <Route path="/pc" element={<PcsPage/>}/>
             <Route path="/pc/:id" element={<PcCharacteristics/>}/>
 
             <Route path="/workstation" element={<WorkstationsPage/>}/>
             <Route path="/workstation/:id" element={<WorkstationsCharacteristicsPage/>}/>
 
-            <Route path="/hardware" element={<HardwarePage/>}/>
+            <Route path="/hardware" element={<HardwareNavigationPage/>}/>
 
             <Route path="/hardware/cpu" element={<CpuPage/>}/>
             <Route path="/hardware/gpu" element={<GpuPage/>}/>
@@ -68,12 +65,12 @@ export default function App() {
             <Route path="/hardware/psu/:id" element={<PsuCharacteristics/>}/>
             <Route path="/hardware/pc-case/:id" element={<PcCaseCharacteristics/>}/>
 
-            <Route path="/try" element={<TryPage/>}/>
-
-
             <Route path="/basket" element={<BasketPage/>}/>
             <Route path="/order" element={<OrderPage/>}/>
+
             <Route path="/user" element={<ProfilePage/>}/>
+            <Route path="/user/login" element={<LoginPage/>}/>
+
             <Route path="/user-pcs" element={<UserPcsPage/>}/>
 
         </Routes>

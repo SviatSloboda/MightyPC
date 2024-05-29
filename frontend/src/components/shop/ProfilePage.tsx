@@ -2,7 +2,7 @@ import {useEffect, useState} from 'react';
 import axios from 'axios';
 import {useAuth} from "../../contexts/AuthContext.tsx";
 import Photo from "../hardware/utils/Photo.tsx";
-import user_image from "../../assets/user_image.png";
+import user_image from "../../assets/shop/user_image.png";
 
 export default function ProfilePage() {
     const {user, isSuperUser} = useAuth();
@@ -75,10 +75,7 @@ export default function ProfilePage() {
             <h1 className="profile__email">Account created at: </h1>
             <span className="profile__creation-date">{user?.dateOfAccountCreation}</span>
 
-            {isSuperUser() &&
-                <>
-                    <h1 className="profile__email">You are super user! </h1>
-                </>}
+            {isSuperUser() && <h1 className="profile__email">You are super user! </h1>}
 
         </div>
 

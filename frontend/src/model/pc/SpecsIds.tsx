@@ -10,4 +10,3 @@ export interface SpecsIds {
 
     [key: string]: string;
 }
-

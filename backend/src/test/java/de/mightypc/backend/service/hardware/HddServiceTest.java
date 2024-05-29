@@ -1,8 +1,7 @@
 package de.mightypc.backend.service.hardware;
 
 import de.mightypc.backend.exception.hardware.HddNotFoundException;
-import de.mightypc.backend.model.hardware.GPU;
-import de.mightypc.backend.model.hardware.HDD;
+import de.mightypc.backend.model.configurator.ItemForConfigurator;
 import de.mightypc.backend.model.hardware.HDD;
 import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.HddRepository;
@@ -13,8 +12,6 @@ import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -79,22 +76,6 @@ class HddServiceTest extends BaseServiceTest<HDD, HddService, HddRepository, Hdd
 
     @Override
     @Test
-    void getAllNamesWithPrices_shouldReturnMapOfNamesWithPrices() {
-        // Arrange
-        HashMap<String, String> expected = new HashMap<>();
-        expected.put("testId", "test ($666)");
-        when(mockHddRepository.findAll()).thenReturn(List.of(testHdd));
-
-        // Act
-        HashMap<String, String> actual = service.getAllNamesWithPrices();
-
-        // Assert
-        assertEquals(expected, actual);
-        verify(mockHddRepository).findAll();
-    }
-
-    @Override
-    @Test
     void attachPhoto_shouldAttachPhotoCorrectly() {
         // Arrange
         HDD expected = testHdd.withPhotos(List.of("Test"));
@@ -130,101 +111,121 @@ class HddServiceTest extends BaseServiceTest<HDD, HddService, HddRepository, Hdd
     }
 
     @Test
-    void getAllWithSortingOfPriceDescAsPages_shouldGetAllHddsWithProperSorting() {
+    void getAllNamesWithPrices_shouldReturnAllNamesWithPrices() {
         // Arrange
-        Page<HDD> expected = new PageImpl<>(List.of(testHdd, testHdd2), pageable, 8);
-        when(repository.findAll()).thenReturn(hdds);
+        when(mockHddRepository.findAll()).thenReturn(hdds);
+
+        String expected = "$hdds:\n{testId:test:($666)}\n{testId2:test:($333)}\n";
 
         // Act
-        Page<HDD> actual = service.getAllWithSortingOfPriceDescAsPages(pageable);
+        String actual = hddService.getAllNamesWithPrices();
 
         // Assert
-        verify(repository).findAll();
         assertEquals(expected, actual);
+        verify(mockHddRepository).findAll();
     }
 
     @Test
-    void getAllWithSortingOfPriceAscAsPages_shouldGetAllHddsWithProperSorting() {
+    void getAllIds_shouldReturnAllIds() {
         // Arrange
-        Page<HDD> expected = new PageImpl<>(List.of(testHdd2, testHdd), pageable, 8);
-        when(repository.findAll()).thenReturn(hdds);
+        when(mockHddRepository.findAll()).thenReturn(hdds);
+
+        List<String> expected = List.of("testId", "testId2");
 
         // Act
-        Page<HDD> actual = service.getAllWithSortingOfPriceAscAsPages(pageable);
+        List<String> actual = hddService.getAllIds();
 
         // Assert
-        verify(repository).findAll();
         assertEquals(expected, actual);
+        verify(mockHddRepository).findAll();
     }
 
     @Test
-    void getAllWithSortingOfRatingDescAsPages_shouldGetAllHddsWithProperSorting() {
+    void getAllHardwareInfoForConfiguration_shouldReturnAllHardwareInfoForConfiguration() {
         // Arrange
-        Page<HDD> expected = new PageImpl<>(List.of(testHdd2, testHdd), pageable, 8);
-        when(repository.findAll()).thenReturn(hdds);
+        when(mockHddRepository.findAll()).thenReturn(hdds);
+
+        List<ItemForConfigurator> expected = List.of(
+                new ItemForConfigurator("testId", "test", new BigDecimal(666), "", "hdd"),
+                new ItemForConfigurator("testId2", "test", new BigDecimal(333), "", "hdd")
+        );
 
         // Act
-        Page<HDD> actual = service.getAllWithSortingOfRatingDescAsPages(pageable);
+        List<ItemForConfigurator> actual = hddService.getAllHardwareInfoForConfiguration();
 
         // Assert
-        verify(repository).findAll();
         assertEquals(expected, actual);
+        verify(mockHddRepository).findAll();
     }
 
     @Test
-    void getAllWithSortingOfRatingAscAsPages_shouldGetAllHddsWithProperSorting() {
+    void getHdds_shouldReturnFilteredAndSortedHdds() {
         // Arrange
-        Page<HDD> expected = new PageImpl<>(List.of(testHdd, testHdd2), pageable, 8);
-        when(repository.findAll()).thenReturn(hdds);
+        List<HDD> expected = List.of(testHdd);
+        when(mockHddRepository.findAll()).thenReturn(hdds);
 
         // Act
-        Page<HDD> actual = service.getAllWithSortingOfRatingAscAsPages(pageable);
+        Page<HDD> actual = hddService.getHdds(pageable, "price-asc", 500, 700, null, null, null, null);
 
         // Assert
-        verify(repository).findAll();
-        assertEquals(expected, actual);
+        assertEquals(new PageImpl<>(expected, pageable, 1), actual);
+        verify(mockHddRepository).findAll();
     }
 
     @Test
-    void getAllWithFilteringByEnergyConsumptionAsPages_shouldGetAllHddsWithProperFiltering() {
+    void getHdds_shouldReturnFilteredAndSortedHddsByCapacity() {
         // Arrange
-        Page<HDD> expected = new PageImpl<>(Collections.singletonList(testHdd2), pageable, 8);
-        when(repository.findAll()).thenReturn(hdds);
+        List<HDD> expected = List.of(testHdd2);
+        when(mockHddRepository.findAll()).thenReturn(hdds);
 
         // Act
-        Page<HDD> actual = service.getAllWithFilteringByEnergyConsumptionAsPages(pageable, 100, 300);
+        Page<HDD> actual = hddService.getHdds(pageable, "price-asc", null, null, 200, 300, null, null);
 
         // Assert
-        verify(repository).findAll();
-        assertEquals(expected, actual);
+        assertEquals(new PageImpl<>(expected, pageable, 1), actual);
+        verify(mockHddRepository).findAll();
     }
 
     @Test
-    void getAllWithFilteringByPriceAsPages_shouldGetAllHddsWithProperFiltering() {
+    void getHdds_shouldReturnFilteredAndSortedHddsByEnergyConsumption() {
         // Arrange
-        Page<HDD> expected = new PageImpl<>(Collections.singletonList(testHdd), pageable, 8);
-        when(repository.findAll()).thenReturn(hdds);
+        List<HDD> expected = List.of(testHdd2);
+        when(mockHddRepository.findAll()).thenReturn(hdds);
 
         // Act
-        Page<HDD> actual = service.getAllWithFilteringByPriceAsPages(pageable, 500, 2500);
+        Page<HDD> actual = hddService.getHdds(pageable, "rating-desc", null, null, null, null, 200, 300);
 
         // Assert
-        verify(repository).findAll();
-        assertEquals(expected, actual);
+        assertEquals(new PageImpl<>(expected, pageable, 1), actual);
+        verify(mockHddRepository).findAll();
     }
 
     @Test
-    void getAllWithFilteringByCapacityAsPages_shouldGetAllHddsWithProperFiltering() {
+    void getHdds_shouldSortHddsByPriceDesc() {
         // Arrange
-        Page<HDD> expected = new PageImpl<>(Collections.singletonList(testHdd), pageable, 8);
-        when(repository.findAll()).thenReturn(hdds);
+        List<HDD> expected = List.of(testHdd, testHdd2);
+        when(mockHddRepository.findAll()).thenReturn(hdds);
 
         // Act
-        Page<HDD> actual = service.getAllWithFilteringByCapacityAsPages(pageable, 1, 50);
+        Page<HDD> actual = hddService.getHdds(pageable, "price-desc", null, null, null, null, null, null);
 
         // Assert
-        verify(repository).findAll();
-        assertEquals(expected, actual);
+        assertEquals(new PageImpl<>(expected, pageable, 2), actual);
+        verify(mockHddRepository).findAll();
+    }
+
+    @Test
+    void getHdds_shouldSortHddsByRatingAsc() {
+        // Arrange
+        List<HDD> expected = List.of(testHdd, testHdd2);
+        when(mockHddRepository.findAll()).thenReturn(hdds);
+
+        // Act
+        Page<HDD> actual = hddService.getHdds(pageable, "rating-asc", null, null, null, null, null, null);
+
+        // Assert
+        assertEquals(new PageImpl<>(expected, pageable, 2), actual);
+        verify(mockHddRepository).findAll();
     }
 
     @Override

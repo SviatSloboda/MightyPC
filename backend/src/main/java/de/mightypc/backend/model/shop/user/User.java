@@ -18,6 +18,7 @@ import java.util.UUID;
 public class User {
     private String id;
     private String email;
+    private String password;
     private List<Order> orders;
     private List<Item> basket;
     private List<PC> pcs;
@@ -26,7 +27,7 @@ public class User {
     private String dateOfAccountCreation;
     private String userPhoto;
 
-    public User(String email, List<Order> orders, List<Item> basket, List<PC> pcs, Boolean isGoogle, String role, String dateOfAccountCreation, String userImage) {
-        this(UUID.randomUUID().toString(), email, orders, basket, pcs, isGoogle, role, dateOfAccountCreation, userImage);
+    public User(String email, String password, List<Order> orders, List<Item> basket, List<PC> pcs, Boolean isGoogle, String role, String dateOfAccountCreation, String userImage) {
+        this(UUID.randomUUID().toString(), password, email, orders, basket, pcs, isGoogle, role, dateOfAccountCreation, userImage);
     }
 }

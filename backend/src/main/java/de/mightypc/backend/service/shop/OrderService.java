@@ -31,7 +31,13 @@ public class OrderService {
         User user = userService.getUserById(userId);
 
         List<Order> currOrders = user.getOrders();
-        Order order = new Order(items, basketService.getEntirePriceOfBasketByUser(user), OrderStatus.PENDING);
+        List<String> photos = new ArrayList<>();
+
+        for (Item item : items) {
+            photos.add(item.photo());
+        }
+
+        Order order = new Order(items, basketService.getEntirePriceOfBasketByUser(user), OrderStatus.PENDING, photos);
 
         if (currOrders == null || currOrders.isEmpty()) {
             user.setOrders(new ArrayList<>(List.of(order)));

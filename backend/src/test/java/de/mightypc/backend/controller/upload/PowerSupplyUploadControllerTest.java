@@ -3,6 +3,7 @@ package de.mightypc.backend.controller.upload;
 import de.mightypc.backend.model.hardware.PowerSupply;
 import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.PowerSupplyRepository;
+import de.mightypc.backend.security.SecurityConfig;
 import de.mightypc.backend.service.CloudinaryService;
 import de.mightypc.backend.service.hardware.PowerSupplyService;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -28,6 +31,8 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Import(SecurityConfig.class)
+@WithMockUser
 class PowerSupplyUploadControllerTest {
 
     @Autowired
@@ -68,7 +73,7 @@ class PowerSupplyUploadControllerTest {
     void uploadImage_shouldReturnUploadedPhotoUrl() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test image content".getBytes());
 
-        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/psu/upload/image/{id}", testPowerSupply.id())
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/hardware/psu/upload/image/{id}", testPowerSupply.id())
                         .file(file))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.content().string("http://example.com/test.jpg"));
@@ -78,7 +83,7 @@ class PowerSupplyUploadControllerTest {
     void uploadImage_shouldSavePhotoUrlToPowerSupply() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test image content".getBytes());
 
-        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/psu/upload/image/{id}", testPowerSupply.id())
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/hardware/psu/upload/image/{id}", testPowerSupply.id())
                         .file(file))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
 

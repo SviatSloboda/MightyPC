@@ -43,7 +43,6 @@ public class PcCaseController extends BaseController<PcCase, PcCaseService> {
     @ResponseStatus(HttpStatus.CREATED)
     public void saveAll(@RequestBody CreatePcCase[] createPcCase) {
         for (CreatePcCase pcCase : createPcCase) {
-
             HardwareSpec hardwareSpec = new HardwareSpec(
                     pcCase.hardwareSpec().name(),
                     pcCase.hardwareSpec().description(),
@@ -55,33 +54,17 @@ public class PcCaseController extends BaseController<PcCase, PcCaseService> {
         }
     }
 
-    @GetMapping("/sort/price")
-    public Page<PcCase> getSortedPcCasesByPrice(Pageable pageable, @RequestParam(value = "type", defaultValue = "desc") String type) {
-        if (type.equals("desc")) {
-            return service.getAllWithSortingOfPriceDescAsPages(pageable);
-        } else if (type.equals("asc")) {
-            return service.getAllWithSortingOfPriceAscAsPages(pageable);
-        } else {
-            throw new IllegalStateException("Not matching value! Accepted only desc and asc!!!");
-        }
+    @GetMapping("/page")
+    public Page<PcCase> getAllByPage(Pageable pageable) {
+
+        return service.getAllByPage(pageable);
     }
 
-    @GetMapping("/sort/rating")
-    public Page<PcCase> getSortedPcCasesByRating(Pageable pageable, @RequestParam(value = "type", defaultValue = "desc") String type) {
-        if (type.equals("desc")) {
-            return service.getAllWithSortingOfRatingDescAsPages(pageable);
-        } else if (type.equals("asc")) {
-            return service.getAllWithSortingOfRatingAscAsPages(pageable);
-        } else {
-            throw new IllegalStateException("Not matching value! Accepted only desc and asc!!!");
-        }
-    }
-
-    @GetMapping("/filter/price")
-    public Page<PcCase> getFilteredPcCasesByPrice(Pageable pageable,
-                                                  @RequestParam(value = "lowest", defaultValue = "0") int lowestPrice,
-                                                  @RequestParam(value = "highest", defaultValue = "999999") int highestPrice
-    ) {
-        return service.getAllWithFilteringByPriceAsPages(pageable, lowestPrice, highestPrice);
+    @GetMapping("/filtered")
+    public Page<PcCase> getPcCases(Pageable pageable,
+                                   @RequestParam(value = "sortType", required = false) String sortType,
+                                   @RequestParam(value = "lowestPrice", required = false) Integer lowestPrice,
+                                   @RequestParam(value = "highestPrice", required = false) Integer highestPrice) {
+        return service.getPcCases(pageable, sortType, lowestPrice, highestPrice);
     }
 }

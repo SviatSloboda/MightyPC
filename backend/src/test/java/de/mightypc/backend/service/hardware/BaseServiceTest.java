@@ -146,8 +146,6 @@ public abstract class BaseServiceTest<T, S extends BaseService<T, R, E>, R exten
 
     abstract void update_shouldThrowHardwareNotFoundException_whenEntityDoesNotExistInRepository();
 
-    abstract void getAllNamesWithPrices_shouldReturnMapOfNamesWithPrices();
-
     abstract void attachPhoto_shouldAttachPhotoCorrectly();
 
     abstract void attachPhoto_shouldThrowHardwareNotFoundException_whenEntityDoesNotExistInRepository();

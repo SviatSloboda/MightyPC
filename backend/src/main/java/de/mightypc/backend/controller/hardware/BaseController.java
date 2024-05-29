@@ -1,8 +1,6 @@
 package de.mightypc.backend.controller.hardware;
 
 import de.mightypc.backend.service.hardware.BaseService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,7 +9,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
-import java.util.Map;
 
 public abstract class BaseController<T, S extends BaseService<T, ?, ?>> {
     S service;
@@ -30,11 +27,6 @@ public abstract class BaseController<T, S extends BaseService<T, ?, ?>> {
         return service.getById(id);
     }
 
-    @GetMapping("/page")
-    public Page<T> getAllByPage(Pageable pageable) {
-        return service.getAllByPage(pageable);
-    }
-
     @DeleteMapping("/{id}")
     public boolean deleteById(@PathVariable String id) {
         return service.deleteById(id);
@@ -43,10 +35,5 @@ public abstract class BaseController<T, S extends BaseService<T, ?, ?>> {
     @PutMapping
     public T update(@RequestBody T entity) {
         return service.update(entity);
-    }
-
-    @GetMapping("/names")
-    public Map<String, String> getAllNames() {
-        return service.getAllNamesWithPrices();
     }
 }

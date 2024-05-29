@@ -13,15 +13,12 @@ export default function Photo(props: Readonly<PhotoProps>) {
         }
     }
 
-    return (<label htmlFor="selfie" className="upload-button">
-        Upload Photo
-        <input
-            type="file"
-            id="selfie"
-            accept="image/png, image/jpeg"
-            capture="user"
-            onChange={savePhoto}
-            className="upload-input"
-        />
+    return (<label htmlFor="selfie" className="upload-button"> Upload Photo<input
+        type="file"
+        id="selfie"
+        accept="image/png, image/jpeg"
+        capture="user"
+        onChange={savePhoto}
+        className="upload-input"/>
     </label>)
 }

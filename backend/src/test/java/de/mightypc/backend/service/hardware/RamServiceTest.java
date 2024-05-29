@@ -1,6 +1,7 @@
 package de.mightypc.backend.service.hardware;
 
 import de.mightypc.backend.exception.hardware.RamNotFoundException;
+import de.mightypc.backend.model.configurator.ItemForConfigurator;
 import de.mightypc.backend.model.hardware.RAM;
 import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.RamRepository;
@@ -11,8 +12,6 @@ import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -79,22 +78,6 @@ class RamServiceTest extends BaseServiceTest<RAM, RamService, RamRepository, Ram
 
     @Override
     @Test
-    void getAllNamesWithPrices_shouldReturnMapOfNamesWithPrices() {
-        // Arrange
-        HashMap<String, String> expected = new HashMap<>();
-        expected.put("testId", "test ($666)");
-        when(mockRamRepository.findAll()).thenReturn(List.of(testRam));
-
-        // Act
-        HashMap<String, String> actual = service.getAllNamesWithPrices();
-
-        // Assert
-        assertEquals(expected, actual);
-        verify(mockRamRepository).findAll();
-    }
-
-    @Override
-    @Test
     void attachPhoto_shouldAttachPhotoCorrectly() {
         // Arrange
         RAM expected = testRam.withPhotos(List.of("Test"));
@@ -132,115 +115,107 @@ class RamServiceTest extends BaseServiceTest<RAM, RamService, RamRepository, Ram
     }
 
     @Test
-    void getAllWithSortingOfPriceDescAsPages_shouldGetAllRamsWithProperSorting() {
+    void getAllNamesWithPrices_shouldReturnAllNamesWithPrices() {
         // Arrange
-        Page<RAM> expected = new PageImpl<>(List.of(testRam, testRam2), pageable, 8);
-        when(repository.findAll()).thenReturn(rams);
+        when(mockRamRepository.findAll()).thenReturn(rams);
+
+        String expected = "$rams:\n{testId:test:($666)}\n{testId2:test:($333)}\n";
 
         // Act
-        Page<RAM> actual = service.getAllWithSortingOfPriceDescAsPages(pageable);
+        String actual = ramService.getAllNamesWithPrices();
 
         // Assert
-        verify(repository).findAll();
         assertEquals(expected, actual);
+        verify(mockRamRepository).findAll();
     }
 
     @Test
-    void getAllWithSortingOfPriceAscAsPages_shouldGetAllRamsWithProperSorting() {
+    void getAllIds_shouldReturnAllIds() {
         // Arrange
-        Page<RAM> expected = new PageImpl<>(List.of(testRam2, testRam), pageable, 8);
-        when(repository.findAll()).thenReturn(rams);
+        when(mockRamRepository.findAll()).thenReturn(rams);
+
+        List<String> expected = List.of("testId", "testId2");
 
         // Act
-        Page<RAM> actual = service.getAllWithSortingOfPriceAscAsPages(pageable);
+        List<String> actual = ramService.getAllIds();
 
         // Assert
-        verify(repository).findAll();
         assertEquals(expected, actual);
+        verify(mockRamRepository).findAll();
     }
 
     @Test
-    void getAllWithSortingOfRatingDescAsPages_shouldGetAllRamsWithProperSorting() {
+    void getAllHardwareInfoForConfiguration_shouldReturnAllHardwareInfoForConfiguration() {
         // Arrange
-        Page<RAM> expected = new PageImpl<>(List.of(testRam2, testRam), pageable, 8);
-        when(repository.findAll()).thenReturn(rams);
+        when(mockRamRepository.findAll()).thenReturn(rams);
+
+        List<ItemForConfigurator> expected = List.of(
+                new ItemForConfigurator("testId", "test", new BigDecimal(666), "", "ram"),
+                new ItemForConfigurator("testId2", "test", new BigDecimal(333), "", "ram")
+        );
 
         // Act
-        Page<RAM> actual = service.getAllWithSortingOfRatingDescAsPages(pageable);
+        List<ItemForConfigurator> actual = ramService.getAllHardwareInfoForConfiguration();
 
         // Assert
-        verify(repository).findAll();
         assertEquals(expected, actual);
+        verify(mockRamRepository).findAll();
     }
 
     @Test
-    void getAllWithSortingOfRatingAscAsPages_shouldGetAllRamsWithProperSorting() {
+    void getRams_shouldReturnFilteredAndSortedRams() {
         // Arrange
-        Page<RAM> expected = new PageImpl<>(List.of(testRam, testRam2), pageable, 8);
-        when(repository.findAll()).thenReturn(rams);
+        List<RAM> expected = List.of(testRam);
+        when(mockRamRepository.findAll()).thenReturn(rams);
 
         // Act
-        Page<RAM> actual = service.getAllWithSortingOfRatingAscAsPages(pageable);
+        Page<RAM> actual = ramService.getRams(pageable, "price-asc", 500, 700, 1, 50, "DDR4");
 
         // Assert
-        verify(repository).findAll();
-        assertEquals(expected, actual);
+        assertEquals(new PageImpl<>(expected, pageable, 1), actual);
+        verify(mockRamRepository).findAll();
     }
 
     @Test
-    void getAllWithFilteringByEnergyConsumptionAsPages_shouldGetAllRamsWithProperFiltering() {
+    void getRams_shouldSortRamsByPriceDesc() {
         // Arrange
-        Page<RAM> expected = new PageImpl<>(Collections.singletonList(testRam2), pageable, 8);
-        when(repository.findAll()).thenReturn(rams);
+        List<RAM> expected = List.of(testRam, testRam2);
+        when(mockRamRepository.findAll()).thenReturn(rams);
 
         // Act
-        Page<RAM> actual = service.getAllWithFilteringByEnergyConsumptionAsPages(pageable, 100, 300);
+        Page<RAM> actual = ramService.getRams(pageable, "price-desc", null, null, null, null, null);
 
         // Assert
-        verify(repository).findAll();
-        assertEquals(expected, actual);
+        assertEquals(new PageImpl<>(expected, pageable, 2), actual);
+        verify(mockRamRepository).findAll();
     }
 
     @Test
-    void getAllWithFilteringByPriceAsPages_shouldGetAllRamsWithProperFiltering() {
+    void getRams_shouldSortRamsByRatingAsc() {
         // Arrange
-        Page<RAM> expected = new PageImpl<>(Collections.singletonList(testRam), pageable, 8);
-        when(repository.findAll()).thenReturn(rams);
+        List<RAM> expected = List.of(testRam, testRam2);
+        when(mockRamRepository.findAll()).thenReturn(rams);
 
         // Act
-        Page<RAM> actual = service.getAllWithFilteringByPriceAsPages(pageable, 500, 2500);
+        Page<RAM> actual = ramService.getRams(pageable, "rating-asc", null, null, null, null, null);
 
         // Assert
-        verify(repository).findAll();
-        assertEquals(expected, actual);
+        assertEquals(new PageImpl<>(expected, pageable, 2), actual);
+        verify(mockRamRepository).findAll();
     }
 
     @Test
-    void getAllWithFilteringByMemorySizeAsPages_shouldGetAllRamsWithProperFiltering() {
+    void getRams_shouldSortRamsByRatingDesc() {
         // Arrange
-        Page<RAM> expected = new PageImpl<>(Collections.singletonList(testRam), pageable, 8);
-        when(repository.findAll()).thenReturn(rams);
+        List<RAM> expected = List.of(testRam2, testRam);
+        when(mockRamRepository.findAll()).thenReturn(rams);
 
         // Act
-        Page<RAM> actual = service.getAllWithFilteringByMemorySizeAsPages(pageable, 1, 50);
+        Page<RAM> actual = ramService.getRams(pageable, "rating-desc", null, null, null, null, null);
 
         // Assert
-        verify(repository).findAll();
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void getAllWithFilteringByTypeSizeAsPages_shouldGetAllRamsWithProperFiltering() {
-        // Arrange
-        Page<RAM> expected = new PageImpl<>(Collections.singletonList(testRam2), pageable, 8);
-        when(repository.findAll()).thenReturn(rams);
-
-        // Act
-        Page<RAM> actual = service.getAllWithFilteringByTypeAsPages(pageable, "DDR228");
-
-        // Assert
-        verify(repository).findAll();
-        assertEquals(expected, actual);
+        assertEquals(new PageImpl<>(expected, pageable, 2), actual);
+        verify(mockRamRepository).findAll();
     }
 
     @Override

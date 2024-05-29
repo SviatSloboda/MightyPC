@@ -10,7 +10,17 @@ import de.mightypc.backend.service.pc.PcService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 import java.util.Map;
@@ -65,40 +75,14 @@ public class PcController {
         return powerSupplyService.getAllPowerSuppliesByEnergyConsumption(energyConsumption);
     }
 
-    @GetMapping("/sort/price")
-    public Page<PC> getSortedPcsByPrice(Pageable pageable, @RequestParam(value = "type", defaultValue = "desc") String type) {
-        if (type.equals("desc")) {
-            return service.getAllWithSortingOfPriceDescAsPages(pageable);
-        } else if (type.equals("asc")) {
-            return service.getAllWithSortingOfPriceAscAsPages(pageable);
-        } else {
-            throw new IllegalStateException("Not matching value! Accepted only desc and asc!!!");
-        }
-    }
+    @GetMapping("/filtered")
+    public Page<PC> getCpus(Pageable pageable,
+                            @RequestParam(value = "sortType", required = false) String sortType,
+                            @RequestParam(value = "lowestPrice", required = false) Integer lowestPrice,
+                            @RequestParam(value = "highestPrice", required = false) Integer highestPrice,
+                            @RequestParam(value = "lowestEnergyConsumption", required = false) Integer lowestEnergyConsumption,
+                            @RequestParam(value = "highestEnergyConsumption", required = false) Integer highestEnergyConsumption) {
 
-    @GetMapping("/sort/rating")
-    public Page<PC> getSortedPcsByRating(Pageable pageable, @RequestParam(value = "type", defaultValue = "desc") String type) {
-        if (type.equals("desc")) {
-            return service.getAllWithSortingOfRatingDescAsPages(pageable);
-        } else if (type.equals("asc")) {
-            return service.getAllWithSortingOfRatingAscAsPages(pageable);
-        } else {
-            throw new IllegalStateException("Not matching value! Accepted only desc and asc!!!");
-        }
-    }
-
-    @GetMapping("/filter/price")
-    public Page<PC> getFilteredPcsByPrice(Pageable pageable,
-                                            @RequestParam(value = "lowest", defaultValue = "0") int lowestPrice,
-                                            @RequestParam(value = "highest", defaultValue = "999999") int highestPrice
-    ) {
-        return service.getAllWithFilteringByPriceAsPages(pageable, lowestPrice, highestPrice);
-    }
-
-    @GetMapping("/filter/energy-consumption")
-    public Page<PC> getFilteredPcsByEnergyConsumption(Pageable pageable,
-                                                        @RequestParam(value = "lowest", defaultValue = "0") int lowestEnergyConsumption,
-                                                        @RequestParam(value = "highest", defaultValue = "999999") int highestEnergyConsumption) {
-        return service.getAllWithFilteringByEnergyConsumptionAsPages(pageable, lowestEnergyConsumption, highestEnergyConsumption);
+        return service.getPcs(pageable, sortType, lowestPrice, highestPrice, lowestEnergyConsumption, highestEnergyConsumption);
     }
 }

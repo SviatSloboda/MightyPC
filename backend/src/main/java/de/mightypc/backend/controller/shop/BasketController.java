@@ -30,6 +30,11 @@ public class BasketController {
         return basketService.getAllItemsOfUserByUserId(userId);
     }
 
+    @GetMapping("/{itemId}")
+    public Item getItemOfUser(@PathVariable String userId, @PathVariable String itemId) {
+        return basketService.getItemById(userId, itemId);
+    }
+
     @DeleteMapping("/{itemId}")
     public void deleteItemById(@PathVariable String userId, @PathVariable String itemId) {
         basketService.deleteItemByUserIdAndItemId(userId, itemId);

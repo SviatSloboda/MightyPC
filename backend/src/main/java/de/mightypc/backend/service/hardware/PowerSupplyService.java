@@ -1,6 +1,7 @@
 package de.mightypc.backend.service.hardware;
 
 import de.mightypc.backend.exception.hardware.PowerSupplyNotFoundException;
+import de.mightypc.backend.model.configurator.ItemForConfigurator;
 import de.mightypc.backend.model.hardware.PowerSupply;
 import de.mightypc.backend.repository.hardware.PowerSupplyRepository;
 import org.springframework.data.domain.Page;
@@ -11,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,31 +37,29 @@ public class PowerSupplyService extends BaseService<PowerSupply, PowerSupplyRepo
         return entity.hardwareSpec().name();
     }
 
-    @Override
     @Transactional
     public PowerSupply attachPhoto(String id, String photoUrl) {
         PowerSupply currPowerSupply = getById(id);
-
         ArrayList<String> photos = new ArrayList<>(currPowerSupply.powerSupplyPhotos());
-
         photos.addFirst(photoUrl);
         PowerSupply updatedPowerSupply = currPowerSupply.withPhotos(photos);
-
         return repository.save(updatedPowerSupply);
     }
 
-    @Override
     @Transactional(readOnly = true)
-    public LinkedHashMap<String, String> getAllNamesWithPrices() {
-        LinkedHashMap<String, String> hashMap = new LinkedHashMap<>();
-
+    public String getAllNamesWithPrices() {
+        StringBuilder stringBuilder = new StringBuilder("power-supplies:\n");
         List<PowerSupply> allPowerSupplies = getAllWithSortingOfPriceDesc();
-
-        for (PowerSupply powerSupply : allPowerSupplies) {
-            hashMap.put(powerSupply.id(), powerSupply.hardwareSpec().name() + " ($" + powerSupply.hardwareSpec().price() + ")");
+        for (PowerSupply psu : allPowerSupplies) {
+            String psuAsString = "{" + psu.id() + ":" + psu.hardwareSpec().name() + ":($" + psu.hardwareSpec().price() + ")}\n";
+            stringBuilder.append(psuAsString);
         }
+        return stringBuilder.toString();
+    }
 
-        return hashMap;
+    @Transactional(readOnly = true)
+    public List<String> getAllIds() {
+        return getAllWithSortingOfPriceDesc().stream().map(PowerSupply::id).toList();
     }
 
     @Transactional(readOnly = true)
@@ -82,75 +80,80 @@ public class PowerSupplyService extends BaseService<PowerSupply, PowerSupplyRepo
     }
 
     @Transactional(readOnly = true)
-    public Page<PowerSupply> getAllWithSortingOfPriceDescAsPages(Pageable pageable) {
-        return new PageImpl<>(getAllWithSortingOfPriceDesc(), pageable, 8);
+    public List<ItemForConfigurator> getAllHardwareInfoForConfiguration() {
+        List<ItemForConfigurator> items = new ArrayList<>();
+        List<PowerSupply> allPowerSupplies = getAllWithSortingOfPriceDesc();
+        for (PowerSupply powerSupply : allPowerSupplies) {
+            String powerSupplyPhoto = "";
+            if (!powerSupply.powerSupplyPhotos().isEmpty()) {
+                powerSupplyPhoto = powerSupply.powerSupplyPhotos().getFirst();
+            }
+            items.add(new ItemForConfigurator(
+                    powerSupply.id(),
+                    powerSupply.hardwareSpec().name(),
+                    powerSupply.hardwareSpec().price(),
+                    powerSupplyPhoto,
+                    "psu"
+            ));
+        }
+        return items;
     }
 
     @Transactional(readOnly = true)
-    public Page<PowerSupply> getAllWithSortingOfPriceAscAsPages(Pageable pageable) {
-        return new PageImpl<>(getAllWithSortingOfPriceAsc(), pageable, 8);
+    public Page<PowerSupply> getPowerSupplies(Pageable pageable, String sortType, Integer lowestPrice, Integer highestPrice, Integer minimalPower, Integer maximalPower) {
+        List<PowerSupply> powerSupplies = getAll();
+
+        if (lowestPrice != null && highestPrice != null) {
+            powerSupplies = powerSupplies.stream()
+                    .filter(powerSupply -> powerSupply.hardwareSpec().price().intValue() >= lowestPrice &&
+                                           powerSupply.hardwareSpec().price().intValue() <= highestPrice)
+                    .toList();
+        }
+
+        if (minimalPower != null && maximalPower != null) {
+            powerSupplies = powerSupplies.stream()
+                    .filter(powerSupply -> powerSupply.power() >= minimalPower &&
+                                           powerSupply.power() <= maximalPower)
+                    .toList();
+        }
+
+        if (sortType != null) {
+            switch (sortType) {
+                case "price-asc":
+                    powerSupplies = powerSupplies.stream()
+                            .sorted(Comparator.comparing(powerSupply -> powerSupply.hardwareSpec().price()))
+                            .toList();
+                    break;
+                case "price-desc":
+                    powerSupplies = powerSupplies.stream()
+                            .sorted(Comparator.comparing((PowerSupply powerSupply) -> powerSupply.hardwareSpec().price()).reversed())
+                            .toList();
+                    break;
+                case "rating-asc":
+                    powerSupplies = powerSupplies.stream()
+                            .sorted(Comparator.comparing(powerSupply -> powerSupply.hardwareSpec().rating()))
+                            .toList();
+                    break;
+                case "rating-desc":
+                    powerSupplies = powerSupplies.stream()
+                            .sorted(Comparator.comparing((PowerSupply powerSupply) -> powerSupply.hardwareSpec().rating()).reversed())
+                            .toList();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), powerSupplies.size());
+        return new PageImpl<>(powerSupplies.subList(start, end), pageable, powerSupplies.size());
     }
 
-    @Transactional(readOnly = true)
-    public Page<PowerSupply> getAllWithSortingOfRatingDescAsPages(Pageable pageable) {
-        return new PageImpl<>(getAllWithSortingOfRatingDesc(), pageable, 8);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<PowerSupply> getAllWithSortingOfRatingAscAsPages(Pageable pageable) {
-        return new PageImpl<>(getAllWithSortingOfRatingAsc(), pageable, 8);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<PowerSupply> getAllWithFilteringByPriceAsPages(Pageable pageable, int lowestPrice, int highestPrice) {
-        return new PageImpl<>(getAllWithFilteringByPrice(lowestPrice, highestPrice), pageable, 8);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<PowerSupply> getAllWithFilteringByPowerAsPages(Pageable pageable, int minimalPower, int maximalPower) {
-        return new PageImpl<>(getAllWithFilteringByPower(minimalPower, maximalPower), pageable, 8);
-    }
 
     private List<PowerSupply> getAllWithSortingOfPriceDesc() {
         return getAll()
                 .stream()
-                .sorted(Comparator.comparing(powerSupply -> powerSupply.hardwareSpec().price()))
-                .toList()
-                .reversed();
-    }
-
-    private List<PowerSupply> getAllWithSortingOfPriceAsc() {
-        return getAll()
-                .stream()
-                .sorted(Comparator.comparing(powerSupply -> powerSupply.hardwareSpec().price()))
-                .toList();
-    }
-
-    private List<PowerSupply> getAllWithSortingOfRatingDesc() {
-        return getAll()
-                .stream()
-                .sorted(Comparator.comparing(powerSupply -> powerSupply.hardwareSpec().rating()))
-                .toList()
-                .reversed();
-    }
-
-    private List<PowerSupply> getAllWithSortingOfRatingAsc() {
-        return getAll()
-                .stream()
-                .sorted(Comparator.comparing(powerSupply -> powerSupply.hardwareSpec().rating()))
-                .toList();
-    }
-
-    private List<PowerSupply> getAllWithFilteringByPrice(int lowestPrice, int highestPrice) {
-        return getAll().stream()
-                .filter(powerSupply -> powerSupply.hardwareSpec().price().intValue() >= lowestPrice
-                                       && powerSupply.hardwareSpec().price().intValue() <= highestPrice)
-                .toList();
-    }
-
-    private List<PowerSupply> getAllWithFilteringByPower(int minimalPower, int maximalPower) {
-        return getAll().stream()
-                .filter(powerSupply -> powerSupply.power() >= minimalPower && powerSupply.power() <= maximalPower)
+                .sorted(Comparator.comparing((PowerSupply powerSupply) -> powerSupply.hardwareSpec().price()).reversed())
                 .toList();
     }
 }

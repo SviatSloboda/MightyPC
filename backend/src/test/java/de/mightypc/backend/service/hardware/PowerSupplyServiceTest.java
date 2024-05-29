@@ -1,6 +1,7 @@
 package de.mightypc.backend.service.hardware;
 
 import de.mightypc.backend.exception.hardware.PowerSupplyNotFoundException;
+import de.mightypc.backend.model.configurator.ItemForConfigurator;
 import de.mightypc.backend.model.hardware.PowerSupply;
 import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.PowerSupplyRepository;
@@ -76,22 +77,6 @@ class PowerSupplyServiceTest extends BaseServiceTest<PowerSupply, PowerSupplySer
 
     @Override
     @Test
-    void getAllNamesWithPrices_shouldReturnMapOfNamesWithPrices() {
-        // Arrange
-        HashMap<String, String> expected = new HashMap<>();
-        expected.put("testId", "test ($666)");
-        when(mockPowerSupplyRepository.findAll()).thenReturn(List.of(testPowerSupply));
-
-        // Act
-        HashMap<String, String> actual = service.getAllNamesWithPrices();
-
-        // Assert
-        assertEquals(expected, actual);
-        verify(mockPowerSupplyRepository).findAll();
-    }
-
-    @Override
-    @Test
     void attachPhoto_shouldAttachPhotoCorrectly() {
         // Arrange
         PowerSupply expected = testPowerSupply.withPhotos(List.of("Test"));
@@ -159,6 +144,48 @@ class PowerSupplyServiceTest extends BaseServiceTest<PowerSupply, PowerSupplySer
         verify(mockPowerSupplyRepository).findAll();
     }
 
+    @Test
+    void getPowerSupplies_shouldSortPowerSuppliesByPriceDesc() {
+        // Arrange
+        List<PowerSupply> expected = List.of(testPowerSupply, testPowerSupply2);
+        when(mockPowerSupplyRepository.findAll()).thenReturn(powerSupplies);
+
+        // Act
+        Page<PowerSupply> actual = powerSupplyService.getPowerSupplies(pageable, "price-desc", null, null, null, null);
+
+        // Assert
+        assertEquals(new PageImpl<>(expected, pageable, 2), actual);
+        verify(mockPowerSupplyRepository).findAll();
+    }
+
+    @Test
+    void getPowerSupplies_shouldSortPowerSuppliesByRatingAsc() {
+        // Arrange
+        List<PowerSupply> expected = List.of(testPowerSupply, testPowerSupply2);
+        when(mockPowerSupplyRepository.findAll()).thenReturn(powerSupplies);
+
+        // Act
+        Page<PowerSupply> actual = powerSupplyService.getPowerSupplies(pageable, "rating-asc", null, null, null, null);
+
+        // Assert
+        assertEquals(new PageImpl<>(expected, pageable, 2), actual);
+        verify(mockPowerSupplyRepository).findAll();
+    }
+
+    @Test
+    void getPowerSupplies_shouldSortPowerSuppliesByRatingDesc() {
+        // Arrange
+        List<PowerSupply> expected = List.of(testPowerSupply2, testPowerSupply);
+        when(mockPowerSupplyRepository.findAll()).thenReturn(powerSupplies);
+
+        // Act
+        Page<PowerSupply> actual = powerSupplyService.getPowerSupplies(pageable, "rating-desc", null, null, null, null);
+
+        // Assert
+        assertEquals(new PageImpl<>(expected, pageable, 2), actual);
+        verify(mockPowerSupplyRepository).findAll();
+    }
+
 
     @Test
     void getNameOfEntity_shouldReturnCorrectNameOfEntity() {
@@ -170,88 +197,67 @@ class PowerSupplyServiceTest extends BaseServiceTest<PowerSupply, PowerSupplySer
     }
 
     @Test
-    void getAllWithSortingOfPriceDescAsPages_shouldGetAllPowerSuppliesWithProperSorting() {
+    void getAllNamesWithPrices_shouldReturnAllNamesWithPrices() {
         // Arrange
-        Page<PowerSupply> expected = new PageImpl<>(List.of(testPowerSupply, testPowerSupply2), pageable, 8);
-        when(repository.findAll()).thenReturn(powerSupplies);
+        when(mockPowerSupplyRepository.findAll()).thenReturn(powerSupplies);
+
+        String expected = "power-supplies:\n{testId:test:($666)}\n{testId2:test:($333)}\n";
 
         // Act
-        Page<PowerSupply> actual = service.getAllWithSortingOfPriceDescAsPages(pageable);
+        String actual = powerSupplyService.getAllNamesWithPrices();
 
         // Assert
-        verify(repository).findAll();
         assertEquals(expected, actual);
+        verify(mockPowerSupplyRepository).findAll();
     }
 
     @Test
-    void getAllWithSortingOfPriceAscAsPages_shouldGetAllPowerSuppliesWithProperSorting() {
+    void getAllIds_shouldReturnAllIds() {
         // Arrange
-        Page<PowerSupply> expected = new PageImpl<>(List.of(testPowerSupply2, testPowerSupply), pageable, 8);
-        when(repository.findAll()).thenReturn(powerSupplies);
+        when(mockPowerSupplyRepository.findAll()).thenReturn(powerSupplies);
+
+        List<String> expected = List.of("testId", "testId2");
 
         // Act
-        Page<PowerSupply> actual = service.getAllWithSortingOfPriceAscAsPages(pageable);
+        List<String> actual = powerSupplyService.getAllIds();
 
         // Assert
-        verify(repository).findAll();
         assertEquals(expected, actual);
+        verify(mockPowerSupplyRepository).findAll();
     }
 
     @Test
-    void getAllWithSortingOfRatingDescAsPages_shouldGetAllPowerSuppliesWithProperSorting() {
+    void getAllHardwareInfoForConfiguration_shouldReturnAllHardwareInfoForConfiguration() {
         // Arrange
-        Page<PowerSupply> expected = new PageImpl<>(List.of(testPowerSupply2, testPowerSupply), pageable, 8);
-        when(repository.findAll()).thenReturn(powerSupplies);
+        when(mockPowerSupplyRepository.findAll()).thenReturn(powerSupplies);
+
+        List<ItemForConfigurator> expected = List.of(
+                new ItemForConfigurator("testId", "test", new BigDecimal(666), "", "psu"),
+                new ItemForConfigurator("testId2", "test", new BigDecimal(333), "", "psu")
+        );
 
         // Act
-        Page<PowerSupply> actual = service.getAllWithSortingOfRatingDescAsPages(pageable);
+        List<ItemForConfigurator> actual = powerSupplyService.getAllHardwareInfoForConfiguration();
 
         // Assert
-        verify(repository).findAll();
         assertEquals(expected, actual);
+        verify(mockPowerSupplyRepository).findAll();
     }
 
     @Test
-    void getAllWithSortingOfRatingAscAsPages_shouldGetAllPowerSuppliesWithProperSorting() {
+    void getPowerSupplies_shouldReturnFilteredAndSortedPowerSupplies() {
         // Arrange
-        Page<PowerSupply> expected = new PageImpl<>(List.of(testPowerSupply, testPowerSupply2), pageable, 8);
-        when(repository.findAll()).thenReturn(powerSupplies);
+        List<PowerSupply> expected = List.of(testPowerSupply);
+        when(mockPowerSupplyRepository.findAll()).thenReturn(powerSupplies);
 
         // Act
-        Page<PowerSupply> actual = service.getAllWithSortingOfRatingAscAsPages(pageable);
+        Page<PowerSupply> actual = powerSupplyService.getPowerSupplies(pageable, "price-asc", 500, 700, 100, 300);
 
         // Assert
-        verify(repository).findAll();
-        assertEquals(expected, actual);
+        assertEquals(new PageImpl<>(expected, pageable, 1), actual);
+        verify(mockPowerSupplyRepository).findAll();
     }
 
-    @Test
-    void getAllWithFilteringByPowerAsPages_shouldGetAllPowerSuppliesWithProperFiltering() {
-        // Arrange
-        Page<PowerSupply> expected = new PageImpl<>(Collections.singletonList(testPowerSupply), pageable, 8);
-        when(repository.findAll()).thenReturn(powerSupplies);
-
-        // Act
-        Page<PowerSupply> actual = service.getAllWithFilteringByPowerAsPages(pageable, 100, 300);
-
-        // Assert
-        verify(repository).findAll();
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void getAllWithFilteringByPriceAsPages_shouldGetAllPowerSuppliesWithProperFiltering() {
-        // Arrange
-        Page<PowerSupply> expected = new PageImpl<>(Collections.singletonList(testPowerSupply), pageable, 8);
-        when(repository.findAll()).thenReturn(powerSupplies);
-
-        // Act
-        Page<PowerSupply> actual = service.getAllWithFilteringByPriceAsPages(pageable, 500, 2500);
-
-        // Assert
-        verify(repository).findAll();
-        assertEquals(expected, actual);
-    }
 
     @Override
     protected PowerSupplyNotFoundException getException() {

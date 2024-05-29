@@ -6,4 +6,5 @@ export interface Order {
     items: Item[];
     completePrice: number;
     orderStatus: OrderStatus;
+    photos: string[];
 }

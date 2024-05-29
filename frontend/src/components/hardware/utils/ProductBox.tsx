@@ -23,6 +23,7 @@ const ProductBox: React.FC<ProductBoxProps> = ({product, imgSrc, toCharacteristi
             <button className="product-box__button" onClick={onAddToBasket}>Buy</button>
             <button className="product-box__button" onClick={toCharacteristicsPage}>Info</button>
         </div>
+
     </div>);
 
 export default ProductBox;

@@ -1,6 +1,7 @@
 package de.mightypc.backend.service.hardware;
 
 import de.mightypc.backend.exception.hardware.HddNotFoundException;
+import de.mightypc.backend.model.configurator.ItemForConfigurator;
 import de.mightypc.backend.model.hardware.HDD;
 import de.mightypc.backend.repository.hardware.HddRepository;
 
@@ -12,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 @Service
@@ -36,115 +36,112 @@ public class HddService extends BaseService<HDD, HddRepository, HddNotFoundExcep
         return entity.hardwareSpec().name();
     }
 
-    @Override
     @Transactional
     public HDD attachPhoto(String id, String photoUrl) {
         HDD currHdd = getById(id);
-
         ArrayList<String> photos = new ArrayList<>(currHdd.hddPhotos());
-
         photos.addFirst(photoUrl);
         HDD updatedHdd = currHdd.withPhotos(photos);
-
         return repository.save(updatedHdd);
     }
 
-    @Override
     @Transactional(readOnly = true)
-    public LinkedHashMap<String, String> getAllNamesWithPrices() {
-        LinkedHashMap<String, String> hashMap = new LinkedHashMap<>();
-
+    public String getAllNamesWithPrices() {
+        StringBuilder stringBuilder = new StringBuilder("$hdds:\n");
         List<HDD> allHdds = getAllWithSortingOfPriceDesc();
-
         for (HDD hdd : allHdds) {
-            hashMap.put(hdd.id(), hdd.hardwareSpec().name() + " ($" + hdd.hardwareSpec().price() + ")");
+            String hddAsString = "{" + hdd.id() + ":" + hdd.hardwareSpec().name() + ":($" + hdd.hardwareSpec().price() + ")}\n";
+            stringBuilder.append(hddAsString);
+        }
+        return stringBuilder.toString();
+    }
+
+    @Transactional(readOnly = true)
+    public List<String> getAllIds() {
+        return getAllWithSortingOfPriceDesc().stream().map(HDD::id).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ItemForConfigurator> getAllHardwareInfoForConfiguration() {
+        List<ItemForConfigurator> items = new ArrayList<>();
+        List<HDD> allHdds = getAllWithSortingOfPriceDesc();
+        for (HDD hdd : allHdds) {
+            String hddPhoto = "";
+            if (!hdd.hddPhotos().isEmpty()) {
+                hddPhoto = hdd.hddPhotos().getFirst();
+            }
+            items.add(new ItemForConfigurator(
+                    hdd.id(),
+                    hdd.hardwareSpec().name(),
+                    hdd.hardwareSpec().price(),
+                    hddPhoto,
+                    "hdd"
+            ));
+        }
+        return items;
+    }
+
+    @Transactional(readOnly = true)
+    public Page<HDD> getHdds(Pageable pageable, String sortType, Integer lowestPrice, Integer highestPrice, Integer minimalCapacity, Integer maximalCapacity, Integer lowestEnergyConsumption, Integer highestEnergyConsumption) {
+        List<HDD> hdds = getAll();
+
+        if (lowestPrice != null && highestPrice != null) {
+            hdds = hdds.stream()
+                    .filter(hdd -> hdd.hardwareSpec().price().intValue() >= lowestPrice &&
+                                   hdd.hardwareSpec().price().intValue() <= highestPrice)
+                    .toList();
         }
 
-        return hashMap;
+        if (minimalCapacity != null && maximalCapacity != null) {
+            hdds = hdds.stream()
+                    .filter(hdd -> hdd.capacity() >= minimalCapacity && hdd.capacity() <= maximalCapacity)
+                    .toList();
+        }
+
+        if (lowestEnergyConsumption != null && highestEnergyConsumption != null) {
+            hdds = hdds.stream()
+                    .filter(hdd -> hdd.energyConsumption() >= lowestEnergyConsumption &&
+                                   hdd.energyConsumption() <= highestEnergyConsumption)
+                    .toList();
+        }
+
+        if (sortType != null) {
+            switch (sortType) {
+                case "price-asc":
+                    hdds = hdds.stream()
+                            .sorted(Comparator.comparing(hdd -> hdd.hardwareSpec().price()))
+                            .toList();
+                    break;
+                case "price-desc":
+                    hdds = hdds.stream()
+                            .sorted(Comparator.comparing((HDD hdd) -> hdd.hardwareSpec().price()).reversed())
+                            .toList();
+                    break;
+                case "rating-asc":
+                    hdds = hdds.stream()
+                            .sorted(Comparator.comparing(hdd -> hdd.hardwareSpec().rating()))
+                            .toList();
+                    break;
+                case "rating-desc":
+                    hdds = hdds.stream()
+                            .sorted(Comparator.comparing((HDD hdd) -> hdd.hardwareSpec().rating()).reversed())
+                            .toList();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), hdds.size());
+        return new PageImpl<>(hdds.subList(start, end), pageable, hdds.size());
     }
 
-    @Transactional(readOnly = true)
-    public Page<HDD> getAllWithSortingOfPriceDescAsPages(Pageable pageable) {
-        return new PageImpl<>(getAllWithSortingOfPriceDesc(), pageable, 8);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<HDD> getAllWithSortingOfPriceAscAsPages(Pageable pageable) {
-        return new PageImpl<>(getAllWithSortingOfPriceAsc(), pageable, 8);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<HDD> getAllWithSortingOfRatingDescAsPages(Pageable pageable) {
-        return new PageImpl<>(getAllWithSortingOfRatingDesc(), pageable, 8);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<HDD> getAllWithSortingOfRatingAscAsPages(Pageable pageable) {
-        return new PageImpl<>(getAllWithSortingOfRatingAsc(), pageable, 8);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<HDD> getAllWithFilteringByPriceAsPages(Pageable pageable, int lowestPrice, int highestPrice) {
-        return new PageImpl<>(getAllWithFilteringByPrice(lowestPrice, highestPrice), pageable, 8);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<HDD> getAllWithFilteringByEnergyConsumptionAsPages(Pageable pageable, int lowestEnergyConsumption, int highestEnergyConsumption) {
-        return new PageImpl<>(getAllWithFilteringByEnergyConsumption(lowestEnergyConsumption, highestEnergyConsumption), pageable, 8);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<HDD> getAllWithFilteringByCapacityAsPages(Pageable pageable, int minimalCapacity, int maximalCapacity) {
-        return new PageImpl<>(getAllWithFilteringByCapasity(minimalCapacity, maximalCapacity), pageable, 8);
-    }
 
     private List<HDD> getAllWithSortingOfPriceDesc() {
         return getAll()
                 .stream()
-                .sorted(Comparator.comparing(hdd -> hdd.hardwareSpec().price()))
-                .toList()
-                .reversed();
-    }
-
-    private List<HDD> getAllWithSortingOfPriceAsc() {
-        return getAll()
-                .stream()
-                .sorted(Comparator.comparing(hdd -> hdd.hardwareSpec().price()))
-                .toList();
-    }
-
-    private List<HDD> getAllWithSortingOfRatingDesc() {
-        return getAll()
-                .stream()
-                .sorted(Comparator.comparing(hdd -> hdd.hardwareSpec().rating()))
-                .toList()
-                .reversed();
-    }
-
-    private List<HDD> getAllWithSortingOfRatingAsc() {
-        return getAll()
-                .stream()
-                .sorted(Comparator.comparing(hdd -> hdd.hardwareSpec().rating()))
-                .toList();
-    }
-
-    private List<HDD> getAllWithFilteringByPrice(int lowestPrice, int highestPrice) {
-        return getAll().stream()
-                .filter(hdd -> hdd.hardwareSpec().price().intValue() >= lowestPrice
-                               && hdd.hardwareSpec().price().intValue() <= highestPrice)
-                .toList();
-    }
-
-    private List<HDD> getAllWithFilteringByCapasity(int minimumCapacity, int maximalCapacity) {
-        return getAll().stream()
-                .filter(hdd -> hdd.capacity() >= minimumCapacity && hdd.capacity() <= maximalCapacity)
-                .toList();
-    }
-
-    private List<HDD> getAllWithFilteringByEnergyConsumption(int lowestEnergyConsumption, int highestEnergyConsumption) {
-        return getAll().stream()
-                .filter(hdd -> hdd.energyConsumption() >= lowestEnergyConsumption
-                               && hdd.energyConsumption() <= highestEnergyConsumption)
+                .sorted(Comparator.comparing((HDD hdd) -> hdd.hardwareSpec().price()).reversed())
                 .toList();
     }
 }

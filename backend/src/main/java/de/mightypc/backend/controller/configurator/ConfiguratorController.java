@@ -1,6 +1,6 @@
 package de.mightypc.backend.controller.configurator;
 
-import de.mightypc.backend.model.configurator.ConfiguratorComponents;
+import de.mightypc.backend.model.configurator.ConfiguratorItems;
 import de.mightypc.backend.model.hardware.SpecsIds;
 import de.mightypc.backend.service.configurator.ChatGptService;
 import de.mightypc.backend.service.configurator.ConfiguratorService;
@@ -30,9 +30,9 @@ public class ConfiguratorController {
         this.powerSupplyService = powerSupplyService;
     }
 
-    @GetMapping
-    public ConfiguratorComponents getAllConfiguratorComponents() {
-        return configuratorService.getAllComponentsIdsAndNamesWithPrices();
+    @GetMapping("/items")
+    public ConfiguratorItems getAllConfiguratorItems() {
+        return configuratorService.getAllItemsWithInfoForConfigurator();
     }
 
     @GetMapping("/motherboard/socket/{cpuSocket}")
@@ -40,12 +40,10 @@ public class ConfiguratorController {
         return motherboardService.getMotherboardsBySocket(cpuSocket);
     }
 
-
     @PostMapping("/gpt")
     public SpecsIds createPcWithChatGpt(@RequestBody String[] userPreferences) {
         return chatGptService.createChatGptRecommendation(userPreferences[0], userPreferences[1]);
     }
-
 
     @PostMapping("/power-supply/energyConsumption/{energyConsumption}")
     public Map<String, String> getAllPowerSuppliesByEnergyConsumption(@PathVariable int energyConsumption) {

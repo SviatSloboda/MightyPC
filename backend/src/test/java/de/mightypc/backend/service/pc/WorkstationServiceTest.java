@@ -161,20 +161,6 @@ class WorkstationServiceTest {
     private final PageRequest pageable = PageRequest.of(0, 8);
 
     @Test
-    void getAllWithSortingOfPriceDescAsPages_shouldGetAllGpusWithProperSorting() {
-        // Arrange
-        Page<Workstation> expected = new PageImpl<>(List.of(testWorkstation, testWorkstation2), pageable, 8);
-        when(workstationRepository.findAll()).thenReturn(workstations);
-
-        // Act
-        Page<Workstation> actual = service.getAllWithSortingOfPriceDescAsPages(pageable);
-
-        // Assert
-        verify(workstationRepository).findAll();
-        assertEquals(expected, actual);
-    }
-
-    @Test
     void getAllByPage_whenPagesIsEmpty_thenThrowWorkationNotFoundException(){
         // Arrange
         when(workstationRepository.findAll(pageable)).thenReturn(new PageImpl<>(new ArrayList<>()));
@@ -182,77 +168,6 @@ class WorkstationServiceTest {
         // Act & Assert
         assertThrows(WorkstationNotFoundException.class,
                 () -> service.getAllByPage(pageable));
-    }
-
-
-    @Test
-    void getAllWithSortingOfPriceAscAsPages_shouldGetAllGpusWithProperSorting() {
-        // Arrange
-        Page<Workstation> expected = new PageImpl<>(List.of(testWorkstation2, testWorkstation), pageable, 8);
-        when(workstationRepository.findAll()).thenReturn(workstations);
-
-        // Act
-        Page<Workstation> actual = service.getAllWithSortingOfPriceAscAsPages(pageable);
-
-        // Assert
-        verify(workstationRepository).findAll();
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void getAllWithSortingOfRatingDescAsPages_shouldGetAllGpusWithProperSorting() {
-        // Arrange
-        Page<Workstation> expected = new PageImpl<>(List.of(testWorkstation2, testWorkstation), pageable, 8);
-        when(workstationRepository.findAll()).thenReturn(workstations);
-
-        // Act
-        Page<Workstation> actual = service.getAllWithSortingOfRatingDescAsPages(pageable);
-
-        // Assert
-        verify(workstationRepository).findAll();
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void getAllWithSortingOfRatingAscAsPages_shouldGetAllGpusWithProperSorting() {
-        // Arrange
-        Page<Workstation> expected = new PageImpl<>(List.of(testWorkstation, testWorkstation2), pageable, 8);
-        when(workstationRepository.findAll()).thenReturn(workstations);
-
-        // Act
-        Page<Workstation> actual = service.getAllWithSortingOfRatingAscAsPages(pageable);
-
-        // Assert
-        verify(workstationRepository).findAll();
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void getAllWithFilteringByEnergyConsumptionAsPages_shouldGetAllGpusWithProperFiltering() {
-        // Arrange
-        Page<Workstation> expected = new PageImpl<>(Collections.singletonList(testWorkstation), pageable, 8);
-        when(workstationRepository.findAll()).thenReturn(workstations);
-
-        // Act
-        Page<Workstation> actual = service.getAllWithFilteringByEnergyConsumptionAsPages(pageable, 100, 1000);
-
-        // Assert
-        verify(workstationRepository).findAll();
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void getAllWithFilteringByPriceAsPages_shouldGetAllGpusWithProperFiltering() {
-        // Arrange
-        Page<Workstation> expected = new PageImpl<>(Collections.singletonList(testWorkstation), pageable, 8);
-        when(workstationRepository.findAll()).thenReturn(workstations);
-
-        // Act
-        Page<Workstation> actual = service.getAllWithFilteringByPriceAsPages(pageable, 500, 2500);
-
-        // Assert
-        verify(workstationRepository).findAll();
-        assertEquals(expected, actual);
     }
 
     @Test
@@ -304,6 +219,96 @@ class WorkstationServiceTest {
         verify(workstationRepository).findById("workstationId");
         verify(workstationRepository).delete(testWorkstation);
     }
+
+    @Test
+    void getWorkstations_shouldReturnFilteredAndSortedWorkstationsByPriceRange() {
+        // Arrange
+        when(workstationRepository.findAll()).thenReturn(workstations);
+
+        // Act
+        Page<Workstation> result = service.getWorkstations(pageable, "price-asc", 300, 700, null, null);
+
+        // Assert
+        assertEquals(2, result.getTotalElements());
+        assertEquals(testWorkstation2, result.getContent().get(0));
+        assertEquals(testWorkstation, result.getContent().get(1));
+        verify(workstationRepository).findAll();
+    }
+
+    @Test
+    void getWorkstations_shouldReturnFilteredAndSortedWorkstationsByEnergyConsumptionRange() {
+        // Arrange
+        when(workstationRepository.findAll()).thenReturn(workstations);
+
+        // Act
+        Page<Workstation> result = service.getWorkstations(pageable, "price-asc", null, null, 800, 1000);
+
+        // Assert
+        assertEquals(1, result.getTotalElements());
+        assertEquals(testWorkstation, result.getContent().get(0));
+        verify(workstationRepository).findAll();
+    }
+
+    @Test
+    void getWorkstations_shouldSortWorkstationsByPriceAsc() {
+        // Arrange
+        when(workstationRepository.findAll()).thenReturn(workstations);
+
+        // Act
+        Page<Workstation> result = service.getWorkstations(pageable, "price-asc", null, null, null, null);
+
+        // Assert
+        assertEquals(2, result.getTotalElements());
+        assertEquals(testWorkstation2, result.getContent().get(0));
+        assertEquals(testWorkstation, result.getContent().get(1));
+        verify(workstationRepository).findAll();
+    }
+
+    @Test
+    void getWorkstations_shouldSortWorkstationsByPriceDesc() {
+        // Arrange
+        when(workstationRepository.findAll()).thenReturn(workstations);
+
+        // Act
+        Page<Workstation> result = service.getWorkstations(pageable, "price-desc", null, null, null, null);
+
+        // Assert
+        assertEquals(2, result.getTotalElements());
+        assertEquals(testWorkstation, result.getContent().get(0));
+        assertEquals(testWorkstation2, result.getContent().get(1));
+        verify(workstationRepository).findAll();
+    }
+
+    @Test
+    void getWorkstations_shouldSortWorkstationsByRatingAsc() {
+        // Arrange
+        when(workstationRepository.findAll()).thenReturn(workstations);
+
+        // Act
+        Page<Workstation> result = service.getWorkstations(pageable, "rating-asc", null, null, null, null);
+
+        // Assert
+        assertEquals(2, result.getTotalElements());
+        assertEquals(testWorkstation, result.getContent().get(0));
+        assertEquals(testWorkstation2, result.getContent().get(1));
+        verify(workstationRepository).findAll();
+    }
+
+    @Test
+    void getWorkstations_shouldSortWorkstationsByRatingDesc() {
+        // Arrange
+        when(workstationRepository.findAll()).thenReturn(workstations);
+
+        // Act
+        Page<Workstation> result = service.getWorkstations(pageable, "rating-desc", null, null, null, null);
+
+        // Assert
+        assertEquals(2, result.getTotalElements());
+        assertEquals(testWorkstation2, result.getContent().get(0));
+        assertEquals(testWorkstation, result.getContent().get(1));
+        verify(workstationRepository).findAll();
+    }
+
 
     @Test
     void getAll_shouldReturnAllGpus() {

@@ -10,6 +10,8 @@ import de.mightypc.backend.repository.shop.UserRepository;
 import de.mightypc.backend.service.shop.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -24,7 +26,8 @@ import static org.mockito.Mockito.verify;
 
 class OrderServiceTest {
     private final UserRepository userRepository = mock(UserRepository.class);
-    private final UserService userService = new UserService(userRepository);
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final UserService userService = new UserService(userRepository, passwordEncoder);
     private final BasketService basketService = new BasketService(userService, userRepository);
     private final OrderService orderService = new OrderService(userService, basketService, userRepository);
 
@@ -32,15 +35,16 @@ class OrderServiceTest {
 
     @BeforeEach
     void setUp() {
-        Item testItem = new Item("itemId", "pc", "destroyer", "something", new BigDecimal(666), Collections.emptyList());
-        Order testOrder = new Order("orderId", new ArrayList<>(List.of(testItem)), new BigDecimal(666), OrderStatus.PENDING);
+        Item testItem = new Item("itemId", "pc", "destroyer", new BigDecimal(666), "", "");
+        Order testOrder = new Order("orderId", new ArrayList<>(List.of(testItem)), new BigDecimal(666), OrderStatus.PENDING, Collections.emptyList());
 
         user = new User("testId", "testEmail", new ArrayList<>(List.of(testOrder)), new ArrayList<>(), new ArrayList<>(), true, "user", "23.32", "link");
     }
 
     @Test
     void placeOrder() {
-        List<Item> items = new ArrayList<>(List.of(new Item("new", "new", "lox", "lox", new BigDecimal(333), Collections.emptyList())));
+        List<Item> items = new ArrayList<>(List.of(new Item("new", "new", "something", new BigDecimal(333), "", "")));
+
         when(userRepository.findById("testId")).thenReturn(Optional.of(user));
 
         orderService.placeOrder("testId", items);
@@ -53,7 +57,7 @@ class OrderServiceTest {
     @Test
     void placeOrder_shouldPlaceOrderProperly_whenOrdersListIsNull() {
         User specialUser = user.withId("specialId").withOrders(null);
-        List<Item> items = new ArrayList<>(List.of(new Item("new", "new", "lox", "lox", new BigDecimal(333), Collections.emptyList())));
+        List<Item> items = new ArrayList<>(List.of(new Item("new", "new", "something", new BigDecimal(333), "", "")));
         when(userRepository.findById("specialId")).thenReturn(Optional.of(specialUser));
 
         orderService.placeOrder("specialId", items);
@@ -95,7 +99,7 @@ class OrderServiceTest {
     }
 
     @Test
-    void  getOrderByUserAndOrderId_whenThereIsNoSuchOrder_shouldOrderNotFoundException(){
+    void getOrderByUserAndOrderId_whenThereIsNoSuchOrder_shouldOrderNotFoundException() {
         // Arrange
         when(userRepository.findById("testId")).thenReturn(Optional.of(user));
         user.setOrders(new ArrayList<>());

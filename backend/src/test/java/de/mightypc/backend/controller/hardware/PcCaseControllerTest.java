@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -35,6 +36,7 @@ class PcCaseControllerTest extends BaseControllerTest {
     }
 
     @DirtiesContext
+    @WithMockUser
     @Test
     void savePcCase_shouldReturnCreatedPcCase() throws Exception {
         String jsonRequestBody = """
@@ -57,6 +59,7 @@ class PcCaseControllerTest extends BaseControllerTest {
     }
 
     @DirtiesContext
+    @WithMockUser
     @Test
     void saveAllPcCases_shouldReturnStatusCreated() throws Exception {
         String jsonRequestBody = """
@@ -83,72 +86,6 @@ class PcCaseControllerTest extends BaseControllerTest {
                         .contentType("application/json")
                         .content(jsonRequestBody))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
-    }
-
-    @DirtiesContext
-    @Test
-    void getSortedPcCasesByPrice_shouldReturnSortedData() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/hardware/pc-case/sort/price?type=asc"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].hardwareSpec.name").value("testPcCase2"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[1].hardwareSpec.name").value("testPcCase1"));
-    }
-
-    @DirtiesContext
-    @Test
-    void getSortedPcCasesByPrice_shouldReturnSortedDataInDescOrder() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/hardware/pc-case/sort/price?type=desc"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].hardwareSpec.name").value("testPcCase1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[1].hardwareSpec.name").value("testPcCase2"));
-    }
-
-    @DirtiesContext
-    @Test
-    void getSortedPcCasesByPrice_shouldReturnBadRequest_whenRequestParamIsIncorrect() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/hardware/pc-case/sort/price?type=badtype"))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
-    }
-
-    @DirtiesContext
-    @Test
-    void getFilteredPcCasesByPrice_shouldReturnFilteredData() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/hardware/pc-case/filter/price?lowest=250&highest=400"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].hardwareSpec.name").value("testPcCase1"));
-    }
-
-    @DirtiesContext
-    @Test
-    void getSortedPcCasesByRating_shouldReturnSortedDataAsc() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/hardware/pc-case/sort/rating?type=asc"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].hardwareSpec.rating").value(4.0))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[1].hardwareSpec.rating").value(4.5));
-    }
-
-    @DirtiesContext
-    @Test
-    void getSortedPcCasesByRating_shouldReturnNotFoundWhenNoPcCasesExist() throws Exception {
-        pcCaseRepository.deleteAll();
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/hardware/pc-case/sort/rating?type=desc"))
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
-    }
-
-    @DirtiesContext
-    @Test
-    void getSortedPcCasesByRating_shouldReturnBadRequest_whenRequestParamIsIncorrect() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/hardware/pc-case/sort/rating?type=badtype"))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
-    }
-
-    @DirtiesContext
-    @Test
-    void getFilteredPcCasesByPrice_shouldReturnNotFoundWhenNoMatch() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/hardware/pc-case/filter/price?lowest=500&highest=1000"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content").isEmpty());
     }
 
     @Override

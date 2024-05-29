@@ -35,8 +35,8 @@ public class WorkstationService extends PcBaseService<Workstation, WorkstationRe
     private final WorkstationRepository workstationRepository;
 
     @Autowired
-    public WorkstationService(WorkstationRepository workstationRepository, CpuService cpuService, GpuService gpuService, SsdService workstationService, HddService hddService, RamService ramService, PcCaseService pcCaseService, PowerSupplyService powerSupplyService, MotherboardService motherboardService) {
-        super(workstationRepository, cpuService, gpuService, workstationService, hddService, ramService, pcCaseService, powerSupplyService, motherboardService);
+    public WorkstationService(WorkstationRepository workstationRepository, CpuService cpuService, GpuService gpuService, SsdService workstationService, HddService hddService, RamService ramService, PcCaseService workstationCaseService, PowerSupplyService powerSupplyService, MotherboardService motherboardService) {
+        super(workstationRepository, cpuService, gpuService, workstationService, hddService, ramService, workstationCaseService, powerSupplyService, motherboardService);
         this.workstationRepository = workstationRepository;
     }
 
@@ -223,76 +223,53 @@ public class WorkstationService extends PcBaseService<Workstation, WorkstationRe
 
 
     @Transactional(readOnly = true)
-    public Page<Workstation> getAllWithSortingOfPriceDescAsPages(Pageable pageable) {
-        return new PageImpl<>(getAllWithSortingOfPriceDesc(), pageable, 8);
-    }
+    public Page<Workstation> getWorkstations(Pageable pageable, String sortType, Integer lowestPrice, Integer highestPrice, Integer lowestEnergyConsumption, Integer highestEnergyConsumption) {
+        List<Workstation> workstations = getAll();
 
-    @Transactional(readOnly = true)
-    public Page<Workstation> getAllWithSortingOfPriceAscAsPages(Pageable pageable) {
-        return new PageImpl<>(getAllWithSortingOfPriceAsc(), pageable, 8);
-    }
+        if (lowestPrice != null && highestPrice != null) {
+            workstations = workstations.stream()
+                    .filter(workstation -> workstation.hardwareSpec().price().intValue() >= lowestPrice &&
+                                           workstation.hardwareSpec().price().intValue() <= highestPrice)
+                    .toList();
+        }
 
-    @Transactional(readOnly = true)
-    public Page<Workstation> getAllWithSortingOfRatingDescAsPages(Pageable pageable) {
-        return new PageImpl<>(getAllWithSortingOfRatingDesc(), pageable, 8);
-    }
+        if (lowestEnergyConsumption != null && highestEnergyConsumption != null) {
+            workstations = workstations.stream()
+                    .filter(workstation -> workstation.energyConsumption() >= lowestEnergyConsumption &&
+                                           workstation.energyConsumption() <= highestEnergyConsumption)
+                    .toList();
+        }
 
-    @Transactional(readOnly = true)
-    public Page<Workstation> getAllWithSortingOfRatingAscAsPages(Pageable pageable) {
-        return new PageImpl<>(getAllWithSortingOfRatingAsc(), pageable, 8);
-    }
+        if (sortType != null) {
 
-    @Transactional(readOnly = true)
-    public Page<Workstation> getAllWithFilteringByPriceAsPages(Pageable pageable, int lowestPrice, int highestPrice) {
-        return new PageImpl<>(getAllWithFilteringByPrice(lowestPrice, highestPrice), pageable, 8);
-    }
+            switch (sortType) {
+                case "price-asc":
+                    workstations = workstations.stream()
+                            .sorted(Comparator.comparing(workstation -> workstation.hardwareSpec().price()))
+                            .toList();
+                    break;
+                case "price-desc":
+                    workstations = workstations.stream()
+                            .sorted(Comparator.comparing((Workstation workstation) -> workstation.hardwareSpec().price()).reversed())
+                            .toList();
+                    break;
+                case "rating-asc":
+                    workstations = workstations.stream()
+                            .sorted(Comparator.comparing(workstation -> workstation.hardwareSpec().rating()))
+                            .toList();
+                    break;
+                case "rating-desc":
+                    workstations = workstations.stream()
+                            .sorted(Comparator.comparing((Workstation workstation) -> workstation.hardwareSpec().rating()).reversed())
+                            .toList();
+                    break;
+                default:
+                    break;
+            }
+        }
 
-    @Transactional(readOnly = true)
-    public Page<Workstation> getAllWithFilteringByEnergyConsumptionAsPages(Pageable pageable, int lowestEnergyConsumption, int highestEnergyConsumption) {
-        return new PageImpl<>(getAllWithFilteringByEnergyConsumption(lowestEnergyConsumption, highestEnergyConsumption), pageable, 8);
-    }
-
-    private List<Workstation> getAllWithSortingOfPriceDesc() {
-        return getAll()
-                .stream()
-                .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().price()))
-                .toList()
-                .reversed();
-    }
-
-    private List<Workstation> getAllWithSortingOfPriceAsc() {
-        return getAll()
-                .stream()
-                .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().price()))
-                .toList();
-    }
-
-    private List<Workstation> getAllWithSortingOfRatingDesc() {
-        return getAll()
-                .stream()
-                .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().rating()))
-                .toList()
-                .reversed();
-    }
-
-    private List<Workstation> getAllWithSortingOfRatingAsc() {
-        return getAll()
-                .stream()
-                .sorted(Comparator.comparing(cpu -> cpu.hardwareSpec().rating()))
-                .toList();
-    }
-
-    private List<Workstation> getAllWithFilteringByPrice(int lowestPrice, int highestPrice) {
-        return getAll().stream()
-                .filter(cpu -> cpu.hardwareSpec().price().intValue() >= lowestPrice
-                               && cpu.hardwareSpec().price().intValue() <= highestPrice)
-                .toList();
-    }
-
-    private List<Workstation> getAllWithFilteringByEnergyConsumption(int lowestEnergyConsumption, int highestEnergyConsumption) {
-        return getAll().stream()
-                .filter(cpu -> cpu.energyConsumption() >= lowestEnergyConsumption
-                               && cpu.energyConsumption() <= highestEnergyConsumption)
-                .toList();
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), workstations.size());
+        return new PageImpl<>(workstations.subList(start, end), pageable, workstations.size());
     }
 }

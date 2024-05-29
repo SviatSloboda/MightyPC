@@ -1,52 +1,51 @@
-import {useState, useCallback, useEffect} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import axios from 'axios';
 import {useNavigate} from "react-router-dom";
-import pcPhoto from "../../assets/Pc.png";
-import nothingImage from "../../assets/noPC.png";
+import pcPhoto from "../../assets/pc/Pc.png";
+import nothingImage from "../../assets/pc/noPC.png";
 import {useAuth} from "../../contexts/AuthContext.tsx";
-import useLoginModal from "../hardware/utils/useLoginModal.ts";
-import LoginModal from "../hardware/utils/LoginModal.tsx";
+import useLoginModal from "../login/useLoginModal.ts";
+import LoginModal from "../login/LoginModal.tsx";
 import {PC} from "../../model/pc/PC.tsx";
-import {login} from "../../contexts/authUtils.ts";
-import UserProductBox from "../hardware/utils/UserProductBox.tsx";
+import UserProductBox from "./UserProductBox.tsx";
 
 export default function UserPcsPage() {
-    const [Pcs, setPcs] = useState<PC[]>([]);
+    const [pcs, setPcs] = useState<PC[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const pcsPerPage = 8;
     const {user} = useAuth();
-    const {isLoginModalOpen, showLoginModal, hideLoginModal} = useLoginModal();
+    const {isLoginModalOpen, showLoginModal, hideLoginModal, handleLogin} = useLoginModal();
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchPcs = async () => {
-            if (!user) {
-                await new Promise((resolve) => {
-                    const checkUser = setInterval(() => {
-                        const currentUser = user;
-                        if (currentUser) {
-                            clearInterval(checkUser);
-                            resolve(currentUser);
-                        }
-                    }, 2);
-                });
-            }
-            const userId = user?.id;
-            if (userId) {
-                const response = await axios.get(`/api/user-pcs/${userId}/page`, {
-                    params: {
-                        page: currentPage,
-                        size: pcsPerPage
+    const fetchPcs = useCallback(async () => {
+        if (!user) {
+            await new Promise((resolve) => {
+                const checkUser = setInterval(() => {
+                    const currentUser = user;
+                    if (currentUser) {
+                        clearInterval(checkUser);
+                        resolve(currentUser);
                     }
-                });
-                setPcs(response.data.content);
-                setTotalPages(response.data.totalPages);
-            }
-        };
+                }, 2);
+            });
+        }
+        const userId = user?.id;
+        if (userId) {
+            const response = await axios.get(`/api/user-pcs/${userId}/page`, {
+                params: {
+                    page: currentPage,
+                    size: pcsPerPage
+                }
+            });
+            setPcs(response.data.content);
+            setTotalPages(response.data.totalPages);
+        }
+    }, [currentPage, user]);
 
-        fetchPcs();
-    }, [currentPage]);
+    useEffect(() => {
+        fetchPcs().catch(error => console.error('Failed to fetch PCs:', error));
+    }, [currentPage, user, fetchPcs]);
 
     const paginate = useCallback((pageNumber: number) => setCurrentPage(pageNumber - 1), []);
 
@@ -68,7 +67,7 @@ export default function UserPcsPage() {
 
     return (
         <>
-            {Pcs.length === 0 ? (
+            {pcs.length === 0 ? (
                 <div className="basket-empty">
                     <img className={"basket-empty__image"} src={nothingImage} alt="No Pcs found"/>
                     <p className={"basket-empty__message"}>You have not configured your own PC yet!</p>
@@ -76,7 +75,7 @@ export default function UserPcsPage() {
             ) : (
                 <>
                     <div className="product-list">
-                        {Pcs.map(pc => (
+                        {pcs.map(pc => (
                             <UserProductBox
                                 key={pc.id}
                                 product={pc}
@@ -94,7 +93,7 @@ export default function UserPcsPage() {
                     </div>
                 </>
             )}
-            <LoginModal isOpen={isLoginModalOpen} onLogin={login} onClose={hideLoginModal}/>
+            <LoginModal isOpen={isLoginModalOpen} onLogin={handleLogin} onClose={hideLoginModal}/>
         </>
     );
 }

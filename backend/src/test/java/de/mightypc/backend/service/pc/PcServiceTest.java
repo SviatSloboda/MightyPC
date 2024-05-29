@@ -132,91 +132,8 @@ class PcServiceTest {
                     "testPowerSupply",
                     "testPcCase"
             ), 900, Collections.emptyList());
+
     private final PageRequest pageable = PageRequest.of(0, 8);
-
-    @Test
-    void getAllWithSortingOfPriceDescAsPages_shouldGetAllGpusWithProperSorting() {
-        // Arrange
-        Page<PC> expected = new PageImpl<>(List.of(testPc, testPc2), pageable, 8);
-        when(pcRepository.findAll()).thenReturn(pcs);
-
-        // Act
-        Page<PC> actual = service.getAllWithSortingOfPriceDescAsPages(pageable);
-
-        // Assert
-        verify(pcRepository).findAll();
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void getAllWithSortingOfPriceAscAsPages_shouldGetAllGpusWithProperSorting() {
-        // Arrange
-        Page<PC> expected = new PageImpl<>(List.of(testPc2, testPc), pageable, 8);
-        when(pcRepository.findAll()).thenReturn(pcs);
-
-        // Act
-        Page<PC> actual = service.getAllWithSortingOfPriceAscAsPages(pageable);
-
-        // Assert
-        verify(pcRepository).findAll();
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void getAllWithSortingOfRatingDescAsPages_shouldGetAllGpusWithProperSorting() {
-        // Arrange
-        Page<PC> expected = new PageImpl<>(List.of(testPc2, testPc), pageable, 8);
-        when(pcRepository.findAll()).thenReturn(pcs);
-
-        // Act
-        Page<PC> actual = service.getAllWithSortingOfRatingDescAsPages(pageable);
-
-        // Assert
-        verify(pcRepository).findAll();
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void getAllWithSortingOfRatingAscAsPages_shouldGetAllGpusWithProperSorting() {
-        // Arrange
-        Page<PC> expected = new PageImpl<>(List.of(testPc, testPc2), pageable, 8);
-        when(pcRepository.findAll()).thenReturn(pcs);
-
-        // Act
-        Page<PC> actual = service.getAllWithSortingOfRatingAscAsPages(pageable);
-
-        // Assert
-        verify(pcRepository).findAll();
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void getAllWithFilteringByEnergyConsumptionAsPages_shouldGetAllGpusWithProperFiltering() {
-        // Arrange
-        Page<PC> expected = new PageImpl<>(Collections.singletonList(testPc), pageable, 8);
-        when(pcRepository.findAll()).thenReturn(pcs);
-
-        // Act
-        Page<PC> actual = service.getAllWithFilteringByEnergyConsumptionAsPages(pageable, 100, 1000);
-
-        // Assert
-        verify(pcRepository).findAll();
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void getAllWithFilteringByPriceAsPages_shouldGetAllGpusWithProperFiltering() {
-        // Arrange
-        Page<PC> expected = new PageImpl<>(Collections.singletonList(testPc), pageable, 8);
-        when(pcRepository.findAll()).thenReturn(pcs);
-
-        // Act
-        Page<PC> actual = service.getAllWithFilteringByPriceAsPages(pageable, 500, 2500);
-
-        // Assert
-        verify(pcRepository).findAll();
-        assertEquals(expected, actual);
-    }
 
     @Test
     void getSpecsForConfigurator_shouldReturnProperSpecsForEnergyConsumption() {
@@ -301,6 +218,137 @@ class PcServiceTest {
         // Assert
         assertEquals(expectedPrice, result);
     }
+
+    @Test
+    void calculateEnergyConsumptionOfPc_shouldReturnTotalConsumption_whenRemainderIsZero() {
+        // Arrange
+        SpecsForEnergyConsumption specs = new SpecsForEnergyConsumption(
+                new CPU("cpuId", new HardwareSpec("testCpu", "test", new BigDecimal(10), 2.5f), 100, "AM4"),
+                new GPU("gpuId", new HardwareSpec("testGpu", "test", new BigDecimal(10), 2.5f), 150),
+                new Motherboard("motherboardId", new HardwareSpec("testMotherboard", "test", new BigDecimal(10), 2.5f), 100, "AM4"),
+                new RAM("ramId", new HardwareSpec("testRam", "test", new BigDecimal(10), 2.5f), "DDR", 50, 2),
+                new SSD("ssdId", new HardwareSpec("testSsd", "test", new BigDecimal(10), 2.5f), 50, 5),
+                new HDD("hddId", new HardwareSpec("testHdd", "test", new BigDecimal(10), 2.5f), 50, 5)
+        );
+        int expectedTotalConsumption = 450;
+
+        // Act
+        int actualTotalConsumption = service.calculateEnergyConsumptionOfPc(specs);
+
+        // Assert
+        assertEquals(expectedTotalConsumption, actualTotalConsumption);
+    }
+
+    @Test
+    void calculateEnergyConsumptionOfPc_shouldRoundUpToNearest50_whenRemainderIsNotZero() {
+        // Arrange
+        SpecsForEnergyConsumption specs = new SpecsForEnergyConsumption(
+                new CPU("cpuId", new HardwareSpec("testCpu", "test", new BigDecimal(10), 2.5f), 102, "AM4"),
+                new GPU("gpuId", new HardwareSpec("testGpu", "test", new BigDecimal(10), 2.5f), 150),
+                new Motherboard("motherboardId", new HardwareSpec("testMotherboard", "test", new BigDecimal(10), 2.5f), 103, "AM4"),
+                new RAM("ramId", new HardwareSpec("testRam", "test", new BigDecimal(10), 2.5f), "DDR", 51, 2),
+                new SSD("ssdId", new HardwareSpec("testSsd", "test", new BigDecimal(10), 2.5f), 52, 5),
+                new HDD("hddId", new HardwareSpec("testHdd", "test", new BigDecimal(10), 2.5f), 54, 5)
+        );
+        int expectedTotalConsumption = 450;
+
+        // Act
+        int actualTotalConsumption = service.calculateEnergyConsumptionOfPc(specs);
+
+        // Assert
+        assertEquals(expectedTotalConsumption, actualTotalConsumption);
+    }
+
+    @Test
+    void getPcs_shouldReturnFilteredAndSortedPcsByPriceRange() {
+        // Arrange
+        when(pcRepository.findAll()).thenReturn(pcs);
+
+        // Act
+        Page<PC> result = service.getPcs(pageable, "price-asc", 300, 700, null, null);
+
+        // Assert
+        assertEquals(2, result.getTotalElements());
+        assertEquals(testPc2, result.getContent().get(0));
+        assertEquals(testPc, result.getContent().get(1));
+        verify(pcRepository).findAll();
+    }
+
+    @Test
+    void getPcs_shouldReturnFilteredAndSortedPcsByEnergyConsumptionRange() {
+        // Arrange
+        when(pcRepository.findAll()).thenReturn(pcs);
+
+        // Act
+        Page<PC> result = service.getPcs(pageable, "price-asc", null, null, 800, 1000);
+
+        // Assert
+        assertEquals(1, result.getTotalElements());
+        assertEquals(testPc, result.getContent().get(0));
+        verify(pcRepository).findAll();
+    }
+
+    @Test
+    void getPcs_shouldSortPcsByPriceAsc() {
+        // Arrange
+        when(pcRepository.findAll()).thenReturn(pcs);
+
+        // Act
+        Page<PC> result = service.getPcs(pageable, "price-asc", null, null, null, null);
+
+        // Assert
+        assertEquals(2, result.getTotalElements());
+        assertEquals(testPc2, result.getContent().get(0));
+        assertEquals(testPc, result.getContent().get(1));
+        verify(pcRepository).findAll();
+    }
+
+    @Test
+    void getPcs_shouldSortPcsByPriceDesc() {
+        // Arrange
+        when(pcRepository.findAll()).thenReturn(pcs);
+
+        // Act
+        Page<PC> result = service.getPcs(pageable, "price-desc", null, null, null, null);
+
+        // Assert
+        assertEquals(2, result.getTotalElements());
+        assertEquals(testPc, result.getContent().get(0));
+        assertEquals(testPc2, result.getContent().get(1));
+        verify(pcRepository).findAll();
+    }
+
+    @Test
+    void getPcs_shouldSortPcsByRatingAsc() {
+        // Arrange
+        when(pcRepository.findAll()).thenReturn(pcs);
+
+        // Act
+        Page<PC> result = service.getPcs(pageable, "rating-asc", null, null, null, null);
+
+        // Assert
+        assertEquals(2, result.getTotalElements());
+        assertEquals(testPc, result.getContent().get(0));
+        assertEquals(testPc2, result.getContent().get(1));
+        verify(pcRepository).findAll();
+    }
+
+    @Test
+    void getPcs_shouldSortPcsByRatingDesc() {
+        // Arrange
+        when(pcRepository.findAll()).thenReturn(pcs);
+
+        // Act
+        Page<PC> result = service.getPcs(pageable, "rating-desc", null, null, null, null);
+
+        // Assert
+        assertEquals(2, result.getTotalElements());
+        assertEquals(testPc2, result.getContent().get(0));
+        assertEquals(testPc, result.getContent().get(1));
+        verify(pcRepository).findAll();
+    }
+
+
 
     @Test
     void createPcResponse_shouldCreateResponseProperly() {
@@ -517,3 +565,14 @@ class PcServiceTest {
         assertEquals(50, actual);
     }
 }
+
+/*
+        when(cpuRepository.findById("cpuId")).thenReturn(Optional.of(cpu));
+        when(gpuRepository.findById("gpuId")).thenReturn(Optional.of(gpu));
+        when(motherboardRepository.findById("motherboardId")).thenReturn(Optional.of(motherboard));
+        when(ramRepository.findById("ramId")).thenReturn(Optional.of(ram));
+        when(ssdRepository.findById("ssdId")).thenReturn(Optional.of(ssd));
+        when(hddRepository.findById("hddId")).thenReturn(Optional.of(hdd));
+        when(pcCaseRepository.findById("pcCaseId")).thenReturn(Optional.of(pcCase));
+        when(powerSupplyRepository.findById("powerSupplyId")).thenReturn(Optional.of(powerSupply));
+ */

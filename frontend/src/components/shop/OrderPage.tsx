@@ -2,8 +2,8 @@ import {useCallback, useEffect, useState} from 'react';
 import axios from 'axios';
 import {useAuth} from '../../contexts/AuthContext';
 import {Order} from '../../model/shop/Order';
-import OrderInfoModal from './OrderInfoModal'; // Adjust the import path as necessary
-import empty_box from "../../assets/empty_box.png";
+import OrderInfoModal from './OrderInfoModal';
+import empty_box from "../../assets/shop/empty_box.png";
 
 export default function OrderPage() {
     const [orders, setOrders] = useState<Order[]>([]);
@@ -31,28 +31,44 @@ export default function OrderPage() {
         setShowModal(true);
     };
 
-    return (<div className="order-page">
-        {orders.length === 0 ? (<div className="basket-empty">
-            <img src={empty_box} alt="Empty Basket" className="basket-empty__image"/>
-            <p className="basket-empty__message">There are no orders!</p>
-        </div>) : (orders.map((order: Order) => (<div key={order.id} className="order-item">
-            <div className="order-item__details">
-                <h2 className="order-item__id">Order ID: {order.id}</h2>
-                <p className="order-item__status">Status: {order.orderStatus}</p>
-                <p className="order-item__total">Total: {order.completePrice} €</p>
-                <div className="order-item__actions">
-                    <button className="order-item__button"
-                            onClick={() => handleOpenInfoModal(order.id)}>Info
-                    </button>
-                    {order.orderStatus === 'PENDING' && <button className="order-item__button">Pay</button>}
+    return (
+        <div className="order-page">
+            {orders.length === 0 ? (
+                <div className="order-page__basket-empty">
+                    <img src={empty_box} alt="Empty Basket" className="order-page__image"/>
+                    <p className="order-page__basket-empty-message">There are no orders!</p>
                 </div>
-            </div>
-        </div>)))}
-        {showModal && (<OrderInfoModal
-            showModal={showModal}
-            setShowModal={setShowModal}
-            orderId={selectedOrderId}
-            userId={user?.id || ''}
-        />)}
-    </div>);
+            ) : (
+                orders.map((order: Order) => (
+                    <div key={order.id} className="order-page__item">
+                        <div className="order-page__item-photos">
+                            {order.items.slice(0, 4).map((item) => (
+                                <img key={item.id} src={item.photo} alt={`Item ${item.id}`}
+                                     className="order-page__item-photo"/>
+                            ))}
+                        </div>
+                        <div className="order-page__item-info">
+                            <h2 className="order-page__item-id">Order ID: {order.id.slice(0, 8)}</h2>
+                            <p className="order-page__item-total">Total: {order.completePrice} €</p>
+                        </div>
+                        <div className="order-page__item-actions">
+                            <button className="order-page__item-button"
+                                    onClick={() => handleOpenInfoModal(order.id)}>Info
+                            </button>
+                            {order.orderStatus === 'PENDING' &&
+                                <button className="order-page__item-button">Pay</button>}
+                        </div>
+                    </div>
+                ))
+            )}
+            {showModal && (
+                <OrderInfoModal
+                    showModal={showModal}
+                    setShowModal={setShowModal}
+                    orderId={selectedOrderId}
+                    userId={user?.id ?? ''}
+                />
+            )}
+        </div>
+    );
 }

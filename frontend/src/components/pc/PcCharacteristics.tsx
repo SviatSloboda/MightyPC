@@ -2,11 +2,11 @@ import {useEffect, useState} from "react";
 import axios from "axios";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {useAuth} from "../../contexts/AuthContext.tsx";
-import useLoginModal from "../hardware/utils/useLoginModal.ts";
-import LoginModal from "../hardware/utils/LoginModal.tsx";
+import useLoginModal from "../login/useLoginModal.ts";
+import LoginModal from "../login/LoginModal.tsx";
 import Photo from "../hardware/utils/Photo.tsx";
 import Rating from "../hardware/utils/Rating.tsx";
-import pcPhoto from "../../assets/Pc.png"
+import pcPhoto from "../../assets/pc/Pc.png"
 import {PC} from "../../model/pc/PC.tsx";
 
 export default function PcCharacteristics() {
@@ -153,11 +153,11 @@ export default function PcCharacteristics() {
 
         const payload = {
             id: pc?.id,
-            type: "pc",
             name: pc?.hardwareSpec.name,
             description: pc?.hardwareSpec.description,
             price: pc?.hardwareSpec.price,
-            photos: pc && (pc.photos?.length ?? 0) > 0 ? pc.photos : [pcPhoto]
+            photo: pc?.photos && pc.photos.length > 0 ? pc.photos[pc.photos.length - 1] : pcPhoto,
+            pathToCharacteristicsPage: "/pc"
         };
 
         axios.post<void>(`/api/basket/${user?.id}`, payload)
@@ -189,13 +189,16 @@ export default function PcCharacteristics() {
     return (<>
         <div className="product-characteristics">
             <div className="product-characteristics__slideshow-container">
-                {photos.map((photo, index) => (<div
-                    className={`product-characteristics__slide ${index === currentSlideIndex ? 'product-characteristics__slide--active' : ''}`}
-                    key={index}
-                >
-                    <div className="product-characteristics__number-text">{index + 1} / {photos.length}</div>
-                    <img src={photo} alt="PC" className="product-characteristics__photo-img"/>
-                </div>))}
+                {photos.map((photo) => (
+                    <div
+                        className={`product-characteristics__slide ${photos.indexOf(photo) === currentSlideIndex ? 'product-characteristics__slide--active' : ''}`}
+                        key={photo}
+                    >
+                        <div
+                            className="product-characteristics__number-text">{photos.indexOf(photo) + 1} / {photos.length}</div>
+                        <img src={photo} alt="PC" className="product-characteristics__photo-img"/>
+                    </div>
+                ))}
                 {!photos.length && <img src={pcPhoto} alt="PC" className="product-characteristics__photo-img"/>}
                 {photos.length >= 2 && (<>
                     <button className="product-characteristics__control product-characteristics__control--prev"
@@ -208,11 +211,15 @@ export default function PcCharacteristics() {
 
             {pc && (<div className="product-characteristics__details pc-details">
                 <div className={"product-characteristics--nameAndBuy"}>
-                    <div className={"product-characteristics--nameAndRating"}>
+                    <div className="product-characteristics--nameAndRating">
                         <h1 className="product-characteristics__name pcCharacteristic__name">{pc?.hardwareSpec.name}</h1>
                         <div className="product-characteristics__info">
-                            <Rating rating={pc?.hardwareSpec.rating ?? 0}/>
-                            <span className="product-characteristics__rating">{pc?.hardwareSpec.rating}/5</span>
+                            {!isUserPc && (
+                                <>
+                                    <Rating rating={pc?.hardwareSpec.rating ?? 0}/>
+                                    <span className="product-characteristics__rating">{pc?.hardwareSpec.rating}/5</span>
+                                </>
+                            )}
                         </div>
                     </div>
 
