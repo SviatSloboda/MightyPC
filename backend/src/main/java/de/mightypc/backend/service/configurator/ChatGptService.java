@@ -12,17 +12,19 @@ import java.util.Arrays;
 
 @Service
 public class ChatGptService {
-    private final RestClient restClient;
+    private RestClient restClient;
     private final ConfiguratorService configuratorService;
 
     public ChatGptService(@Value("${app.chatgpt.api.url}") String url,
                           @Value("${app.chatgpt.api.key}") String apiKey,
                           @Value("${app.chatgpt.api.org}") String org,
-                          ConfiguratorService configuratorService
-    ) {
+                          ConfiguratorService configuratorService) {
 
         this.configuratorService = configuratorService;
+        setRestClient(url, apiKey, org);
+    }
 
+    public void setRestClient(String url, String apiKey, String org) {
         restClient = RestClient.builder()
                 .baseUrl(url)
                 .defaultHeader("Authorization", "Bearer " + apiKey)
@@ -31,7 +33,7 @@ public class ChatGptService {
     }
 
     private String[] getIdsFromChatGpt(String computerType, String price) {
-        String componentsList = configuratorService.getAllComponentsIdsAndNamesWithPrices();
+        String componentsList = configuratorService.getAllComponentsIdsAndNamesWithPricesForChatGpt();
 
         String prompt = """
                 Role: Professional PC Configurator.
@@ -94,3 +96,4 @@ public class ChatGptService {
         );
     }
 }
+

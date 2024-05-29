@@ -98,35 +98,38 @@ public class GpuService extends BaseService<GPU, GpuRepository, GpuNotFoundExcep
                     .toList();
         }
 
-        switch (sortType) {
-            case "price-asc":
-                gpus = gpus.stream()
-                        .sorted(Comparator.comparing(gpu -> gpu.hardwareSpec().price()))
-                        .toList();
-                break;
-            case "price-desc":
-                gpus = gpus.stream()
-                        .sorted(Comparator.comparing((GPU gpu) -> gpu.hardwareSpec().price()).reversed())
-                        .toList();
-                break;
-            case "rating-asc":
-                gpus = gpus.stream()
-                        .sorted(Comparator.comparing(gpu -> gpu.hardwareSpec().rating()))
-                        .toList();
-                break;
-            case "rating-desc":
-                gpus = gpus.stream()
-                        .sorted(Comparator.comparing((GPU gpu) -> gpu.hardwareSpec().rating()).reversed())
-                        .toList();
-                break;
-            default:
-                break;
+        if (sortType != null) {
+            switch (sortType) {
+                case "price-asc":
+                    gpus = gpus.stream()
+                            .sorted(Comparator.comparing(gpu -> gpu.hardwareSpec().price()))
+                            .toList();
+                    break;
+                case "price-desc":
+                    gpus = gpus.stream()
+                            .sorted(Comparator.comparing((GPU gpu) -> gpu.hardwareSpec().price()).reversed())
+                            .toList();
+                    break;
+                case "rating-asc":
+                    gpus = gpus.stream()
+                            .sorted(Comparator.comparing(gpu -> gpu.hardwareSpec().rating()))
+                            .toList();
+                    break;
+                case "rating-desc":
+                    gpus = gpus.stream()
+                            .sorted(Comparator.comparing((GPU gpu) -> gpu.hardwareSpec().rating()).reversed())
+                            .toList();
+                    break;
+                default:
+                    break;
+            }
         }
 
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), gpus.size());
         return new PageImpl<>(gpus.subList(start, end), pageable, gpus.size());
     }
+
 
     private List<GPU> getAllWithSortingOfPriceDesc() {
         return getAll()
@@ -135,4 +138,3 @@ public class GpuService extends BaseService<GPU, GpuRepository, GpuNotFoundExcep
                 .toList();
     }
 }
-

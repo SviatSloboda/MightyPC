@@ -13,11 +13,14 @@ import de.mightypc.backend.repository.hardware.RamRepository;
 import de.mightypc.backend.repository.hardware.SsdRepository;
 import de.mightypc.backend.repository.pc.PcRepository;
 import de.mightypc.backend.repository.shop.UserRepository;
+import de.mightypc.backend.security.SecurityConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -32,6 +35,8 @@ import static org.hamcrest.Matchers.hasSize;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Import(SecurityConfig.class)
+@WithMockUser
 class UserPcsControllerTest {
     @Autowired
     MockMvc mockMvc;
@@ -106,6 +111,7 @@ class UserPcsControllerTest {
     private final User user = new User(
             "user1",
             "testEmail",
+            "testPassword",
             new ArrayList<>(),
             new ArrayList<>(),
             new ArrayList<>(List.of(testPc, testPc2)),

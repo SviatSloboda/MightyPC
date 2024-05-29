@@ -114,7 +114,7 @@ public class UserService {
     }
 
     public User getUserById(String id) {
-        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("There is no such user"));
+        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("There is no such user with id: " + id + "."));
     }
 
     public User attachPhoto(String userId, String photoUrl) {

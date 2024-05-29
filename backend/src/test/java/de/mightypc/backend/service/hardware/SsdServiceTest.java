@@ -1,6 +1,7 @@
 package de.mightypc.backend.service.hardware;
 
 import de.mightypc.backend.exception.hardware.SsdNotFoundException;
+import de.mightypc.backend.model.configurator.ItemForConfigurator;
 import de.mightypc.backend.model.hardware.SSD;
 import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.SsdRepository;
@@ -11,8 +12,6 @@ import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,22 +76,6 @@ class SsdServiceTest extends BaseServiceTest<SSD, SsdService, SsdRepository, Ssd
 
     @Override
     @Test
-    void getAllNamesWithPrices_shouldReturnMapOfNamesWithPrices() {
-        // Arrange
-        HashMap<String, String> expected = new HashMap<>();
-        expected.put("testId", "test ($666)");
-        when(mockSsdRepository.findAll()).thenReturn(List.of(testSsd));
-
-        // Act
-        HashMap<String, String> actual = service.getAllNamesWithPrices();
-
-        // Assert
-        assertEquals(expected, actual);
-        verify(mockSsdRepository).findAll();
-    }
-
-    @Override
-    @Test
     void attachPhoto_shouldAttachPhotoCorrectly() {
         // Arrange
         SSD expected = testSsd.withPhotos(List.of("Test"));
@@ -130,101 +113,107 @@ class SsdServiceTest extends BaseServiceTest<SSD, SsdService, SsdRepository, Ssd
     }
 
     @Test
-    void getAllWithSortingOfPriceDescAsPages_shouldGetAllSsdsWithProperSorting() {
+    void getAllNamesWithPrices_shouldReturnAllNamesWithPrices() {
         // Arrange
-        Page<SSD> expected = new PageImpl<>(List.of(testSsd, testSsd2), pageable, 8);
-        when(repository.findAll()).thenReturn(ssds);
+        when(mockSsdRepository.findAll()).thenReturn(ssds);
+
+        String expected = "$ssds:\n{testId:test:($666)}\n{testId2:test:($333)}\n";
 
         // Act
-        Page<SSD> actual = service.getAllWithSortingOfPriceDescAsPages(pageable);
+        String actual = ssdService.getAllNamesWithPrices();
 
         // Assert
-        verify(repository).findAll();
         assertEquals(expected, actual);
+        verify(mockSsdRepository).findAll();
     }
 
     @Test
-    void getAllWithSortingOfPriceAscAsPages_shouldGetAllSsdsWithProperSorting() {
+    void getAllIds_shouldReturnAllIds() {
         // Arrange
-        Page<SSD> expected = new PageImpl<>(List.of(testSsd2, testSsd), pageable, 8);
-        when(repository.findAll()).thenReturn(ssds);
+        when(mockSsdRepository.findAll()).thenReturn(ssds);
+
+        List<String> expected = List.of("testId", "testId2");
 
         // Act
-        Page<SSD> actual = service.getAllWithSortingOfPriceAscAsPages(pageable);
+        List<String> actual = ssdService.getAllIds();
 
         // Assert
-        verify(repository).findAll();
         assertEquals(expected, actual);
+        verify(mockSsdRepository).findAll();
     }
 
     @Test
-    void getAllWithSortingOfRatingDescAsPages_shouldGetAllSsdsWithProperSorting() {
+    void getAllHardwareInfoForConfiguration_shouldReturnAllHardwareInfoForConfiguration() {
         // Arrange
-        Page<SSD> expected = new PageImpl<>(List.of(testSsd2, testSsd), pageable, 8);
-        when(repository.findAll()).thenReturn(ssds);
+        when(mockSsdRepository.findAll()).thenReturn(ssds);
+
+        List<ItemForConfigurator> expected = List.of(
+                new ItemForConfigurator("testId", "test", new BigDecimal(666), "", "ssd"),
+                new ItemForConfigurator("testId2", "test", new BigDecimal(333), "", "ssd")
+        );
 
         // Act
-        Page<SSD> actual = service.getAllWithSortingOfRatingDescAsPages(pageable);
+        List<ItemForConfigurator> actual = ssdService.getAllHardwareInfoForConfiguration();
 
         // Assert
-        verify(repository).findAll();
         assertEquals(expected, actual);
+        verify(mockSsdRepository).findAll();
     }
 
     @Test
-    void getAllWithSortingOfRatingAscAsPages_shouldGetAllSsdsWithProperSorting() {
+    void getSsds_shouldSortSsdsByPriceDesc() {
         // Arrange
-        Page<SSD> expected = new PageImpl<>(List.of(testSsd, testSsd2), pageable, 8);
-        when(repository.findAll()).thenReturn(ssds);
+        List<SSD> expected = List.of(testSsd, testSsd2);
+        when(mockSsdRepository.findAll()).thenReturn(ssds);
 
         // Act
-        Page<SSD> actual = service.getAllWithSortingOfRatingAscAsPages(pageable);
+        Page<SSD> actual = ssdService.getSsds(pageable, "price-desc", null, null, null, null);
 
         // Assert
-        verify(repository).findAll();
-        assertEquals(expected, actual);
+        assertEquals(new PageImpl<>(expected, pageable, 2), actual);
+        verify(mockSsdRepository).findAll();
     }
 
     @Test
-    void getAllWithFilteringByEnergyConsumptionAsPages_shouldGetAllSsdsWithProperFiltering() {
+    void getSsds_shouldSortSsdsByRatingAsc() {
         // Arrange
-        Page<SSD> expected = new PageImpl<>(Collections.singletonList(testSsd2), pageable, 8);
-        when(repository.findAll()).thenReturn(ssds);
+        List<SSD> expected = List.of(testSsd, testSsd2);
+        when(mockSsdRepository.findAll()).thenReturn(ssds);
 
         // Act
-        Page<SSD> actual = service.getAllWithFilteringByEnergyConsumptionAsPages(pageable, 100, 300);
+        Page<SSD> actual = ssdService.getSsds(pageable, "rating-asc", null, null, null, null);
 
         // Assert
-        verify(repository).findAll();
-        assertEquals(expected, actual);
+        assertEquals(new PageImpl<>(expected, pageable, 2), actual);
+        verify(mockSsdRepository).findAll();
     }
 
     @Test
-    void getAllWithFilteringByPriceAsPages_shouldGetAllSsdsWithProperFiltering() {
+    void getSsds_shouldSortSsdsByRatingDesc() {
         // Arrange
-        Page<SSD> expected = new PageImpl<>(Collections.singletonList(testSsd), pageable, 8);
-        when(repository.findAll()).thenReturn(ssds);
+        List<SSD> expected = List.of(testSsd2, testSsd);
+        when(mockSsdRepository.findAll()).thenReturn(ssds);
 
         // Act
-        Page<SSD> actual = service.getAllWithFilteringByPriceAsPages(pageable, 500, 2500);
+        Page<SSD> actual = ssdService.getSsds(pageable, "rating-desc", null, null, null, null);
 
         // Assert
-        verify(repository).findAll();
-        assertEquals(expected, actual);
+        assertEquals(new PageImpl<>(expected, pageable, 2), actual);
+        verify(mockSsdRepository).findAll();
     }
 
     @Test
-    void getAllWithFilteringByCapacityAsPages_shouldGetAllSsdsWithProperFiltering() {
+    void getSsds_shouldReturnFilteredAndSortedSsds() {
         // Arrange
-        Page<SSD> expected = new PageImpl<>(Collections.singletonList(testSsd), pageable, 8);
-        when(repository.findAll()).thenReturn(ssds);
+        List<SSD> expected = List.of(testSsd);
+        when(mockSsdRepository.findAll()).thenReturn(ssds);
 
         // Act
-        Page<SSD> actual = service.getAllWithFilteringByCapacityAsPages(pageable, 1, 50);
+        Page<SSD> actual = ssdService.getSsds(pageable, "price-asc", 500, 700, 1, 50);
 
         // Assert
-        verify(repository).findAll();
-        assertEquals(expected, actual);
+        assertEquals(new PageImpl<>(expected, pageable, 1), actual);
+        verify(mockSsdRepository).findAll();
     }
 
     @Override

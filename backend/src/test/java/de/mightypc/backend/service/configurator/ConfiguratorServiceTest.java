@@ -1,23 +1,14 @@
 package de.mightypc.backend.service.configurator;
 
-import de.mightypc.backend.service.hardware.CpuService;
-import de.mightypc.backend.service.hardware.GpuService;
-import de.mightypc.backend.service.hardware.HddService;
-import de.mightypc.backend.service.hardware.MotherboardService;
-import de.mightypc.backend.service.hardware.PcCaseService;
-import de.mightypc.backend.service.hardware.PowerSupplyService;
-import de.mightypc.backend.service.hardware.RamService;
-import de.mightypc.backend.service.hardware.SsdService;
+import de.mightypc.backend.model.configurator.ConfiguratorItems;
+import de.mightypc.backend.model.configurator.ItemForConfigurator;
+import de.mightypc.backend.service.hardware.*;
 import org.junit.jupiter.api.Test;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class ConfiguratorServiceTest {
     private final CpuService cpuService = mock(CpuService.class);
@@ -29,52 +20,52 @@ class ConfiguratorServiceTest {
     private final PcCaseService pcCaseService = mock(PcCaseService.class);
     private final PowerSupplyService powerSupplyService = mock(PowerSupplyService.class);
 
-    private final ConfiguratorService configuratorService = new ConfiguratorService(cpuService, gpuService, ssdService, hddService, ramService, pcCaseService, powerSupplyService, motherboardService);
+    private final ConfiguratorService configuratorService = new ConfiguratorService(
+            cpuService, gpuService, ssdService, hddService, ramService, pcCaseService, powerSupplyService, motherboardService
+    );
 
     @Test
-    void getAllComponentsIdsAndNamesWithPrices_shouldReturnAllComponentsWithPrices() {
-        // Arrange
-        LinkedHashMap<String, String> cpuPrices = new LinkedHashMap<>();
-        cpuPrices.put("cpuId", "AMD Ryzen 7 3700X ($299.99)");
-        LinkedHashMap<String, String> gpuPrices = new LinkedHashMap<>();
-        gpuPrices.put("gpuId", "Nvidia RTX 3080 ($699.99)");
-        LinkedHashMap<String, String> mbPrices = new LinkedHashMap<>();
-        mbPrices.put("mbId", "ASUS ROG Strix B450-F ($129.99)");
-        LinkedHashMap<String, String> ramPrices = new LinkedHashMap<>();
-        ramPrices.put("ramId", "Corsair Vengeance LPX 16GB ($79.99)");
-        LinkedHashMap<String, String> ssdPrices = new LinkedHashMap<>();
-        ssdPrices.put("ssdId", "Samsung 970 Evo 1TB ($149.99)");
-        LinkedHashMap<String, String> hddPrices = new LinkedHashMap<>();
-        hddPrices.put("hddId", "Seagate Barracuda 2TB ($54.99)");
-        LinkedHashMap<String, String> psPrices = new LinkedHashMap<>();
-        psPrices.put("psId", "Corsair RM850x ($119.99)");
-        LinkedHashMap<String, String> casePrices = new LinkedHashMap<>();
-        casePrices.put("caseId", "NZXT H510 ($69.99)");
+    void getAllComponentsIdsAndNamesWithPrices_ForChatGpt_shouldReturnProperString() {
+        when(cpuService.getAllNamesWithPrices()).thenReturn("cpu1 100 cpu2 200 ");
+        when(gpuService.getAllNamesWithPrices()).thenReturn("gpu1 300 gpu2 400 ");
+        when(motherboardService.getAllNamesWithPrices()).thenReturn("mb1 500 mb2 600 ");
+        when(ssdService.getAllNamesWithPrices()).thenReturn("ssd1 700 ssd2 800 ");
+        when(hddService.getAllNamesWithPrices()).thenReturn("hdd1 900 hdd2 1000 ");
+        when(ramService.getAllNamesWithPrices()).thenReturn("ram1 1100 ram2 1200 ");
+        when(pcCaseService.getAllNamesWithPrices()).thenReturn("case1 1300 case2 1400 ");
+        when(powerSupplyService.getAllNamesWithPrices()).thenReturn("ps1 1500 ps2 1600 ");
 
-        when(cpuService.getAllNamesWithPrices()).thenReturn(cpuPrices);
-        when(gpuService.getAllNamesWithPrices()).thenReturn(gpuPrices);
-        when(motherboardService.getAllNamesWithPrices()).thenReturn(mbPrices);
-        when(ramService.getAllNamesWithPrices()).thenReturn(ramPrices);
-        when(ssdService.getAllNamesWithPrices()).thenReturn(ssdPrices);
-        when(hddService.getAllNamesWithPrices()).thenReturn(hddPrices);
-        when(powerSupplyService.getAllNamesWithPrices()).thenReturn(psPrices);
-        when(pcCaseService.getAllNamesWithPrices()).thenReturn(casePrices);
+        String actual = configuratorService.getAllComponentsIdsAndNamesWithPricesForChatGpt();
+        String expected = "cpu1100cpu2200gpu1300gpu2400mb1500mb2600ram11100ram21200ssd1700ssd2800hdd1900hdd21000ps11500ps21600case11300case21400";
 
-        List<LinkedHashMap<String, String>> expectedComponents = List.of(cpuPrices, gpuPrices, mbPrices, ramPrices, ssdPrices, hddPrices, psPrices, casePrices);
+        assertEquals(expected, actual);
+    }
 
-        // Act
-        ConfiguratorComponents actualComponents = configuratorService.getAllComponentsIdsAndNamesWithPrices();
+    @Test
+    void getAllItemsWithInfoForOrder_shouldReturnProperConfiguratorItems() {
+        List<ItemForConfigurator> cpuItems = List.of(mock(ItemForConfigurator.class));
+        List<ItemForConfigurator> gpuItems = List.of(mock(ItemForConfigurator.class));
+        List<ItemForConfigurator> motherboardItems = List.of(mock(ItemForConfigurator.class));
+        List<ItemForConfigurator> ramItems = List.of(mock(ItemForConfigurator.class));
+        List<ItemForConfigurator> ssdItems = List.of(mock(ItemForConfigurator.class));
+        List<ItemForConfigurator> hddItems = List.of(mock(ItemForConfigurator.class));
+        List<ItemForConfigurator> powerSupplyItems = List.of(mock(ItemForConfigurator.class));
+        List<ItemForConfigurator> pcCaseItems = List.of(mock(ItemForConfigurator.class));
 
-        // Assert
-        verify(cpuService).getAllNamesWithPrices();
-        verify(gpuService).getAllNamesWithPrices();
-        verify(motherboardService).getAllNamesWithPrices();
-        verify(ramService).getAllNamesWithPrices();
-        verify(ssdService).getAllNamesWithPrices();
-        verify(hddService).getAllNamesWithPrices();
-        verify(powerSupplyService).getAllNamesWithPrices();
-        verify(pcCaseService).getAllNamesWithPrices();
+        when(cpuService.getAllHardwareInfoForConfiguration()).thenReturn(cpuItems);
+        when(gpuService.getAllHardwareInfoForConfiguration()).thenReturn(gpuItems);
+        when(motherboardService.getAllHardwareInfoForConfiguration()).thenReturn(motherboardItems);
+        when(ramService.getAllHardwareInfoForConfiguration()).thenReturn(ramItems);
+        when(ssdService.getAllHardwareInfoForConfiguration()).thenReturn(ssdItems);
+        when(hddService.getAllHardwareInfoForConfiguration()).thenReturn(hddItems);
+        when(powerSupplyService.getAllHardwareInfoForConfiguration()).thenReturn(powerSupplyItems);
+        when(pcCaseService.getAllHardwareInfoForConfiguration()).thenReturn(pcCaseItems);
 
-        assertEquals(new ConfiguratorComponents(expectedComponents), actualComponents);
+        ConfiguratorItems actual = configuratorService.getAllItemsWithInfoForConfigurator();
+        ConfiguratorItems expected = new ConfiguratorItems(List.of(
+                cpuItems, gpuItems, motherboardItems, ramItems, ssdItems, hddItems, powerSupplyItems, pcCaseItems
+        ));
+
+        assertEquals(expected, actual);
     }
 }

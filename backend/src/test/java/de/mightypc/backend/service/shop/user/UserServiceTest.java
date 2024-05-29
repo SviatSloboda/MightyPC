@@ -5,6 +5,8 @@ import de.mightypc.backend.model.shop.user.User;
 import de.mightypc.backend.repository.shop.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -16,7 +18,8 @@ import static org.mockito.Mockito.verify;
 
 class UserServiceTest {
     private final UserRepository userRepository = mock(UserRepository.class);
-    private final UserService userService = new UserService(userRepository);
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final UserService userService = new UserService(userRepository, passwordEncoder);
 
     private User user;
 

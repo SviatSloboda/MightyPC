@@ -1,7 +1,7 @@
 package de.mightypc.backend.service.hardware;
 
 import de.mightypc.backend.exception.hardware.GpuNotFoundException;
-import de.mightypc.backend.model.hardware.GPU;
+import de.mightypc.backend.model.configurator.ItemForConfigurator;
 import de.mightypc.backend.model.hardware.GPU;
 import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.GpuRepository;
@@ -12,8 +12,6 @@ import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -74,23 +72,6 @@ class GpuServiceTest extends BaseServiceTest<GPU, GpuService, GpuRepository, Gpu
         verify(mockGpuRepository).existsById("testId");
     }
 
-
-    @Override
-    @Test
-    void getAllNamesWithPrices_shouldReturnMapOfNamesWithPrices() {
-        // Arrange
-        HashMap<String, String> expected = new HashMap<>();
-        expected.put("testId", "test ($666)");
-        when(mockGpuRepository.findAll()).thenReturn(List.of(testGpu));
-
-        // Act
-        HashMap<String, String> actual = service.getAllNamesWithPrices();
-
-        // Assert
-        assertEquals(expected, actual);
-        verify(mockGpuRepository).findAll();
-    }
-
     @Override
     @Test
     void attachPhoto_shouldAttachPhotoCorrectly() {
@@ -131,88 +112,171 @@ class GpuServiceTest extends BaseServiceTest<GPU, GpuService, GpuRepository, Gpu
     }
 
     @Test
-    void getAllWithSortingOfPriceDescAsPages_shouldGetAllGpusWithProperSorting() {
+    void getAllNamesWithPrices_shouldReturnAllNamesWithPrices() {
         // Arrange
-        Page<GPU> expected = new PageImpl<>(List.of(testGpu, testGpu2), pageable, 8);
-        when(repository.findAll()).thenReturn(gpus);
+        when(mockGpuRepository.findAll()).thenReturn(gpus);
+
+        String expected = "$gpus:\n{testId:test:($666)}\n{testId2:test:($333)}\n";
 
         // Act
-        Page<GPU> actual = service.getAllWithSortingOfPriceDescAsPages(pageable);
+        String actual = gpuService.getAllNamesWithPrices();
 
         // Assert
-        verify(repository).findAll();
         assertEquals(expected, actual);
+        verify(mockGpuRepository).findAll();
     }
 
     @Test
-    void getAllWithSortingOfPriceAscAsPages_shouldGetAllGpusWithProperSorting() {
+    void getAllIds_shouldReturnAllIds() {
         // Arrange
-        Page<GPU> expected = new PageImpl<>(List.of(testGpu2, testGpu), pageable, 8);
-        when(repository.findAll()).thenReturn(gpus);
+        when(mockGpuRepository.findAll()).thenReturn(gpus);
+
+        List<String> expected = List.of("testId", "testId2");
 
         // Act
-        Page<GPU> actual = service.getAllWithSortingOfPriceAscAsPages(pageable);
+        List<String> actual = gpuService.getAllIds();
 
         // Assert
-        verify(repository).findAll();
         assertEquals(expected, actual);
+        verify(mockGpuRepository).findAll();
     }
 
     @Test
-    void getAllWithSortingOfRatingDescAsPages_shouldGetAllGpusWithProperSorting() {
+    void getAllHardwareInfoForConfiguration_shouldReturnAllHardwareInfoForConfiguration() {
         // Arrange
-        Page<GPU> expected = new PageImpl<>(List.of(testGpu2, testGpu), pageable, 8);
-        when(repository.findAll()).thenReturn(gpus);
+        when(mockGpuRepository.findAll()).thenReturn(gpus);
+
+        List<ItemForConfigurator> expected = List.of(
+                new ItemForConfigurator("testId", "test", new BigDecimal(666), "", "gpu"),
+                new ItemForConfigurator("testId2", "test", new BigDecimal(333), "", "gpu")
+        );
 
         // Act
-        Page<GPU> actual = service.getAllWithSortingOfRatingDescAsPages(pageable);
+        List<ItemForConfigurator> actual = gpuService.getAllHardwareInfoForConfiguration();
 
         // Assert
-        verify(repository).findAll();
         assertEquals(expected, actual);
+        verify(mockGpuRepository).findAll();
     }
 
     @Test
-    void getAllWithSortingOfRatingAscAsPages_shouldGetAllGpusWithProperSorting() {
+    void getGpus_shouldReturnFilteredAndSortedGpus() {
         // Arrange
-        Page<GPU> expected = new PageImpl<>(List.of(testGpu, testGpu2), pageable, 8);
-        when(repository.findAll()).thenReturn(gpus);
+        List<GPU> expected = List.of(testGpu);
+        when(mockGpuRepository.findAll()).thenReturn(gpus);
 
         // Act
-        Page<GPU> actual = service.getAllWithSortingOfRatingAscAsPages(pageable);
+        Page<GPU> actual = gpuService.getGpus(pageable, "price-asc", 500, 700, null, null);
 
         // Assert
-        verify(repository).findAll();
-        assertEquals(expected, actual);
+        assertEquals(new PageImpl<>(expected, pageable, 1), actual);
+        verify(mockGpuRepository).findAll();
     }
 
     @Test
-    void getAllWithFilteringByEnergyConsumptionAsPages_shouldGetAllGpusWithProperFiltering() {
+    void getGpus_shouldReturnFilteredAndSortedGpusByEnergyConsumption() {
         // Arrange
-        Page<GPU> expected = new PageImpl<>(Collections.singletonList(testGpu2), pageable, 8);
-        when(repository.findAll()).thenReturn(gpus);
+        List<GPU> expected = List.of(testGpu2);
+        when(mockGpuRepository.findAll()).thenReturn(gpus);
 
         // Act
-        Page<GPU> actual = service.getAllWithFilteringByEnergyConsumptionAsPages(pageable, 100, 300);
+        Page<GPU> actual = gpuService.getGpus(pageable, "rating-desc", null, null, 200, 300);
 
         // Assert
-        verify(repository).findAll();
-        assertEquals(expected, actual);
+        assertEquals(new PageImpl<>(expected, pageable, 1), actual);
+        verify(mockGpuRepository).findAll();
     }
 
     @Test
-    void getAllWithFilteringByPriceAsPages_shouldGetAllGpusWithProperFiltering() {
+    void getGpus_shouldSortGpusByPriceDesc() {
         // Arrange
-        Page<GPU> expected = new PageImpl<>(Collections.singletonList(testGpu), pageable, 8);
-        when(repository.findAll()).thenReturn(gpus);
+        List<GPU> expected = List.of(testGpu, testGpu2);
+        when(mockGpuRepository.findAll()).thenReturn(gpus);
 
         // Act
-        Page<GPU> actual = service.getAllWithFilteringByPriceAsPages(pageable, 500, 2500);
+        Page<GPU> actual = gpuService.getGpus(pageable, "price-desc", null, null, null, null);
 
         // Assert
-        verify(repository).findAll();
-        assertEquals(expected, actual);
+        assertEquals(new PageImpl<>(expected, pageable, 2), actual);
+        verify(mockGpuRepository).findAll();
     }
+
+    @Test
+    void getGpus_shouldSortGpusByRatingAsc() {
+        // Arrange
+        List<GPU> expected = List.of(testGpu, testGpu2);
+        when(mockGpuRepository.findAll()).thenReturn(gpus);
+
+        // Act
+        Page<GPU> actual = gpuService.getGpus(pageable, "rating-asc", null, null, null, null);
+
+        // Assert
+        assertEquals(new PageImpl<>(expected, pageable, 2), actual);
+        verify(mockGpuRepository).findAll();
+    }
+
+    @Test
+    void getAllHardwareInfoForConfiguration_shouldReturnInfoWithPhotos() {
+        // Arrange
+        GPU gpuWithPhoto = testGpu.withGpuPhotos(List.of("photoUrl"));
+        List<GPU> gpusWithPhoto = List.of(gpuWithPhoto, testGpu2);
+        when(mockGpuRepository.findAll()).thenReturn(gpusWithPhoto);
+
+        List<ItemForConfigurator> expected = List.of(
+                new ItemForConfigurator("testId", "test", new BigDecimal(666), "photoUrl", "gpu"),
+                new ItemForConfigurator("testId2", "test", new BigDecimal(333), "", "gpu")
+        );
+
+        // Act
+        List<ItemForConfigurator> actual = gpuService.getAllHardwareInfoForConfiguration();
+
+        // Assert
+        assertEquals(expected, actual);
+        verify(mockGpuRepository).findAll();
+    }
+
+    @Test
+    void getGpus_shouldSortGpusByRatingDesc() {
+        // Arrange
+        List<GPU> expected = List.of(testGpu2, testGpu);
+        when(mockGpuRepository.findAll()).thenReturn(gpus);
+
+        // Act
+        Page<GPU> actual = gpuService.getGpus(pageable, "rating-desc", null, null, null, null);
+
+        // Assert
+        assertEquals(new PageImpl<>(expected, pageable, 2), actual);
+        verify(mockGpuRepository).findAll();
+    }
+
+    @Test
+    void getGpus_shouldFilterGpusByLowestAndHighestPrice() {
+        // Arrange
+        List<GPU> expected = List.of(testGpu2);
+        when(mockGpuRepository.findAll()).thenReturn(gpus);
+
+        // Act
+        Page<GPU> actual = gpuService.getGpus(pageable, "price-asc", 300, 400, null, null);
+
+        // Assert
+        assertEquals(new PageImpl<>(expected, pageable, 1), actual);
+        verify(mockGpuRepository).findAll();
+    }
+
+    @Test
+    void getGpus_shouldFilterAndSortGpusByEnergyConsumptionAndRatingAsc() {
+        // Arrange
+        List<GPU> expected = List.of(testGpu);
+        when(mockGpuRepository.findAll()).thenReturn(gpus);
+
+        // Act
+        Page<GPU> actual = gpuService.getGpus(pageable, "rating-asc", null, null, 20, 30);
+
+        // Assert
+        assertEquals(new PageImpl<>(expected, pageable, 1), actual);
+        verify(mockGpuRepository).findAll();
+    }
+
 
     @Override
     protected GpuNotFoundException getException() {

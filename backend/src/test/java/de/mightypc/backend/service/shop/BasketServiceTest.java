@@ -7,25 +7,21 @@ import de.mightypc.backend.repository.shop.UserRepository;
 import de.mightypc.backend.service.shop.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class BasketServiceTest {
     private final UserRepository userRepository = mock(UserRepository.class);
-    private final UserService userService = new UserService(userRepository);
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final UserService userService = new UserService(userRepository, passwordEncoder);
     private final BasketService basketService = new BasketService(userService, userRepository);
 
     private User user;
@@ -34,11 +30,11 @@ class BasketServiceTest {
     void setUp() {
         Item testItem = new Item(
                 "itemId",
-                "pc",
                 "destroyer",
-                "something",
+                "pc",
                 new BigDecimal(666),
-                Collections.emptyList()
+                "",
+                ""
         );
 
         user = new User(
@@ -58,11 +54,11 @@ class BasketServiceTest {
     void getAllItemsOfUserByUserId() {
         // Arrange
         List<Item> expected = new ArrayList<>(List.of(new Item("itemId",
-                "pc",
                 "destroyer",
-                "something",
+                "pc",
                 new BigDecimal(666),
-                Collections.emptyList()
+                "",
+                ""
         )));
 
         when(userRepository.findById("testId")).thenReturn(Optional.of(user));
@@ -78,7 +74,7 @@ class BasketServiceTest {
     @Test
     void saveItem() {
         // Arrange
-        Item testItem = new Item("new", "new", "lox", "lox", new BigDecimal(333), Collections.emptyList());
+        Item testItem = new Item("new", "something", "new", new BigDecimal(333), "", "");
 
         when(userRepository.findById("testId")).thenReturn(Optional.of(user));
 
@@ -95,7 +91,7 @@ class BasketServiceTest {
     void saveItem_shouldSaveProperly_whenUserBasketIsNull() {
         // Arrange
         User specialUser = user.withId("specialId").withBasket(null);
-        Item testItem = new Item("new", "new", "lox", "lox", new BigDecimal(333), Collections.emptyList());
+        Item testItem = new Item("new", "something", "new", new BigDecimal(333), "", "");
 
         when(userRepository.findById("specialId")).thenReturn(Optional.of(specialUser));
 
@@ -105,11 +101,11 @@ class BasketServiceTest {
         // Assert
         verify(userRepository).save(specialUser);
         verify(userRepository).findById("specialId");
-        assertEquals(1, user.getBasket().size());
+        assertEquals(1, specialUser.getBasket().size());
     }
 
     @Test
-    void  getItemById_whenThereIsNoSuchItem_shouldThrowNoSuchItemException(){
+    void getItemById_whenThereIsNoSuchItem_shouldThrowNoSuchItemException() {
         // Arrange
         when(userRepository.findById("testId")).thenReturn(Optional.of(user));
         user.setOrders(new ArrayList<>());
@@ -151,7 +147,8 @@ class BasketServiceTest {
     @Test
     void getEntirePriceOf_shouldCalculatePriceCorrectly() {
         // Arrange
-        user.getBasket().add(new Item("new", "new", "lox", "lox", new BigDecimal(333), Collections.emptyList()));
+        user.getBasket().add(new Item("new", "something", "new", new BigDecimal(333), "", ""));
+
         when(userRepository.findById("testId")).thenReturn(Optional.of(user));
 
         // Act
@@ -160,5 +157,29 @@ class BasketServiceTest {
         // Assert
         verify(userRepository).findById("testId");
         assertEquals(new BigDecimal(999), actual);
+    }
+
+    @Test
+    void getItemById_shouldReturnItem_whenItemExistsInBasket() {
+        // Arrange
+        when(userRepository.findById("testId")).thenReturn(Optional.of(user));
+
+        // Act
+        Item actualItem = basketService.getItemById("testId", "itemId");
+
+        // Assert
+        verify(userRepository).findById("testId");
+        assertEquals("itemId", actualItem.id());
+        assertEquals("destroyer", actualItem.name());
+        assertEquals(new BigDecimal(666), actualItem.price());
+    }
+
+    @Test
+    void getItemById_shouldThrowItemNotFoundException_whenItemDoesNotExistInBasket() {
+        // Arrange
+        when(userRepository.findById("testId")).thenReturn(Optional.of(user));
+
+        // Act & Assert
+        assertThrows(ItemNotFoundException.class, () -> basketService.getItemById("testId", "nonExistingItemId"));
     }
 }

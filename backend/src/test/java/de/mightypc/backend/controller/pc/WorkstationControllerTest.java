@@ -11,11 +11,15 @@ import de.mightypc.backend.repository.hardware.PowerSupplyRepository;
 import de.mightypc.backend.repository.hardware.RamRepository;
 import de.mightypc.backend.repository.hardware.SsdRepository;
 import de.mightypc.backend.repository.pc.WorkstationRepository;
+import de.mightypc.backend.security.SecurityConfig;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -29,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Import(SecurityConfig.class)
 class WorkstationControllerTest {
     @Autowired
     MockMvc mockMvc;
@@ -123,6 +128,7 @@ class WorkstationControllerTest {
     }
 
     @DirtiesContext
+    @WithMockUser
     @Test
     void save_shouldCreateWorkstationAndReturnStatusCreated() throws Exception {
         String requestBody = """
@@ -155,6 +161,7 @@ class WorkstationControllerTest {
     }
 
     @DirtiesContext
+    @WithMockUser
     @Test
     void saveAll_shouldCreateMultipleWorkstationsAndReturnStatusCreated() throws Exception {
         String requestBody = """
@@ -205,108 +212,93 @@ class WorkstationControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isCreated());
     }
 
-
     @DirtiesContext
     @Test
-    void getSortedWorkstationsByPrice_shouldReturnSortedData() throws Exception {
+    void getWorkstations_shouldReturnWorkstationsFilteredByPriceRange() throws Exception {
         workstationRepository.save(testWorkstation);
         workstationRepository.save(testWorkstation2);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/workstation/sort/price?type=asc"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/workstation/filtered")
+                        .param("page", "0")
+                        .param("size", "8")
+                        .param("lowestPrice", "100")
+                        .param("highestPrice", "300"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content", hasSize(2)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].hardwareSpec.name").value("testWorkstation2"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[1].hardwareSpec.name").value("testWorkstation1"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content", Matchers.hasSize(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].hardwareSpec.price").value(200));
     }
-
 
     @DirtiesContext
     @Test
-    void getSortedWorkstationsByPriceDesc_shouldReturnSortedDataInDescOrder() throws Exception {
+    void getWorkstations_shouldReturnWorkstationsSortedByRatingDesc() throws Exception {
         workstationRepository.save(testWorkstation);
         workstationRepository.save(testWorkstation2);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/workstation/sort/price?type=desc"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/workstation/filtered")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sortType", "rating-desc"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].hardwareSpec.name").value("testWorkstation1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[1].hardwareSpec.name").value("testWorkstation2"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content", Matchers.hasSize(2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].hardwareSpec.rating").value(4.5f));
     }
 
     @DirtiesContext
     @Test
-    void getSortedWorkstationsByPrice_shouldReturnBadRequest_whenRequestParamIsIncorrect() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/workstation/sort/price?type=badtype"))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
-    }
-
-    @DirtiesContext
-    @Test
-    void getFilteredWorkstationsByPrice_shouldReturnFilteredData() throws Exception {
+    void getWorkstations_shouldReturnAllWorkstations_whenNoFiltersApplied() throws Exception {
         workstationRepository.save(testWorkstation);
         workstationRepository.save(testWorkstation2);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/workstation/filter/price?lowest=250&highest=400"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/workstation/filtered")
+                        .param("page", "0")
+                        .param("size", "8"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].hardwareSpec.name").value("testWorkstation1"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content", Matchers.hasSize(2)));
     }
 
     @DirtiesContext
     @Test
-    void getSortedWorkstationsByRating_shouldReturnSortedDataAsc() throws Exception {
+    void getWorkstations_shouldReturnWorkstationsSortedByPriceAsc() throws Exception {
         workstationRepository.save(testWorkstation);
         workstationRepository.save(testWorkstation2);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/workstation/sort/rating?type=asc"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/workstation/filtered")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sortType", "price-asc"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].hardwareSpec.rating").value(4.0))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[1].hardwareSpec.rating").value(4.5));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content", Matchers.hasSize(2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].hardwareSpec.price").value(200));
     }
 
     @DirtiesContext
     @Test
-    void getFilteredWorkstationsByEnergyConsumption_shouldReturnFilteredData() throws Exception {
+    void getWorkstations_shouldReturnWorkstationsSortedByPriceDesc() throws Exception {
         workstationRepository.save(testWorkstation);
         workstationRepository.save(testWorkstation2);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/workstation/filter/energy-consumption?lowest=70&highest=1000"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/workstation/filtered")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sortType", "price-desc"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$").isNotEmpty());
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content", Matchers.hasSize(2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].hardwareSpec.price").value(350));
     }
 
     @DirtiesContext
     @Test
-    void getFilteredWorkstationsByEnergyConsumption_shouldReturnNotFoundWhenNoMatch() throws Exception {
+    void getWorkstations_shouldReturnWorkstationsSortedByRatingAsc() throws Exception {
         workstationRepository.save(testWorkstation);
         workstationRepository.save(testWorkstation2);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/workstation/filter/energy-consumption?lowest=100&highest=150"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/workstation/filtered")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sortType", "rating-asc"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content").isEmpty());
-    }
-
-    @DirtiesContext
-    @Test
-    void getSortedWorkstationsByRating_shouldReturnNotFoundWhenNoWorkstationsExist() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/workstation/sort/rating?type=desc"))
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
-    }
-
-    @DirtiesContext
-    @Test
-    void getSortedWorkstationsByRating_shouldReturnBadRequest_whenRequestParamIsIncorrect() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/workstation/sort/rating?type=badtype"))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
-    }
-
-    @DirtiesContext
-    @Test
-    void getFilteredWorkstationsByPrice_shouldReturnNotFoundWhenNoMatch() throws Exception {
-        workstationRepository.save(testWorkstation);
-        workstationRepository.save(testWorkstation2);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/workstation/filter/price?lowest=500&highest=1000"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content").isEmpty());
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content", Matchers.hasSize(2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].hardwareSpec.rating").value(4.0f));
     }
 
     @DirtiesContext
@@ -325,6 +317,7 @@ class WorkstationControllerTest {
     }
 
     @DirtiesContext
+    @WithMockUser
     @Test
     void deleteById_shouldDeleteWorkstationWithSpecifiedId() throws Exception {
         workstationRepository.save(testWorkstation);
@@ -337,6 +330,7 @@ class WorkstationControllerTest {
 
 
     @DirtiesContext
+    @WithMockUser
     @Test
     void updateWorkstationResponse_shouldUpdateWorkstationAndReturnOk() throws Exception {
         workstationRepository.save(testWorkstation);

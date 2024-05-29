@@ -11,11 +11,15 @@ import de.mightypc.backend.repository.hardware.PowerSupplyRepository;
 import de.mightypc.backend.repository.hardware.RamRepository;
 import de.mightypc.backend.repository.hardware.SsdRepository;
 import de.mightypc.backend.repository.pc.PcRepository;
+import de.mightypc.backend.security.SecurityConfig;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -29,37 +33,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Import(SecurityConfig.class)
 class PcControllerTest {
-    @Autowired
-    MockMvc mockMvc;
-
-    @Autowired
-    private PcRepository pcRepository;
-
-    @Autowired
-    private CpuRepository cpuRepository;
-
-    @Autowired
-    private GpuRepository gpuRepository;
-
-    @Autowired
-    private MotherboardRepository motherboardRepository;
-
-    @Autowired
-    private RamRepository ramRepository;
-
-    @Autowired
-    private SsdRepository ssdRepository;
-
-    @Autowired
-    private HddRepository hddRepository;
-
-    @Autowired
-    private PcCaseRepository pcCaseRepository;
-
-    @Autowired
-    private PowerSupplyRepository powerSupplyRepository;
-
     private final CPU cpu = new CPU("cpuId", new HardwareSpec("testCpu", "test", new BigDecimal(50), 2.5f), 10, "AM4");
     private final GPU gpu = new GPU("gpuId", new HardwareSpec("testGpu", "test", new BigDecimal(50), 2.5f), 10);
     private final Motherboard motherboard = new Motherboard("motherboardId", new HardwareSpec("testMotherboard", "test", new BigDecimal(50), 2.5f), 10, "AM4");
@@ -68,7 +43,6 @@ class PcControllerTest {
     private final HDD hdd = new HDD("hddId", new HardwareSpec("testHdd", "test", new BigDecimal(50), 2.5f), 5, 10);
     private final PcCase pcCase = new PcCase("pcCaseId", new HardwareSpec("testPcCase", "test", new BigDecimal(50), 2.5f), "3x3x3");
     private final PowerSupply powerSupply = new PowerSupply("powerSupplyId", new HardwareSpec("testPowerSupply", "test", new BigDecimal(50), 2.5f), 600);
-
     private final CPU cpu2 = new CPU("cpuId2", new HardwareSpec("testCpu2", "test", new BigDecimal(10), 2.5f), 5, "AM4");
     private final GPU gpu2 = new GPU("gpuId2", new HardwareSpec("testGpu2", "test", new BigDecimal(10), 2.5f), 5);
     private final Motherboard motherboard2 = new Motherboard("motherboardId2", new HardwareSpec("testMotherboard2", "test", new BigDecimal(10), 2.5f), 5, "AM4");
@@ -77,10 +51,7 @@ class PcControllerTest {
     private final HDD hdd2 = new HDD("hddId2", new HardwareSpec("testHdd2", "test", new BigDecimal(10), 2.5f), 5, 5);
     private final PcCase pcCase2 = new PcCase("pcCaseId2", new HardwareSpec("testPcCase2", "test", new BigDecimal(10), 2.5f), "3x3x3");
     private final PowerSupply powerSupply2 = new PowerSupply("powerSupplyId2", new HardwareSpec("testPowerSupply2", "test", new BigDecimal(10), 2.5f), 500);
-
     private final Specs specs = new Specs(cpu, gpu, motherboard, ram, ssd, hdd, powerSupply, pcCase);
-    private final Specs specs2 = new Specs(cpu2, gpu2, motherboard2, ram2, ssd2, hdd2, powerSupply2, pcCase2);
-
     private PC testPc = new PC(
             "testPcId1",
             new HardwareSpec("testPc1", "testDescription", new BigDecimal(350), 4.5f),
@@ -88,7 +59,7 @@ class PcControllerTest {
             95,
             Collections.emptyList()
     );
-
+    private final Specs specs2 = new Specs(cpu2, gpu2, motherboard2, ram2, ssd2, hdd2, powerSupply2, pcCase2);
     private final PC testPc2 = new PC(
             "testPcId2",
             new HardwareSpec("testPc2", "testDescription", new BigDecimal(200), 4.00f),
@@ -96,9 +67,29 @@ class PcControllerTest {
             65,
             Collections.emptyList()
     );
+    @Autowired
+    MockMvc mockMvc;
+    @Autowired
+    private PcRepository pcRepository;
+    @Autowired
+    private CpuRepository cpuRepository;
+    @Autowired
+    private GpuRepository gpuRepository;
+    @Autowired
+    private MotherboardRepository motherboardRepository;
+    @Autowired
+    private RamRepository ramRepository;
+    @Autowired
+    private SsdRepository ssdRepository;
+    @Autowired
+    private HddRepository hddRepository;
+    @Autowired
+    private PcCaseRepository pcCaseRepository;
+    @Autowired
+    private PowerSupplyRepository powerSupplyRepository;
 
     @BeforeEach
-    void setup(){
+    void setup() {
         cpuRepository.save(cpu);
         gpuRepository.save(gpu);
         motherboardRepository.save(motherboard);
@@ -119,28 +110,29 @@ class PcControllerTest {
     }
 
     @DirtiesContext
+    @WithMockUser
     @Test
     void save_shouldCreatePcAndReturnStatusCreated() throws Exception {
         String requestBody = """
-            {
-                "hardwareSpec": {
-                    "name": "Gaming PC",
-                    "description": "High-end gaming PC",
-                    "price": 1500,
-                    "rating": 4.7
-                },
-                "specsIds": {
-                    "cpuId": "cpuId",
-                    "gpuId": "gpuId",
-                    "motherboardId": "motherboardId",
-                    "ramId": "ramId",
-                    "ssdId": "ssdId",
-                    "hddId": "hddId",
-                    "powerSupplyId": "powerSupplyId",
-                    "pcCaseId": "pcCaseId"
+                {
+                    "hardwareSpec": {
+                        "name": "Gaming PC",
+                        "description": "High-end gaming PC",
+                        "price": 1500,
+                        "rating": 4.7
+                    },
+                    "specsIds": {
+                        "cpuId": "cpuId",
+                        "gpuId": "gpuId",
+                        "motherboardId": "motherboardId",
+                        "ramId": "ramId",
+                        "ssdId": "ssdId",
+                        "hddId": "hddId",
+                        "powerSupplyId": "powerSupplyId",
+                        "pcCaseId": "pcCaseId"
+                    }
                 }
-            }
-            """;
+                """;
         mockMvc.perform(MockMvcRequestBuilders.post("/api/pc")
                         .contentType("application/json")
                         .content(requestBody))
@@ -149,154 +141,51 @@ class PcControllerTest {
     }
 
     @DirtiesContext
+    @WithMockUser
     @Test
     void saveAll_shouldCreateMultiplePcsAndReturnStatusCreated() throws Exception {
         String requestBody = """
-            [{
-                "hardwareSpec": {
-                    "name": "Gaming PC",
-                    "description": "High-end gaming PC",
-                    "price": 1500,
-                    "rating": 4.7
+                [{
+                    "hardwareSpec": {
+                        "name": "Gaming PC",
+                        "description": "High-end gaming PC",
+                        "price": 1500,
+                        "rating": 4.7
+                    },
+                    "specsIds": {
+                        "cpuId": "cpuId",
+                        "gpuId": "gpuId",
+                        "motherboardId": "motherboardId",
+                        "ramId": "ramId",
+                        "ssdId": "ssdId",
+                        "hddId": "hddId",
+                        "powerSupplyId": "powerSupplyId",
+                        "pcCaseId": "pcCaseId"
+                    }
                 },
-                "specsIds": {
-                    "cpuId": "cpuId",
-                    "gpuId": "gpuId",
-                    "motherboardId": "motherboardId",
-                    "ramId": "ramId",
-                    "ssdId": "ssdId",
-                    "hddId": "hddId",
-                    "powerSupplyId": "powerSupplyId",
-                    "pcCaseId": "pcCaseId"
-                }
-            },
-            {
-                "hardwareSpec": {
-                    "name": "Office PC",
-                    "description": "Efficient office PC",
-                    "price": 500,
-                    "rating": 4.0
-                },
-                "specsIds": {
-                    "cpuId": "cpuId",
-                    "gpuId": "gpuId",
-                    "motherboardId": "motherboardId",
-                    "ramId": "ramId",
-                    "ssdId": "ssdId",
-                    "hddId": "hddId",
-                    "powerSupplyId": "powerSupplyId",
-                    "pcCaseId": "pcCaseId"
-                }
-            }]
-            """;
+                {
+                    "hardwareSpec": {
+                        "name": "Office PC",
+                        "description": "Efficient office PC",
+                        "price": 500,
+                        "rating": 4.0
+                    },
+                    "specsIds": {
+                        "cpuId": "cpuId",
+                        "gpuId": "gpuId",
+                        "motherboardId": "motherboardId",
+                        "ramId": "ramId",
+                        "ssdId": "ssdId",
+                        "hddId": "hddId",
+                        "powerSupplyId": "powerSupplyId",
+                        "pcCaseId": "pcCaseId"
+                    }
+                }]
+                """;
         mockMvc.perform(MockMvcRequestBuilders.post("/api/pc/all")
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
-    }
-
-
-    @DirtiesContext
-    @Test
-    void getSortedPcsByPrice_shouldReturnSortedData() throws Exception {
-        pcRepository.save(testPc);
-        pcRepository.save(testPc2);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/pc/sort/price?type=asc"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content", hasSize(2)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].hardwareSpec.name").value("testPc2"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[1].hardwareSpec.name").value("testPc1"));
-    }
-
-
-    @DirtiesContext
-    @Test
-    void getSortedPcsByPriceDesc_shouldReturnSortedDataInDescOrder() throws Exception {
-        pcRepository.save(testPc);
-        pcRepository.save(testPc2);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/pc/sort/price?type=desc"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].hardwareSpec.name").value("testPc1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[1].hardwareSpec.name").value("testPc2"));
-    }
-
-    @DirtiesContext
-    @Test
-    void getSortedPcsByPrice_shouldReturnBadRequest_whenRequestParamIsIncorrect() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/pc/sort/price?type=badtype"))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
-    }
-
-    @DirtiesContext
-    @Test
-    void getFilteredPcsByPrice_shouldReturnFilteredData() throws Exception {
-        pcRepository.save(testPc);
-        pcRepository.save(testPc2);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/pc/filter/price?lowest=250&highest=400"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].hardwareSpec.name").value("testPc1"));
-    }
-
-    @DirtiesContext
-    @Test
-    void getSortedPcsByRating_shouldReturnSortedDataAsc() throws Exception {
-        pcRepository.save(testPc);
-        pcRepository.save(testPc2);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/pc/sort/rating?type=asc"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].hardwareSpec.rating").value(4.0))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[1].hardwareSpec.rating").value(4.5));
-    }
-
-    @DirtiesContext
-    @Test
-    void getFilteredPcsByEnergyConsumption_shouldReturnFilteredData() throws Exception {
-        pcRepository.save(testPc);
-        pcRepository.save(testPc2);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/pc/filter/energy-consumption?lowest=70&highest=100"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].energyConsumption").value(95));
-    }
-
-    @DirtiesContext
-    @Test
-    void getFilteredPcsByEnergyConsumption_shouldReturnNotFoundWhenNoMatch() throws Exception {
-        pcRepository.save(testPc);
-        pcRepository.save(testPc2);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/pc/filter/energy-consumption?lowest=100&highest=150"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content").isEmpty());
-    }
-
-    @DirtiesContext
-    @Test
-    void getSortedPcsByRating_shouldReturnNotFoundWhenNoPcsExist() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/pc/sort/rating?type=desc"))
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
-    }
-
-    @DirtiesContext
-    @Test
-    void getSortedPcsByRating_shouldReturnBadRequest_whenRequestParamIsIncorrect() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/pc/sort/rating?type=badtype"))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
-    }
-
-    @DirtiesContext
-    @Test
-    void getFilteredPcsByPrice_shouldReturnNotFoundWhenNoMatch() throws Exception {
-        pcRepository.save(testPc);
-        pcRepository.save(testPc2);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/pc/filter/price?lowest=500&highest=1000"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content").isEmpty());
     }
 
     @DirtiesContext
@@ -316,17 +205,107 @@ class PcControllerTest {
 
     @DirtiesContext
     @Test
+    void getWorkstations_shouldReturnWorkstationsFilteredByPriceRange() throws Exception {
+        pcRepository.save(testPc);
+        pcRepository.save(testPc2);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/pc/filtered")
+                        .param("page", "0")
+                        .param("size", "8")
+                        .param("lowestPrice", "100")
+                        .param("highestPrice", "300"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content", Matchers.hasSize(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].hardwareSpec.price").value(200));
+    }
+
+    @DirtiesContext
+    @Test
+    void getWorkstations_shouldReturnWorkstationsSortedByRatingDesc() throws Exception {
+        pcRepository.save(testPc);
+        pcRepository.save(testPc2);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/pc/filtered")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sortType", "rating-desc"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content", Matchers.hasSize(2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].hardwareSpec.rating").value(4.5f));
+    }
+
+    @DirtiesContext
+    @Test
+    void getWorkstations_shouldReturnAllWorkstations_whenNoFiltersApplied() throws Exception {
+        pcRepository.save(testPc);
+        pcRepository.save(testPc2);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/pc/filtered")
+                        .param("page", "0")
+                        .param("size", "8"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content", Matchers.hasSize(2)));
+    }
+
+    @DirtiesContext
+    @Test
+    void getWorkstations_shouldReturnWorkstationsSortedByPriceAsc() throws Exception {
+        pcRepository.save(testPc);
+        pcRepository.save(testPc2);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/pc/filtered")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sortType", "price-asc"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content", Matchers.hasSize(2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].hardwareSpec.price").value(200));
+    }
+
+    @DirtiesContext
+    @Test
+    void getWorkstations_shouldReturnWorkstationsSortedByPriceDesc() throws Exception {
+        pcRepository.save(testPc);
+        pcRepository.save(testPc2);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/pc/filtered")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sortType", "price-desc"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content", Matchers.hasSize(2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].hardwareSpec.price").value(350));
+    }
+
+    @DirtiesContext
+    @Test
+    void getWorkstations_shouldReturnWorkstationsSortedByRatingAsc() throws Exception {
+        pcRepository.save(testPc);
+        pcRepository.save(testPc2);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/pc/filtered")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sortType", "rating-asc"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content", Matchers.hasSize(2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].hardwareSpec.rating").value(4.0f));
+    }
+
+    @DirtiesContext
+    @WithMockUser
+    @Test
     void calculateEnergyConsumption_shouldReturnPowerSupplyIdsAndNamesWithPrices() throws Exception {
         String requestBody = """
-    {
-        "cpuId": "cpuId",
-        "gpuId": "gpuId",
-        "motherboardId": "motherboardId",
-        "ramId": "ramId",
-        "ssdId": "ssdId",
-        "hddId": "hddId"
-    }
-    """;
+                {
+                    "cpuId": "cpuId",
+                    "gpuId": "gpuId",
+                    "motherboardId": "motherboardId",
+                    "ramId": "ramId",
+                    "ssdId": "ssdId",
+                    "hddId": "hddId"
+                }
+                """;
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/pc/configuration/calculate-energy-consumption")
                         .contentType("application/json")
@@ -337,6 +316,7 @@ class PcControllerTest {
     }
 
     @DirtiesContext
+    @WithMockUser
     @Test
     void deleteById_shouldDeletePcWithSpecifiedId() throws Exception {
         pcRepository.save(testPc);
@@ -349,6 +329,7 @@ class PcControllerTest {
 
 
     @DirtiesContext
+    @WithMockUser
     @Test
     void updatePcResponse_shouldUpdatePcAndReturnOk() throws Exception {
         pcRepository.save(testPc);
@@ -357,26 +338,26 @@ class PcControllerTest {
         testPc = testPc.withHardwareSpec(new HardwareSpec("Updated Gaming PC", "testDescription", new BigDecimal(350), 4.5f));
 
         String requestBody = """
-        {
-            "id": "%s",
-            "hardwareSpec": {
-                "name": "%s",
-                "description": "Updated description",
-                "price": 1500,
-                "rating": 4.9
-            },
-            "specsIds": {
-                "cpuId": "cpuId",
-                "gpuId": "gpuId",
-                "motherboardId": "motherboardId",
-                "ramId": "ramId",
-                "ssdId": "ssdId",
-                "hddId": "hddId",
-                "powerSupplyId": "powerSupplyId",
-                "pcCaseId": "pcCaseId"
-            }
-        }
-        """.formatted(testPc.id(), updatedName);
+                {
+                    "id": "%s",
+                    "hardwareSpec": {
+                        "name": "%s",
+                        "description": "Updated description",
+                        "price": 1500,
+                        "rating": 4.9
+                    },
+                    "specsIds": {
+                        "cpuId": "cpuId",
+                        "gpuId": "gpuId",
+                        "motherboardId": "motherboardId",
+                        "ramId": "ramId",
+                        "ssdId": "ssdId",
+                        "hddId": "hddId",
+                        "powerSupplyId": "powerSupplyId",
+                        "pcCaseId": "pcCaseId"
+                    }
+                }
+                """.formatted(testPc.id(), updatedName);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/api/pc")
                         .contentType("application/json")
@@ -387,5 +368,4 @@ class PcControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.hardwareSpec.name").value(updatedName));
     }
-
 }

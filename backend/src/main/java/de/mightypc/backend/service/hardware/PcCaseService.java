@@ -91,29 +91,31 @@ public class PcCaseService extends BaseService<PcCase, PcCaseRepository, PcCaseN
                     .toList();
         }
 
-        switch (sortType) {
-            case "price-asc":
-                pcCases = pcCases.stream()
-                        .sorted(Comparator.comparing(pcCase -> pcCase.hardwareSpec().price()))
-                        .toList();
-                break;
-            case "price-desc":
-                pcCases = pcCases.stream()
-                        .sorted(Comparator.comparing((PcCase pcCase) -> pcCase.hardwareSpec().price()).reversed())
-                        .toList();
-                break;
-            case "rating-asc":
-                pcCases = pcCases.stream()
-                        .sorted(Comparator.comparing(pcCase -> pcCase.hardwareSpec().rating()))
-                        .toList();
-                break;
-            case "rating-desc":
-                pcCases = pcCases.stream()
-                        .sorted(Comparator.comparing((PcCase pcCase) -> pcCase.hardwareSpec().rating()).reversed())
-                        .toList();
-                break;
-            default:
-                break;
+        if (sortType != null) {
+            switch (sortType) {
+                case "price-asc":
+                    pcCases = pcCases.stream()
+                            .sorted(Comparator.comparing(pcCase -> pcCase.hardwareSpec().price()))
+                            .toList();
+                    break;
+                case "price-desc":
+                    pcCases = pcCases.stream()
+                            .sorted(Comparator.comparing((PcCase pcCase) -> pcCase.hardwareSpec().price()).reversed())
+                            .toList();
+                    break;
+                case "rating-asc":
+                    pcCases = pcCases.stream()
+                            .sorted(Comparator.comparing(pcCase -> pcCase.hardwareSpec().rating()))
+                            .toList();
+                    break;
+                case "rating-desc":
+                    pcCases = pcCases.stream()
+                            .sorted(Comparator.comparing((PcCase pcCase) -> pcCase.hardwareSpec().rating()).reversed())
+                            .toList();
+                    break;
+                default:
+                    break;
+            }
         }
 
         int start = (int) pageable.getOffset();

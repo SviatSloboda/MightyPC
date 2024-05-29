@@ -13,9 +13,7 @@ import de.mightypc.backend.service.hardware.RamService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class ConfiguratorService {
@@ -39,7 +37,7 @@ public class ConfiguratorService {
         this.powerSupplyService = powerSupplyService;
     }
 
-    public String getAllComponentsIdsAndNamesWithPrices() {
+    public String getAllComponentsIdsAndNamesWithPricesForChatGpt() {
         StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append(cpuService.getAllNamesWithPrices());
@@ -54,7 +52,7 @@ public class ConfiguratorService {
         return new String(stringBuilder).replace(" ", "");
     }
 
-    public ConfiguratorItems getAllItems() {
+    public ConfiguratorItems getAllItemsWithInfoForConfigurator() {
         List<List<ItemForConfigurator>> allItems = new ArrayList<>();
 
         allItems.add(cpuService.getAllHardwareInfoForConfiguration());
@@ -68,30 +66,4 @@ public class ConfiguratorService {
 
         return new ConfiguratorItems(allItems);
     }
-
-    public boolean validateComponentIds(String[] ids) {
-        Set<String> validIds = getAllValidComponentIds();
-        for (String id : ids) {
-            if (!validIds.contains(id)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private Set<String> getAllValidComponentIds() {
-        Set<String> validIds = new HashSet<>();
-
-        validIds.addAll(cpuService.getAllIds());
-        validIds.addAll(gpuService.getAllIds());
-        validIds.addAll(motherboardService.getAllIds());
-        validIds.addAll(ramService.getAllIds());
-        validIds.addAll(ssdService.getAllIds());
-        validIds.addAll(hddService.getAllIds());
-        validIds.addAll(powerSupplyService.getAllIds());
-        validIds.addAll(pcCaseService.getAllIds());
-
-        return validIds;
-    }
-
 }

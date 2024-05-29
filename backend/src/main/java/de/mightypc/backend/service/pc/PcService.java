@@ -249,29 +249,31 @@ public class PcService extends PcBaseService<PC, PcRepository> {
                     .toList();
         }
 
-        switch (sortType) {
-            case "price-asc":
-                pcs = pcs.stream()
-                        .sorted(Comparator.comparing(pc -> pc.hardwareSpec().price()))
-                        .toList();
-                break;
-            case "price-desc":
-                pcs = pcs.stream()
-                        .sorted(Comparator.comparing((PC pc) -> pc.hardwareSpec().price()).reversed())
-                        .toList();
-                break;
-            case "rating-asc":
-                pcs = pcs.stream()
-                        .sorted(Comparator.comparing(pc -> pc.hardwareSpec().rating()))
-                        .toList();
-                break;
-            case "rating-desc":
-                pcs = pcs.stream()
-                        .sorted(Comparator.comparing((PC pc) -> pc.hardwareSpec().rating()).reversed())
-                        .toList();
-                break;
-            default:
-                break;
+        if (sortType != null) {
+            switch (sortType) {
+                case "price-asc":
+                    pcs = pcs.stream()
+                            .sorted(Comparator.comparing(pc -> pc.hardwareSpec().price()))
+                            .toList();
+                    break;
+                case "price-desc":
+                    pcs = pcs.stream()
+                            .sorted(Comparator.comparing((PC pc) -> pc.hardwareSpec().price()).reversed())
+                            .toList();
+                    break;
+                case "rating-asc":
+                    pcs = pcs.stream()
+                            .sorted(Comparator.comparing(pc -> pc.hardwareSpec().rating()))
+                            .toList();
+                    break;
+                case "rating-desc":
+                    pcs = pcs.stream()
+                            .sorted(Comparator.comparing((PC pc) -> pc.hardwareSpec().rating()).reversed())
+                            .toList();
+                    break;
+                default:
+                    break;
+            }
         }
 
         int start = (int) pageable.getOffset();

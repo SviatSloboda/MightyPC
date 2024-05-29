@@ -98,29 +98,31 @@ public class SsdService extends BaseService<SSD, SsdRepository, SsdNotFoundExcep
                     .toList();
         }
 
-        switch (sortType) {
-            case "price-asc":
-                ssds = ssds.stream()
-                        .sorted(Comparator.comparing(ssd -> ssd.hardwareSpec().price()))
-                        .toList();
-                break;
-            case "price-desc":
-                ssds = ssds.stream()
-                        .sorted(Comparator.comparing((SSD ssd) -> ssd.hardwareSpec().price()).reversed())
-                        .toList();
-                break;
-            case "rating-asc":
-                ssds = ssds.stream()
-                        .sorted(Comparator.comparing(ssd -> ssd.hardwareSpec().rating()))
-                        .toList();
-                break;
-            case "rating-desc":
-                ssds = ssds.stream()
-                        .sorted(Comparator.comparing((SSD ssd) -> ssd.hardwareSpec().rating()).reversed())
-                        .toList();
-                break;
-            default:
-                break;
+        if (sortType != null) {
+            switch (sortType) {
+                case "price-asc":
+                    ssds = ssds.stream()
+                            .sorted(Comparator.comparing(ssd -> ssd.hardwareSpec().price()))
+                            .toList();
+                    break;
+                case "price-desc":
+                    ssds = ssds.stream()
+                            .sorted(Comparator.comparing((SSD ssd) -> ssd.hardwareSpec().price()).reversed())
+                            .toList();
+                    break;
+                case "rating-asc":
+                    ssds = ssds.stream()
+                            .sorted(Comparator.comparing(ssd -> ssd.hardwareSpec().rating()))
+                            .toList();
+                    break;
+                case "rating-desc":
+                    ssds = ssds.stream()
+                            .sorted(Comparator.comparing((SSD ssd) -> ssd.hardwareSpec().rating()).reversed())
+                            .toList();
+                    break;
+                default:
+                    break;
+            }
         }
 
         int start = (int) pageable.getOffset();

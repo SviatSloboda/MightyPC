@@ -30,14 +30,9 @@ public class ConfiguratorController {
         this.powerSupplyService = powerSupplyService;
     }
 
-    @GetMapping
-    public String getAllConfiguratorComponents() {
-        return configuratorService.getAllComponentsIdsAndNamesWithPrices();
-    }
-
     @GetMapping("/items")
     public ConfiguratorItems getAllConfiguratorItems() {
-        return configuratorService.getAllItems();
+        return configuratorService.getAllItemsWithInfoForConfigurator();
     }
 
     @GetMapping("/motherboard/socket/{cpuSocket}")

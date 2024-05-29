@@ -104,29 +104,31 @@ public class RamService extends BaseService<RAM, RamRepository, RamNotFoundExcep
                     .toList();
         }
 
-        switch (sortType) {
-            case "price-asc":
-                rams = rams.stream()
-                        .sorted(Comparator.comparing(ram -> ram.hardwareSpec().price()))
-                        .toList();
-                break;
-            case "price-desc":
-                rams = rams.stream()
-                        .sorted(Comparator.comparing((RAM ram) -> ram.hardwareSpec().price()).reversed())
-                        .toList();
-                break;
-            case "rating-asc":
-                rams = rams.stream()
-                        .sorted(Comparator.comparing(ram -> ram.hardwareSpec().rating()))
-                        .toList();
-                break;
-            case "rating-desc":
-                rams = rams.stream()
-                        .sorted(Comparator.comparing((RAM ram) -> ram.hardwareSpec().rating()).reversed())
-                        .toList();
-                break;
-            default:
-                break;
+        if (sortType != null) {
+            switch (sortType) {
+                case "price-asc":
+                    rams = rams.stream()
+                            .sorted(Comparator.comparing(ram -> ram.hardwareSpec().price()))
+                            .toList();
+                    break;
+                case "price-desc":
+                    rams = rams.stream()
+                            .sorted(Comparator.comparing((RAM ram) -> ram.hardwareSpec().price()).reversed())
+                            .toList();
+                    break;
+                case "rating-asc":
+                    rams = rams.stream()
+                            .sorted(Comparator.comparing(ram -> ram.hardwareSpec().rating()))
+                            .toList();
+                    break;
+                case "rating-desc":
+                    rams = rams.stream()
+                            .sorted(Comparator.comparing((RAM ram) -> ram.hardwareSpec().rating()).reversed())
+                            .toList();
+                    break;
+                default:
+                    break;
+            }
         }
 
         int start = (int) pageable.getOffset();

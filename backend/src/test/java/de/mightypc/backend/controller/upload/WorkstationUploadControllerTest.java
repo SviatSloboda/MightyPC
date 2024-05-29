@@ -3,6 +3,7 @@ package de.mightypc.backend.controller.upload;
 import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.model.pc.Workstation;
 import de.mightypc.backend.repository.pc.WorkstationRepository;
+import de.mightypc.backend.security.SecurityConfig;
 import de.mightypc.backend.service.CloudinaryService;
 import de.mightypc.backend.service.pc.WorkstationService;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -29,6 +32,8 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Import(SecurityConfig.class)
+@WithMockUser
 class WorkstationUploadControllerTest {
 
     @Autowired

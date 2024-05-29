@@ -119,29 +119,31 @@ public class MotherboardService extends BaseService<Motherboard, MotherboardRepo
                     .toList();
         }
 
-        switch (sortType) {
-            case "price-asc":
-                motherboards = motherboards.stream()
-                        .sorted(Comparator.comparing(motherboard -> motherboard.hardwareSpec().price()))
-                        .toList();
-                break;
-            case "price-desc":
-                motherboards = motherboards.stream()
-                        .sorted(Comparator.comparing((Motherboard motherboard) -> motherboard.hardwareSpec().price()).reversed())
-                        .toList();
-                break;
-            case "rating-asc":
-                motherboards = motherboards.stream()
-                        .sorted(Comparator.comparing(motherboard -> motherboard.hardwareSpec().rating()))
-                        .toList();
-                break;
-            case "rating-desc":
-                motherboards = motherboards.stream()
-                        .sorted(Comparator.comparing((Motherboard motherboard) -> motherboard.hardwareSpec().rating()).reversed())
-                        .toList();
-                break;
-            default:
-                break;
+        if (sortType != null) {
+            switch (sortType) {
+                case "price-asc":
+                    motherboards = motherboards.stream()
+                            .sorted(Comparator.comparing(motherboard -> motherboard.hardwareSpec().price()))
+                            .toList();
+                    break;
+                case "price-desc":
+                    motherboards = motherboards.stream()
+                            .sorted(Comparator.comparing((Motherboard motherboard) -> motherboard.hardwareSpec().price()).reversed())
+                            .toList();
+                    break;
+                case "rating-asc":
+                    motherboards = motherboards.stream()
+                            .sorted(Comparator.comparing(motherboard -> motherboard.hardwareSpec().rating()))
+                            .toList();
+                    break;
+                case "rating-desc":
+                    motherboards = motherboards.stream()
+                            .sorted(Comparator.comparing((Motherboard motherboard) -> motherboard.hardwareSpec().rating()).reversed())
+                            .toList();
+                    break;
+                default:
+                    break;
+            }
         }
 
         int start = (int) pageable.getOffset();

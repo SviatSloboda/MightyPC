@@ -105,29 +105,31 @@ public class HddService extends BaseService<HDD, HddRepository, HddNotFoundExcep
                     .toList();
         }
 
-        switch (sortType) {
-            case "price-asc":
-                hdds = hdds.stream()
-                        .sorted(Comparator.comparing(hdd -> hdd.hardwareSpec().price()))
-                        .toList();
-                break;
-            case "price-desc":
-                hdds = hdds.stream()
-                        .sorted(Comparator.comparing((HDD hdd) -> hdd.hardwareSpec().price()).reversed())
-                        .toList();
-                break;
-            case "rating-asc":
-                hdds = hdds.stream()
-                        .sorted(Comparator.comparing(hdd -> hdd.hardwareSpec().rating()))
-                        .toList();
-                break;
-            case "rating-desc":
-                hdds = hdds.stream()
-                        .sorted(Comparator.comparing((HDD hdd) -> hdd.hardwareSpec().rating()).reversed())
-                        .toList();
-                break;
-            default:
-                break;
+        if (sortType != null) {
+            switch (sortType) {
+                case "price-asc":
+                    hdds = hdds.stream()
+                            .sorted(Comparator.comparing(hdd -> hdd.hardwareSpec().price()))
+                            .toList();
+                    break;
+                case "price-desc":
+                    hdds = hdds.stream()
+                            .sorted(Comparator.comparing((HDD hdd) -> hdd.hardwareSpec().price()).reversed())
+                            .toList();
+                    break;
+                case "rating-asc":
+                    hdds = hdds.stream()
+                            .sorted(Comparator.comparing(hdd -> hdd.hardwareSpec().rating()))
+                            .toList();
+                    break;
+                case "rating-desc":
+                    hdds = hdds.stream()
+                            .sorted(Comparator.comparing((HDD hdd) -> hdd.hardwareSpec().rating()).reversed())
+                            .toList();
+                    break;
+                default:
+                    break;
+            }
         }
 
         int start = (int) pageable.getOffset();

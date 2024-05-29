@@ -1,6 +1,7 @@
 package de.mightypc.backend.service.hardware;
 
 import de.mightypc.backend.exception.hardware.PcCaseNotFoundException;
+import de.mightypc.backend.model.configurator.ItemForConfigurator;
 import de.mightypc.backend.model.hardware.PcCase;
 import de.mightypc.backend.model.hardware.HardwareSpec;
 import de.mightypc.backend.repository.hardware.PcCaseRepository;
@@ -11,8 +12,6 @@ import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -73,21 +72,6 @@ class PcCaseServiceTest extends BaseServiceTest<PcCase, PcCaseService, PcCaseRep
         verify(mockPcCaseRepository).existsById("testId");
     }
 
-    @Override
-    @Test
-    void getAllNamesWithPrices_shouldReturnMapOfNamesWithPrices() {
-        // Arrange
-        HashMap<String, String> expected = new HashMap<>();
-        expected.put("testId", "test ($666)");
-        when(mockPcCaseRepository.findAll()).thenReturn(List.of(testPcCase));
-
-        // Act
-        HashMap<String, String> actual = service.getAllNamesWithPrices();
-
-        // Assert
-        assertEquals(expected, actual);
-        verify(mockPcCaseRepository).findAll();
-    }
 
     @Override
     @Test
@@ -118,74 +102,109 @@ class PcCaseServiceTest extends BaseServiceTest<PcCase, PcCaseService, PcCaseRep
     }
 
     @Test
-    void getAllWithSortingOfPriceDescAsPages_shouldGetAllPcCasesWithProperSorting() {
+    void getAllNamesWithPrices_shouldReturnAllNamesWithPrices() {
         // Arrange
-        Page<PcCase> expected = new PageImpl<>(List.of(testPcCase, testPcCase2), pageable, 8);
-        when(repository.findAll()).thenReturn(pcCases);
+        when(mockPcCaseRepository.findAll()).thenReturn(pcCases);
+
+        String expected = "$pcCases:\n{testId:test:($666)}\n{testId2:test:($333)}\n";
 
         // Act
-        Page<PcCase> actual = service.getAllWithSortingOfPriceDescAsPages(pageable);
+        String actual = pcCaseService.getAllNamesWithPrices();
 
         // Assert
-        verify(repository).findAll();
         assertEquals(expected, actual);
+        verify(mockPcCaseRepository).findAll();
     }
 
     @Test
-    void getAllWithSortingOfPriceAscAsPages_shouldGetAllPcCasesWithProperSorting() {
+    void getAllIds_shouldReturnAllIds() {
         // Arrange
-        Page<PcCase> expected = new PageImpl<>(List.of(testPcCase2, testPcCase), pageable, 8);
-        when(repository.findAll()).thenReturn(pcCases);
+        when(mockPcCaseRepository.findAll()).thenReturn(pcCases);
+
+        List<String> expected = List.of("testId", "testId2");
 
         // Act
-        Page<PcCase> actual = service.getAllWithSortingOfPriceAscAsPages(pageable);
+        List<String> actual = pcCaseService.getAllIds();
 
         // Assert
-        verify(repository).findAll();
         assertEquals(expected, actual);
+        verify(mockPcCaseRepository).findAll();
     }
 
     @Test
-    void getAllWithSortingOfRatingDescAsPages_shouldGetAllPcCasesWithProperSorting() {
+    void getAllHardwareInfoForConfiguration_shouldReturnAllHardwareInfoForConfiguration() {
         // Arrange
-        Page<PcCase> expected = new PageImpl<>(List.of(testPcCase2, testPcCase), pageable, 8);
-        when(repository.findAll()).thenReturn(pcCases);
+        when(mockPcCaseRepository.findAll()).thenReturn(pcCases);
+
+        List<ItemForConfigurator> expected = List.of(
+                new ItemForConfigurator("testId", "test", new BigDecimal(666), "", "pc-case"),
+                new ItemForConfigurator("testId2", "test", new BigDecimal(333), "", "pc-case")
+        );
 
         // Act
-        Page<PcCase> actual = service.getAllWithSortingOfRatingDescAsPages(pageable);
+        List<ItemForConfigurator> actual = pcCaseService.getAllHardwareInfoForConfiguration();
 
         // Assert
-        verify(repository).findAll();
         assertEquals(expected, actual);
+        verify(mockPcCaseRepository).findAll();
     }
 
     @Test
-    void getAllWithSortingOfRatingAscAsPages_shouldGetAllPcCasesWithProperSorting() {
+    void getPcCases_shouldReturnFilteredAndSortedPcCases() {
         // Arrange
-        Page<PcCase> expected = new PageImpl<>(List.of(testPcCase, testPcCase2), pageable, 8);
-        when(repository.findAll()).thenReturn(pcCases);
+        List<PcCase> expected = List.of(testPcCase);
+        when(mockPcCaseRepository.findAll()).thenReturn(pcCases);
 
         // Act
-        Page<PcCase> actual = service.getAllWithSortingOfRatingAscAsPages(pageable);
+        Page<PcCase> actual = pcCaseService.getPcCases(pageable, "price-asc", 500, 700);
 
         // Assert
-        verify(repository).findAll();
-        assertEquals(expected, actual);
+        assertEquals(new PageImpl<>(expected, pageable, 1), actual);
+        verify(mockPcCaseRepository).findAll();
     }
 
     @Test
-    void getAllWithFilteringByPriceAsPages_shouldGetAllPcCasesWithProperFiltering() {
+    void getPcCases_shouldSortPcCasesByPriceDesc() {
         // Arrange
-        Page<PcCase> expected = new PageImpl<>(Collections.singletonList(testPcCase), pageable, 8);
-        when(repository.findAll()).thenReturn(pcCases);
+        List<PcCase> expected = List.of(testPcCase, testPcCase2);
+        when(mockPcCaseRepository.findAll()).thenReturn(pcCases);
 
         // Act
-        Page<PcCase> actual = service.getAllWithFilteringByPriceAsPages(pageable, 500, 2500);
+        Page<PcCase> actual = pcCaseService.getPcCases(pageable, "price-desc", null, null);
 
         // Assert
-        verify(repository).findAll();
-        assertEquals(expected, actual);
+        assertEquals(new PageImpl<>(expected, pageable, 2), actual);
+        verify(mockPcCaseRepository).findAll();
     }
+
+    @Test
+    void getPcCases_shouldSortPcCasesByRatingAsc() {
+        // Arrange
+        List<PcCase> expected = List.of(testPcCase, testPcCase2);
+        when(mockPcCaseRepository.findAll()).thenReturn(pcCases);
+
+        // Act
+        Page<PcCase> actual = pcCaseService.getPcCases(pageable, "rating-asc", null, null);
+
+        // Assert
+        assertEquals(new PageImpl<>(expected, pageable, 2), actual);
+        verify(mockPcCaseRepository).findAll();
+    }
+
+    @Test
+    void getPcCases_shouldSortPcCasesByRatingDesc() {
+        // Arrange
+        List<PcCase> expected = List.of(testPcCase2, testPcCase);
+        when(mockPcCaseRepository.findAll()).thenReturn(pcCases);
+
+        // Act
+        Page<PcCase> actual = pcCaseService.getPcCases(pageable, "rating-desc", null, null);
+
+        // Assert
+        assertEquals(new PageImpl<>(expected, pageable, 2), actual);
+        verify(mockPcCaseRepository).findAll();
+    }
+
 
     @Override
     @Test

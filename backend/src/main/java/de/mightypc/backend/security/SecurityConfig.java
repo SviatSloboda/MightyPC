@@ -51,17 +51,17 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/configurator/**").authenticated()
                         .requestMatchers("/api/user-pcs/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/hardware/**").permitAll()
+
                         .requestMatchers(HttpMethod.GET, "/api/pc/**").permitAll()
+
                         .requestMatchers(HttpMethod.POST, "api/configuration/calculate-energy-consumption").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/workstation/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/user/{userId}/change-password").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/user/{userId}/set-password").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/user/{userId}/set-password").authenticated()
-
                         .requestMatchers(HttpMethod.GET, "/api/basket/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/basket/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/basket/**").authenticated()
-
                         .requestMatchers(HttpMethod.GET, "/api/order/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/order/**").authenticated()
                         .anyRequest().authenticated())

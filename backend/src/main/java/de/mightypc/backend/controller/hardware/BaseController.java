@@ -36,9 +36,4 @@ public abstract class BaseController<T, S extends BaseService<T, ?, ?>> {
     public T update(@RequestBody T entity) {
         return service.update(entity);
     }
-
-    @GetMapping("/names")
-    public String getAllNames() {
-        return service.getAllNamesWithPrices();
-    }
 }

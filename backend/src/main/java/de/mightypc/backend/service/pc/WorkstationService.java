@@ -229,40 +229,43 @@ public class WorkstationService extends PcBaseService<Workstation, WorkstationRe
         if (lowestPrice != null && highestPrice != null) {
             workstations = workstations.stream()
                     .filter(workstation -> workstation.hardwareSpec().price().intValue() >= lowestPrice &&
-                                  workstation.hardwareSpec().price().intValue() <= highestPrice)
+                                           workstation.hardwareSpec().price().intValue() <= highestPrice)
                     .toList();
         }
 
         if (lowestEnergyConsumption != null && highestEnergyConsumption != null) {
             workstations = workstations.stream()
                     .filter(workstation -> workstation.energyConsumption() >= lowestEnergyConsumption &&
-                                  workstation.energyConsumption() <= highestEnergyConsumption)
+                                           workstation.energyConsumption() <= highestEnergyConsumption)
                     .toList();
         }
 
-        switch (sortType) {
-            case "price-asc":
-                workstations = workstations.stream()
-                        .sorted(Comparator.comparing(workstation -> workstation.hardwareSpec().price()))
-                        .toList();
-                break;
-            case "price-desc":
-                workstations = workstations.stream()
-                        .sorted(Comparator.comparing((Workstation workstation) -> workstation.hardwareSpec().price()).reversed())
-                        .toList();
-                break;
-            case "rating-asc":
-                workstations = workstations.stream()
-                        .sorted(Comparator.comparing(workstation -> workstation.hardwareSpec().rating()))
-                        .toList();
-                break;
-            case "rating-desc":
-                workstations = workstations.stream()
-                        .sorted(Comparator.comparing((Workstation workstation) -> workstation.hardwareSpec().rating()).reversed())
-                        .toList();
-                break;
-            default:
-                break;
+        if (sortType != null) {
+
+            switch (sortType) {
+                case "price-asc":
+                    workstations = workstations.stream()
+                            .sorted(Comparator.comparing(workstation -> workstation.hardwareSpec().price()))
+                            .toList();
+                    break;
+                case "price-desc":
+                    workstations = workstations.stream()
+                            .sorted(Comparator.comparing((Workstation workstation) -> workstation.hardwareSpec().price()).reversed())
+                            .toList();
+                    break;
+                case "rating-asc":
+                    workstations = workstations.stream()
+                            .sorted(Comparator.comparing(workstation -> workstation.hardwareSpec().rating()))
+                            .toList();
+                    break;
+                case "rating-desc":
+                    workstations = workstations.stream()
+                            .sorted(Comparator.comparing((Workstation workstation) -> workstation.hardwareSpec().rating()).reversed())
+                            .toList();
+                    break;
+                default:
+                    break;
+            }
         }
 
         int start = (int) pageable.getOffset();

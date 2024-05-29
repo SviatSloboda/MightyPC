@@ -5,11 +5,14 @@ import de.mightypc.backend.model.shop.order.Order;
 import de.mightypc.backend.model.shop.order.OrderStatus;
 import de.mightypc.backend.model.shop.user.User;
 import de.mightypc.backend.repository.shop.UserRepository;
+import de.mightypc.backend.security.SecurityConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -17,54 +20,53 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Import(SecurityConfig.class)
+@WithMockUser
 class OrderControllerTest {
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private UserRepository userRepository;
-
     private final Item item1 = new Item(
             "itemId1",
             "pc",
-            "pc",
             "testDescription",
             new BigDecimal("120"),
-            new ArrayList<>()
+            "",
+            ""
     );
-
     private final Item item2 = new Item(
             "itemId2",
             "workstation",
-            "workstation",
             "testDescription",
             new BigDecimal("1200"),
-            new ArrayList<>()
+            "",
+            ""
     );
 
     private final Order order1 = new Order(
             "orderId1",
             List.of(item1),
             new BigDecimal("120"),
-            OrderStatus.PENDING
+            OrderStatus.PENDING,
+            Collections.emptyList()
     );
 
     private final Order order2 = new Order(
             "orderId2",
             List.of(item1, item2),
             new BigDecimal("1320"),
-            OrderStatus.PENDING
+            OrderStatus.PENDING,
+            Collections.emptyList()
     );
 
     private final User user = new User(
             "user1",
             "testEmail",
+            "testPassword",
             new ArrayList<>(List.of(order1, order2)),
             new ArrayList<>(List.of(item1, item2)),
             new ArrayList<>(),
@@ -73,6 +75,11 @@ class OrderControllerTest {
             "23.32",
             "link"
     );
+
+    @Autowired
+    private MockMvc mockMvc;
+    @Autowired
+    private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {
@@ -83,15 +90,15 @@ class OrderControllerTest {
     @Test
     void placeOrder_shouldReturnStatusCreated() throws Exception {
         String jsonRequestBody = """
-            [{
-                "id": "item1",
-                "type": "Electronics",
-                "name": "Laptop",
-                "description": "High-end gaming laptop",
-                "price": 1200,
-                "photos": ["url1", "url2"]
-            }]
-            """;
+                [{
+                    "id": "item1",
+                    "type": "Electronics",
+                    "name": "Laptop",
+                    "description": "High-end gaming laptop",
+                    "price": 1200,
+                    "photos": ["url1", "url2"]
+                }]
+                """;
         mockMvc.perform(MockMvcRequestBuilders.post("/api/order/{userId}", "user1")
                         .contentType("application/json")
                         .content(jsonRequestBody))
@@ -128,10 +135,10 @@ class OrderControllerTest {
     @Test
     void updateStatus_shouldUpdateOrderStatus() throws Exception {
         String jsonRequestBody = """
-            {
-                "orderStatus": "PAYED"
-            }
-            """;
+                {
+                    "orderStatus": "PAYED"
+                }
+                """;
         mockMvc.perform(MockMvcRequestBuilders.put("/api/order/{userId}/{orderId}", "user1", "orderId1")
                         .contentType("application/json")
                         .content(jsonRequestBody))
@@ -144,5 +151,4 @@ class OrderControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/order/{userId}/all", "user1"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
-
 }

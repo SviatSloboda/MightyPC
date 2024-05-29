@@ -30,6 +30,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -57,7 +59,8 @@ class UserPcsServiceTest {
     private final PowerSupplyRepository powerSupplyRepository = mock(PowerSupplyRepository.class);
     private final MotherboardRepository motherboardRepository = mock(MotherboardRepository.class);
 
-    private final UserService userService = new UserService(userRepository);
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final UserService userService = new UserService(userRepository, passwordEncoder);
     private final CpuService cpuService = new CpuService(cpuRepository);
     private final GpuService gpuService = new GpuService(gpuRepository);
     private final SsdService ssdService = new SsdService(ssdRepository);
@@ -183,7 +186,7 @@ class UserPcsServiceTest {
         user.setPcs(new ArrayList<>());
 
         // Act & Assert
-        assertThrows(UserPcNotFoundException.class, () -> userPcsService.getPcByUserIdAndPcIdAsPcResponse("testId","roflId"));
+        assertThrows(UserPcNotFoundException.class, () -> userPcsService.getPcByUserIdAndPcIdAsPcResponse("testId", "roflId"));
     }
 
     @Test

@@ -117,29 +117,31 @@ public class PowerSupplyService extends BaseService<PowerSupply, PowerSupplyRepo
                     .toList();
         }
 
-        switch (sortType) {
-            case "price-asc":
-                powerSupplies = powerSupplies.stream()
-                        .sorted(Comparator.comparing(powerSupply -> powerSupply.hardwareSpec().price()))
-                        .toList();
-                break;
-            case "price-desc":
-                powerSupplies = powerSupplies.stream()
-                        .sorted(Comparator.comparing((PowerSupply powerSupply) -> powerSupply.hardwareSpec().price()).reversed())
-                        .toList();
-                break;
-            case "rating-asc":
-                powerSupplies = powerSupplies.stream()
-                        .sorted(Comparator.comparing(powerSupply -> powerSupply.hardwareSpec().rating()))
-                        .toList();
-                break;
-            case "rating-desc":
-                powerSupplies = powerSupplies.stream()
-                        .sorted(Comparator.comparing((PowerSupply powerSupply) -> powerSupply.hardwareSpec().rating()).reversed())
-                        .toList();
-                break;
-            default:
-                break;
+        if (sortType != null) {
+            switch (sortType) {
+                case "price-asc":
+                    powerSupplies = powerSupplies.stream()
+                            .sorted(Comparator.comparing(powerSupply -> powerSupply.hardwareSpec().price()))
+                            .toList();
+                    break;
+                case "price-desc":
+                    powerSupplies = powerSupplies.stream()
+                            .sorted(Comparator.comparing((PowerSupply powerSupply) -> powerSupply.hardwareSpec().price()).reversed())
+                            .toList();
+                    break;
+                case "rating-asc":
+                    powerSupplies = powerSupplies.stream()
+                            .sorted(Comparator.comparing(powerSupply -> powerSupply.hardwareSpec().rating()))
+                            .toList();
+                    break;
+                case "rating-desc":
+                    powerSupplies = powerSupplies.stream()
+                            .sorted(Comparator.comparing((PowerSupply powerSupply) -> powerSupply.hardwareSpec().rating()).reversed())
+                            .toList();
+                    break;
+                default:
+                    break;
+            }
         }
 
         int start = (int) pageable.getOffset();
