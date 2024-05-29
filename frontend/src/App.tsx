@@ -26,6 +26,7 @@ import {
     GpuCharacteristics, HddCharacteristics,
     MotherboardCharacteristics, PcCaseCharacteristics, PsuCharacteristics, RamCharacteristics, SsdCharacteristics
 } from "./components/hardware/Characteristics.tsx";
+import PrivacyPolicy from "./components/login/PrivacyPolicy.tsx";
 
 
 export default function App() {
@@ -72,6 +73,8 @@ export default function App() {
             <Route path="/user/login" element={<LoginPage/>}/>
 
             <Route path="/user-pcs" element={<UserPcsPage/>}/>
+
+            <Route path="/privacy-policy" element={<PrivacyPolicy/>}/>
 
         </Routes>
         <FooterBar/>
