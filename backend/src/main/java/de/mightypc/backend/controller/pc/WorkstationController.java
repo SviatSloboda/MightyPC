@@ -64,11 +64,11 @@ public class WorkstationController {
 
     @GetMapping("/filtered")
     public Page<Workstation> getWorkstations(Pageable pageable,
-                            @RequestParam(value = "sortType", required = false) String sortType,
-                            @RequestParam(value = "lowestPrice", required = false) Integer lowestPrice,
-                            @RequestParam(value = "highestPrice", required = false) Integer highestPrice,
-                            @RequestParam(value = "lowestEnergyConsumption", required = false) Integer lowestEnergyConsumption,
-                            @RequestParam(value = "highestEnergyConsumption", required = false) Integer highestEnergyConsumption) {
+                                             @RequestParam(value = "sortType", required = false) String sortType,
+                                             @RequestParam(value = "lowestPrice", required = false) Integer lowestPrice,
+                                             @RequestParam(value = "highestPrice", required = false) Integer highestPrice,
+                                             @RequestParam(value = "lowestEnergyConsumption", required = false) Integer lowestEnergyConsumption,
+                                             @RequestParam(value = "highestEnergyConsumption", required = false) Integer highestEnergyConsumption) {
 
         return service.getWorkstations(pageable, sortType, lowestPrice, highestPrice, lowestEnergyConsumption, highestEnergyConsumption);
     }

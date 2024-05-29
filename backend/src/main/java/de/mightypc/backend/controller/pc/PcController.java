@@ -77,11 +77,11 @@ public class PcController {
 
     @GetMapping("/filtered")
     public Page<PC> getCpus(Pageable pageable,
-                             @RequestParam(value = "sortType", required = false) String sortType,
-                             @RequestParam(value = "lowestPrice", required = false) Integer lowestPrice,
-                             @RequestParam(value = "highestPrice", required = false) Integer highestPrice,
-                             @RequestParam(value = "lowestEnergyConsumption", required = false) Integer lowestEnergyConsumption,
-                             @RequestParam(value = "highestEnergyConsumption", required = false) Integer highestEnergyConsumption) {
+                            @RequestParam(value = "sortType", required = false) String sortType,
+                            @RequestParam(value = "lowestPrice", required = false) Integer lowestPrice,
+                            @RequestParam(value = "highestPrice", required = false) Integer highestPrice,
+                            @RequestParam(value = "lowestEnergyConsumption", required = false) Integer lowestEnergyConsumption,
+                            @RequestParam(value = "highestEnergyConsumption", required = false) Integer highestEnergyConsumption) {
 
         return service.getPcs(pageable, sortType, lowestPrice, highestPrice, lowestEnergyConsumption, highestEnergyConsumption);
     }

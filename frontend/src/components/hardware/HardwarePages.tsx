@@ -295,15 +295,28 @@ function HardwarePage<T extends HardwareItem>({ type }: Readonly<HardwarePagePro
         }
         const photoKey = `${type}Photos` as keyof T;
         const photos = item[photoKey] as unknown as string[] | undefined;
+
+        let pathToCharacteristicsPage: string;
+        switch (type) {
+            case 'pc':
+                pathToCharacteristicsPage = `/pc/${item.id}`;
+                break;
+            case 'workstation':
+                pathToCharacteristicsPage = `/workstation/${item.id}`;
+                break;
+            default:
+                pathToCharacteristicsPage = `/hardware/${type}/${item.id}`;
+                break;
+        }
+
         const payload = {
             id: item.id,
             name: item.hardwareSpec.name,
             description: item.hardwareSpec.description,
             price: item.hardwareSpec.price,
             photo: photos && photos.length > 0 ? photos[0] : hardwareConfig[type].photo,
-            pathToCharacteristicsPage: type === 'pc' ? `/pc/${item.id}` : type === 'workstation' ? `/workstation/${item.id}` : `/hardware/${type}/${item.id}`
+            pathToCharacteristicsPage
         };
-
 
         axios.post(`/api/basket/${user.id}`, payload)
             .then(() => {
@@ -311,6 +324,7 @@ function HardwarePage<T extends HardwareItem>({ type }: Readonly<HardwarePagePro
             })
             .catch(console.error);
     };
+
 
     const handleSort = (sortBy: string) => {
         setSortType(sortBy);

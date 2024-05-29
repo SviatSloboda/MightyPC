@@ -12,8 +12,8 @@ import java.util.Arrays;
 
 @Service
 public class ChatGptService {
-    private RestClient restClient;
     private final ConfiguratorService configuratorService;
+    private RestClient restClient;
 
     public ChatGptService(@Value("${app.chatgpt.api.url}") String url,
                           @Value("${app.chatgpt.api.key}") String apiKey,
