@@ -62,7 +62,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserResponse> login(@RequestBody Map<String, String> credentials) {
+    public ResponseEntity<UserResponse> login(@RequestBody Map<String, String> credentials, HttpServletRequest request, HttpServletResponse response) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -71,9 +71,22 @@ public class UserController {
                     )
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            return ResponseEntity.ok(userService.getLoggedInUser(authentication));
+
+            request.getSession(true);
+
+            return ResponseEntity.ok(getCurrentUser(authentication));
         } catch (BadCredentialsException ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+    }
+
+    @GetMapping("/current")
+    public UserResponse getCurrentUser(Authentication authentication) {
+        UserResponse userResponse = userService.getLoggedInUser(authentication);
+        if (userResponse != null) {
+            return userResponse;
+        } else {
+            throw new IllegalStateException("user can't be null");
         }
     }
 }
