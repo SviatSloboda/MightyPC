@@ -60,38 +60,6 @@ public class UserService {
         return new UserResponse(userRepository.getUserByEmail(userEmail));
     }
 
-    public UserResponse getLoggedInUser(OAuth2User oAuth2User) {
-        if (oAuth2User == null) {
-            return null;
-        }
-
-        // Inspect attributes to extract email
-        String userEmail = (String) oAuth2User.getAttributes().get("email");
-        if (userEmail == null || userEmail.isEmpty()) {
-            return null;
-        }
-
-        boolean isReturningUser = userRepository.existsByEmail(userEmail.trim());
-        if (!isReturningUser) {
-            return new UserResponse(
-                    userRepository.save(new User(
-                            UUID.randomUUID().toString(),
-                            userEmail,
-                            "",
-                            new ArrayList<>(),
-                            new ArrayList<>(),
-                            new ArrayList<>(),
-                            true,
-                            "CUSTOMER",
-                            ZonedDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.FULL)
-                            ), "")
-                    ));
-        } else {
-            User user = userRepository.findUserByEmail(userEmail.trim()).orElseThrow(() -> new UserNotFoundException("There is no such user with email: " + userEmail));
-            return new UserResponse(user);
-        }
-    }
-
     public void registerUserWithEmailAndPassword(CreateUser createuser) {
         if (createuser == null) throw new IllegalStateException("User data can't be null!");
 

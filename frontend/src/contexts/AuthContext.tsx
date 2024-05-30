@@ -90,7 +90,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             }
         };
 
-        // Only fetch user if there are valid authentication cookies or OAuth login success
         const hasAuthCookies = document.cookie.includes('authToken');
         const urlParams = new URLSearchParams(window.location.search);
         if (hasAuthCookies || urlParams.get('oauth2Login') === 'true') {
