@@ -15,6 +15,10 @@ Welcome to the PC Shop, an innovative online platform designed to enhance your P
 - **Containerization:** Docker
 - **CI/CD:** GitHub Actions, Render
 
+## Test Coverage
+![image](https://github.com/SviatSloboda/MightyPC/assets/109550885/0c4bab14-7558-4c16-b25a-30bb6d6a0d50)
+
+
 ## Features
 
 ### For Users
