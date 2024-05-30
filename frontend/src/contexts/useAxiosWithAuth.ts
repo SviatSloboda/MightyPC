@@ -1,8 +1,8 @@
 import axios from 'axios';
-import { useAuth } from "./AuthContext.tsx";
+import {useAuth} from "./AuthContext.tsx";
 
 const useAxiosWithAuth = () => {
-    const { logout } = useAuth();
+    const {logout} = useAuth();
 
     const axiosInstance = axios.create({
         baseURL: '/api',

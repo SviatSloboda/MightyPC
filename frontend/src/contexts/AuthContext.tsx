@@ -1,6 +1,6 @@
-import React, { createContext, ReactNode, useContext, useState, useMemo, useEffect } from 'react';
+import React, {createContext, ReactNode, useContext, useEffect, useMemo, useState} from 'react';
 import axios from 'axios';
-import { User } from '../model/shop/User';
+import {User} from '../model/shop/User';
 
 interface AuthContextType {
     user: User | null;
@@ -26,7 +26,7 @@ interface AuthProviderProps {
     children: ReactNode;
 }
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -37,7 +37,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const login = async (email: string, password: string) => {
         setIsLoading(true);
         try {
-            const response = await axios.post('/api/user/login', { email, password }, { withCredentials: true });
+            const response = await axios.post('/api/user/login', {email, password}, {withCredentials: true});
             if (response.status === 200) {
                 setUser(response.data);
             } else {
@@ -57,7 +57,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const logout = async () => {
         try {
-            await axios.post('/api/user/logout', {}, { withCredentials: true });
+            await axios.post('/api/user/logout', {}, {withCredentials: true});
             setUser(null);
         } catch (error) {
             console.error('Logout failed', error);
@@ -81,7 +81,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const response = await axios.get('/api/user/current', { withCredentials: true });
+                const response = await axios.get('/api/user/current', {withCredentials: true});
                 if (response.status === 200) {
                     setUser(response.data);
                 }

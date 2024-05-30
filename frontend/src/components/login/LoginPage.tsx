@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
-import { toast, ToastContainer } from 'react-toastify';
+import {toast, ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import RegisterModal from './RegisterModal';
-import { useAuth } from '../../contexts/AuthContext';
+import {useAuth} from '../../contexts/AuthContext';
 
 export default function LoginPage() {
-    const { updateUser } = useAuth();
+    const {updateUser} = useAuth();
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -19,7 +19,7 @@ export default function LoginPage() {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const response = await axios.post('/api/user/login', { email, password }, { withCredentials: true });
+            const response = await axios.post('/api/user/login', {email, password}, {withCredentials: true});
             if (response.status === 200) {
                 updateUser(response.data);
                 navigate('/');
@@ -46,7 +46,7 @@ export default function LoginPage() {
     const handleRegisterClose = () => setIsRegisterModalOpen(false);
     const handleRegisterSave = async (email: string, password: string) => {
         try {
-            const response = await axios.post('/api/user/register', { email, password });
+            const response = await axios.post('/api/user/register', {email, password});
             if (response.status === 201) {
                 toast.success('Registration successful. Please log in.');
             } else {
