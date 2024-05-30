@@ -8,6 +8,7 @@ interface AuthContextType {
     isSuperUser: () => boolean;
     logout: () => Promise<void>;
     login: (email: string, password: string) => Promise<void>;
+    loginWithGoogle: () => void;
     isLoading: boolean;
 }
 
@@ -50,6 +51,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
     };
 
+    const loginWithGoogle = () => {
+        window.location.href = "http://localhost:8080/oauth2/authorization/google";
+    };
+
     const logout = async () => {
         try {
             await axios.post('/api/user/logout', {}, { withCredentials: true });
@@ -69,6 +74,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         isSuperUser,
         logout,
         login,
+        loginWithGoogle,
         isLoading,
     }), [user, isLoading]);
 
@@ -84,9 +90,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             }
         };
 
-        // Only fetch user if there are valid authentication cookies
+        // Only fetch user if there are valid authentication cookies or OAuth login success
         const hasAuthCookies = document.cookie.includes('authToken');
-        if (hasAuthCookies) {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (hasAuthCookies || urlParams.get('oauth2Login') === 'true') {
             fetchUser();
         }
     }, []);

@@ -5,6 +5,8 @@ import de.mightypc.backend.model.shop.user.UserResponse;
 import de.mightypc.backend.service.shop.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,14 +25,17 @@ import java.util.Map;
 public class UserController {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
+    Logger logger = LoggerFactory.getLogger(UserController.class);
 
     public UserController(UserService userService, AuthenticationManager authenticationManager) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
     }
 
-    @GetMapping
+    @GetMapping("/auth")
     public UserResponse getUser(@AuthenticationPrincipal OAuth2User user) {
+       logger.warn(user.getAttributes().toString());
+
         return userService.getLoggedInUser(user);
     }
 

@@ -56,17 +56,21 @@ public class UserService {
                             ), "")
                     ));
         }
+
         return new UserResponse(userRepository.getUserByEmail(userEmail));
     }
 
-    public UserResponse getLoggedInUser(OAuth2User oauth2User) {
-        if (oauth2User == null) {
+    public UserResponse getLoggedInUser(OAuth2User oAuth2User) {
+        if (oAuth2User == null) {
             return null;
         }
-        String userEmail = oauth2User.getAttribute("email");
+
+        // Inspect attributes to extract email
+        String userEmail = (String) oAuth2User.getAttributes().get("email");
         if (userEmail == null || userEmail.isEmpty()) {
             return null;
         }
+
         boolean isReturningUser = userRepository.existsByEmail(userEmail.trim());
         if (!isReturningUser) {
             return new UserResponse(
@@ -78,11 +82,14 @@ public class UserService {
                             new ArrayList<>(),
                             new ArrayList<>(),
                             true,
-                            "default",
-                            ZonedDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.FULL)),
-                            "")));
+                            "CUSTOMER",
+                            ZonedDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.FULL)
+                            ), "")
+                    ));
+        } else {
+            User user = userRepository.findUserByEmail(userEmail.trim()).orElseThrow(() -> new UserNotFoundException("There is no such user with email: " + userEmail));
+            return new UserResponse(user);
         }
-        return new UserResponse(userRepository.getUserByEmail(userEmail));
     }
 
     public void registerUserWithEmailAndPassword(CreateUser createuser) {

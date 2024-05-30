@@ -66,6 +66,9 @@ public class SecurityConfig {
                         .maximumSessions(1)
                         .sessionRegistry(sessionRegistry()))
                 .httpBasic(withDefaults())
+                .oauth2Login(oauth -> oauth
+                        .loginPage("/oauth2/authorization/google")
+                        .defaultSuccessUrl("http://localhost:5173?oauth2Login=true", true))
                 .logout(logout -> logout
                         .logoutUrl("/api/logout")
                         .logoutSuccessHandler((request, response, authentication) -> response.setStatus(HttpServletResponse.SC_OK))
