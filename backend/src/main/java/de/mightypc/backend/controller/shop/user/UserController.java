@@ -5,8 +5,6 @@ import de.mightypc.backend.model.shop.user.UserResponse;
 import de.mightypc.backend.service.shop.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,7 +21,6 @@ import java.util.Map;
 public class UserController {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
-    Logger logger = LoggerFactory.getLogger(UserController.class);
 
     public UserController(UserService userService, AuthenticationManager authenticationManager) {
         this.userService = userService;
@@ -45,16 +42,6 @@ public class UserController {
     public void deleteAccount(HttpServletRequest request, HttpServletResponse response, @PathVariable String userId) {
         logoutUser(request, response);
         userService.deleteAccount(userId);
-    }
-
-    @PostMapping("/{userId}/set-password")
-    public void setUserPassword(@PathVariable String userId, @RequestBody String password) {
-        userService.setPassword(userId, password);
-    }
-
-    @PostMapping("/{userId}/change-password")
-    public void changeUserPassword(@PathVariable String userId, @RequestBody String[] passwords) {
-        userService.changeUserPassword(userId, passwords);
     }
 
     @PostMapping("/login")

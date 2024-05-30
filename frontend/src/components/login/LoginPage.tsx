@@ -7,7 +7,7 @@ import RegisterModal from './RegisterModal';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function LoginPage() {
-    const { updateUser, loginWithGoogle } = useAuth();
+    const { updateUser } = useAuth();
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
