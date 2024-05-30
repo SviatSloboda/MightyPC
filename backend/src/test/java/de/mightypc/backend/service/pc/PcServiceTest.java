@@ -565,14 +565,3 @@ class PcServiceTest {
         assertEquals(50, actual);
     }
 }
-
-/*
-        when(cpuRepository.findById("cpuId")).thenReturn(Optional.of(cpu));
-        when(gpuRepository.findById("gpuId")).thenReturn(Optional.of(gpu));
-        when(motherboardRepository.findById("motherboardId")).thenReturn(Optional.of(motherboard));
-        when(ramRepository.findById("ramId")).thenReturn(Optional.of(ram));
-        when(ssdRepository.findById("ssdId")).thenReturn(Optional.of(ssd));
-        when(hddRepository.findById("hddId")).thenReturn(Optional.of(hdd));
-        when(pcCaseRepository.findById("pcCaseId")).thenReturn(Optional.of(pcCase));
-        when(powerSupplyRepository.findById("powerSupplyId")).thenReturn(Optional.of(powerSupply));
- */

@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 
@@ -18,12 +17,10 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
 public class UserService {
-
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -56,32 +53,7 @@ public class UserService {
                             ), "")
                     ));
         }
-        return new UserResponse(userRepository.getUserByEmail(userEmail));
-    }
 
-    public UserResponse getLoggedInUser(OAuth2User oauth2User) {
-        if (oauth2User == null) {
-            return null;
-        }
-        String userEmail = oauth2User.getAttribute("email");
-        if (userEmail == null || userEmail.isEmpty()) {
-            return null;
-        }
-        boolean isReturningUser = userRepository.existsByEmail(userEmail.trim());
-        if (!isReturningUser) {
-            return new UserResponse(
-                    userRepository.save(new User(
-                            UUID.randomUUID().toString(),
-                            userEmail,
-                            "",
-                            new ArrayList<>(),
-                            new ArrayList<>(),
-                            new ArrayList<>(),
-                            true,
-                            "default",
-                            ZonedDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.FULL)),
-                            "")));
-        }
         return new UserResponse(userRepository.getUserByEmail(userEmail));
     }
 
@@ -132,26 +104,5 @@ public class UserService {
     public void deleteAccount(String userId) {
         User user = getUserById(userId);
         userRepository.delete(user);
-    }
-
-    public void setPassword(String userId, String password) {
-        User user = getUserById(userId);
-
-        if (!user.getPassword().isEmpty()) throw new IllegalStateException("Password is already set!!!");
-
-        user.setPassword(passwordEncoder.encode(password));
-
-        userRepository.save(user);
-
-    }
-
-    public void changeUserPassword(String userId, String[] passwords) {
-        User user = getUserById(userId);
-        if (passwordEncoder.matches(passwords[0], user.getPassword())) {
-            user.setPassword(passwordEncoder.encode(passwords[1]));
-            userRepository.save(user);
-        } else {
-            throw new NoSuchElementException("Bad password!");
-        }
     }
 }

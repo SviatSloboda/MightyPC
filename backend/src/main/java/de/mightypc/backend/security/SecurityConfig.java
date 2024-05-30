@@ -1,7 +1,6 @@
 package de.mightypc.backend.security;
 
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -12,9 +11,12 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -22,16 +24,13 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Value("${app.environment}")
-    private String environment;
-
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public DaoAuthenticationProvider authenticationProvider(UserDetailsService userDetailsService) {
+    public DaoAuthenticationProvider authenticationProvider(CustomUserDetailsService userDetailsService) {
         DaoAuthenticationProvider auth = new DaoAuthenticationProvider();
         auth.setUserDetailsService(userDetailsService);
         auth.setPasswordEncoder(passwordEncoder());
@@ -51,30 +50,20 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/configurator/**").authenticated()
                         .requestMatchers("/api/user-pcs/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/hardware/**").permitAll()
-
                         .requestMatchers(HttpMethod.GET, "/api/pc/**").permitAll()
-
-                        .requestMatchers(HttpMethod.POST, "api/configuration/calculate-energy-consumption").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/configuration/calculate-energy-consumption").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/workstation/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/user/{userId}/change-password").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/user/{userId}/set-password").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/api/user/{userId}/set-password").authenticated()
+                        .requestMatchers("/api/user/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/user/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/basket/**").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/basket/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/api/basket/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/order/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/order/**").authenticated()
                         .anyRequest().authenticated())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+                        .maximumSessions(1)
+                        .sessionRegistry(sessionRegistry()))
                 .httpBasic(withDefaults())
-                .oauth2Login(oauth -> {
-                    oauth.loginPage("/oauth2/authorization/google");
-                    if ("prod".equals(environment)) {
-                        oauth.defaultSuccessUrl("/", true);
-                    } else {
-                        oauth.defaultSuccessUrl("http://localhost:5173", true);
-                    }
-                })
                 .logout(logout -> logout
                         .logoutUrl("/api/logout")
                         .logoutSuccessHandler((request, response, authentication) -> response.setStatus(HttpServletResponse.SC_OK))
@@ -83,5 +72,24 @@ public class SecurityConfig {
                         .clearAuthentication(true)
                         .permitAll());
         return http.build();
+    }
+
+    @Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
+    }
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOrigins("http://localhost:5173")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedHeaders("*")
+                        .allowCredentials(true);
+            }
+        };
     }
 }

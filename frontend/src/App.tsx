@@ -15,16 +15,24 @@ import {
     CpuPage,
     GpuPage,
     HddPage,
-    MotherboardPage, PcCasePage, PcsPage,
+    MotherboardPage,
+    PcCasePage,
+    PcsPage,
     PowerSupplyPage,
     RamPage,
-    SsdPage, WorkstationsPage
+    SsdPage,
+    WorkstationsPage
 } from "./components/hardware/HardwarePages.tsx";
 
 import {
     CpuCharacteristics,
-    GpuCharacteristics, HddCharacteristics,
-    MotherboardCharacteristics, PcCaseCharacteristics, PsuCharacteristics, RamCharacteristics, SsdCharacteristics
+    GpuCharacteristics,
+    HddCharacteristics,
+    MotherboardCharacteristics,
+    PcCaseCharacteristics,
+    PsuCharacteristics,
+    RamCharacteristics,
+    SsdCharacteristics
 } from "./components/hardware/Characteristics.tsx";
 import PrivacyPolicy from "./components/login/PrivacyPolicy.tsx";
 

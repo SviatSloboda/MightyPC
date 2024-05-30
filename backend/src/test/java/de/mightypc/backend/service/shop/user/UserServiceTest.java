@@ -1,110 +1,159 @@
 package de.mightypc.backend.service.shop.user;
 
 import de.mightypc.backend.exception.shop.user.UserNotFoundException;
+import de.mightypc.backend.model.shop.user.CreateUser;
 import de.mightypc.backend.model.shop.user.User;
+import de.mightypc.backend.model.shop.user.UserResponse;
 import de.mightypc.backend.repository.shop.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 class UserServiceTest {
-    private final UserRepository userRepository = mock(UserRepository.class);
-    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-    private final UserService userService = new UserService(userRepository, passwordEncoder);
+    @Mock
+    private UserRepository userRepository;
 
-    private User user;
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
-    @BeforeEach
-    void setUp() {
-        user = new User(
-                "testId",
-                "testEmail",
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>(),
-                true,
-                "user",
-                "23.32",
-                "link"
-        );
+    @InjectMocks
+    private UserService userService;
+
+    public UserServiceTest() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void getLoggedInUser() {
-    }
-
-    @Test
-    void logoutUser() {
-    }
-
-    @Test
-    void getUserById_whenThereIsNoSuchUser_shouldThrowUserNotFoundException() {
+    void getLoggedInUser_shouldReturnUserResponse_whenAuthenticated() {
         // Arrange
-        when(userRepository.findById("testId")).thenReturn(Optional.empty());
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.isAuthenticated()).thenReturn(true);
+        when(authentication.getName()).thenReturn("user@example.com");
+        when(userRepository.existsByEmail("user@example.com")).thenReturn(true);
+        User user = new User(UUID.randomUUID().toString(), "user@example.com", "", new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), false, "CUSTOMER", ZonedDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.FULL)), "");
+        when(userRepository.getUserByEmail("user@example.com")).thenReturn(user);
+
+        // Act
+        UserResponse result = userService.getLoggedInUser(authentication);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("user@example.com", result.email());
+    }
+
+    @Test
+    void getLoggedInUser_shouldReturnNull_whenNotAuthenticated() {
+        // Arrange
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.isAuthenticated()).thenReturn(false);
+
+        // Act
+        UserResponse result = userService.getLoggedInUser(authentication);
+
+        // Assert
+        assertNull(result);
+    }
+
+    @Test
+    void registerUserWithEmailAndPassword_shouldSaveUser() {
+        // Arrange
+        CreateUser createUser = new CreateUser("user@example.com", "password");
+        when(userRepository.existsByEmail("user@example.com")).thenReturn(false);
+        when(passwordEncoder.encode("password")).thenReturn("encodedPassword");
+        User savedUser = new User(UUID.randomUUID().toString(), "user@example.com", "encodedPassword", new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), false, "CUSTOMER", ZonedDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.FULL)), "");
+        when(userRepository.save(any(User.class))).thenReturn(savedUser);
+
+        // Act
+        userService.registerUserWithEmailAndPassword(createUser);
+
+        // Assert
+        verify(userRepository).save(any(User.class));
+    }
+
+    @Test
+    void registerUserWithEmailAndPassword_shouldThrowException_whenUserAlreadyExists() {
+        // Arrange
+        CreateUser createUser = new CreateUser("user@example.com", "password");
+        when(userRepository.existsByEmail("user@example.com")).thenReturn(true);
 
         // Act & Assert
-        assertThrows(UserNotFoundException.class, () -> userService.getUserById("testId"));
+        assertThrows(IllegalStateException.class, () -> userService.registerUserWithEmailAndPassword(createUser));
     }
 
     @Test
-    void getUserById_shouldReturnProperUser() {
+    void getUserById_shouldReturnUser_whenUserExists() {
         // Arrange
-        when(userRepository.findById("testId")).thenReturn(Optional.of(user));
+        User user = new User(UUID.randomUUID().toString(), "user@example.com", "", new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), false, "CUSTOMER", ZonedDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.FULL)), "");
+        when(userRepository.findById("userId")).thenReturn(Optional.of(user));
 
         // Act
-        User actual = userService.getUserById("testId");
+        User result = userService.getUserById("userId");
 
         // Assert
-        verify(userRepository).findById("testId");
-        assertEquals(user, actual);
+        assertNotNull(result);
+        assertEquals("user@example.com", result.getEmail());
     }
 
     @Test
-    void attachPhoto() {
+    void getUserById_shouldThrowUserNotFoundException_whenUserDoesNotExist() {
         // Arrange
-        String testPhoto = "testPhoto";
-        when(userRepository.findById("testId")).thenReturn(Optional.of(user));
+        when(userRepository.findById("userId")).thenReturn(Optional.empty());
 
-        // Act
-        userService.attachPhoto("testId", testPhoto);
-
-        // Assert
-        verify(userRepository).findById("testId");
-        assertEquals(user.getUserPhoto(), testPhoto);
+        // Act & Assert
+        assertThrows(UserNotFoundException.class, () -> userService.getUserById("userId"));
     }
 
     @Test
-    void deleteImage() {
+    void attachPhoto_shouldSaveUserWithPhoto() {
         // Arrange
-        when(userRepository.findById("testId")).thenReturn(Optional.of(user));
+        User user = new User(UUID.randomUUID().toString(), "user@example.com", "", new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), false, "CUSTOMER", ZonedDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.FULL)), "");
+        when(userRepository.findById("userId")).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenReturn(user);
 
         // Act
-        userService.deleteImage("testId");
+        User result = userService.attachPhoto("userId", "photoUrl");
 
         // Assert
-        verify(userRepository).findById("testId");
-        assertTrue(user.getUserPhoto().isEmpty());
+        assertEquals("photoUrl", result.getUserPhoto());
     }
 
     @Test
-    void deleteAccount() {
+    void deleteImage_shouldRemoveUserPhoto() {
         // Arrange
-        when(userRepository.findById("testId")).thenReturn(Optional.of(user));
+        User user = new User(UUID.randomUUID().toString(), "user@example.com", "", new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), false, "CUSTOMER", ZonedDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.FULL)), "photoUrl");
+        when(userRepository.findById("userId")).thenReturn(Optional.of(user));
 
         // Act
-        userService.deleteAccount("testId");
+        userService.deleteImage("userId");
 
         // Assert
-        verify(userRepository).findById("testId");
+        assertEquals("", user.getUserPhoto());
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    void deleteAccount_shouldDeleteUser() {
+        // Arrange
+        User user = new User(UUID.randomUUID().toString(), "user@example.com", "", new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), false, "CUSTOMER", ZonedDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.FULL)), "");
+        when(userRepository.findById("userId")).thenReturn(Optional.of(user));
+
+        // Act
+        userService.deleteAccount("userId");
+
+        // Assert
         verify(userRepository).delete(user);
     }
 }

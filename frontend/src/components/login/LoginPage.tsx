@@ -4,7 +4,7 @@ import axios from 'axios';
 import {toast, ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import RegisterModal from './RegisterModal';
-import {useAuth} from '../../contexts/AuthContext.tsx';
+import {useAuth} from '../../contexts/AuthContext';
 
 export default function LoginPage() {
     const {updateUser} = useAuth();
@@ -38,10 +38,8 @@ export default function LoginPage() {
     };
 
     const handleGoogleLogin = () => {
-        window.location.href = "http://localhost:8080/oauth2/authorization/google"
-    }
-    const handleGitHubLogin = () => {
-        window.location.href = "http://localhost:8080/oauth2/authorization/github";
+        toast.info("To use Google or Github Auth contact dev: slsvyatko@gmail.com")
+        toast.info("Use classic way of logging in!")
     };
 
     const handleRegisterOpen = () => setIsRegisterModalOpen(true);
@@ -107,11 +105,10 @@ export default function LoginPage() {
                 </div>
                 <div className="login-text-links">
                     <button className="login-text-link" onClick={handleGoogleLogin}>with Google</button>
-                    <button className="login-text-link" onClick={handleGitHubLogin}>with GitHub</button>
+                    <button className="login-text-link" onClick={handleGoogleLogin}>with Github</button>
                 </div>
                 <div className="login-links">
                     <button className="login-link" onClick={handleRegisterOpen}>Register</button>
-                    <button className="login-link" onClick={() => navigate('/reset-password')}>Forgot password?</button>
                 </div>
             </div>
             <RegisterModal isOpen={isRegisterModalOpen} onClose={handleRegisterClose} onSave={handleRegisterSave}/>
