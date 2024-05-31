@@ -71,8 +71,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/basket/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/basket/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/order/**").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/order/**").authenticated()
-                        .anyRequest().authenticated())
+                        .requestMatchers(HttpMethod.POST, "/api/order/**").authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter(tokenProvider, userDetailsService), UsernamePasswordAuthenticationFilter.class)
