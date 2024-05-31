@@ -33,7 +33,7 @@ class SsdControllerTest extends BaseControllerTest {
     }
 
     @DirtiesContext
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @Test
     void saveSsd_shouldReturnCreatedSsd() throws Exception {
         String jsonRequestBody = """
@@ -56,7 +56,7 @@ class SsdControllerTest extends BaseControllerTest {
     }
 
     @DirtiesContext
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @Test
     void saveAllSsds_shouldReturnStatusCreated() throws Exception {
         String jsonRequestBody = """

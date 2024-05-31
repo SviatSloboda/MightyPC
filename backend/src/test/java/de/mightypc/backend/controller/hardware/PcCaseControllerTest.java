@@ -36,7 +36,7 @@ class PcCaseControllerTest extends BaseControllerTest {
     }
 
     @DirtiesContext
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @Test
     void savePcCase_shouldReturnCreatedPcCase() throws Exception {
         String jsonRequestBody = """
@@ -59,7 +59,7 @@ class PcCaseControllerTest extends BaseControllerTest {
     }
 
     @DirtiesContext
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @Test
     void saveAllPcCases_shouldReturnStatusCreated() throws Exception {
         String jsonRequestBody = """

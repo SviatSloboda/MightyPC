@@ -39,7 +39,7 @@ class CpuControllerTest extends BaseControllerTest {
 
     @DirtiesContext
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void saveCpu_shouldReturnCreatedCpu() throws Exception {
         String jsonRequestBody = """
                 {
@@ -64,7 +64,7 @@ class CpuControllerTest extends BaseControllerTest {
 
     @DirtiesContext
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void saveAllCpus_shouldReturnStatusCreated() throws Exception {
         String jsonRequestBody = """
                 [{

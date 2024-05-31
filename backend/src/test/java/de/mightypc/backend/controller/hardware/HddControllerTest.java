@@ -37,7 +37,7 @@ class HddControllerTest extends BaseControllerTest {
 
     @DirtiesContext
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void saveHdd_shouldReturnCreatedHdd() throws Exception {
         String jsonRequestBody = """
                 {
@@ -60,7 +60,7 @@ class HddControllerTest extends BaseControllerTest {
 
     @DirtiesContext
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void saveAllHdds_shouldReturnStatusCreated() throws Exception {
         String jsonRequestBody = """
                 [{

@@ -110,7 +110,7 @@ class PcControllerTest {
     }
 
     @DirtiesContext
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @Test
     void save_shouldCreatePcAndReturnStatusCreated() throws Exception {
         String requestBody = """
@@ -141,7 +141,7 @@ class PcControllerTest {
     }
 
     @DirtiesContext
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @Test
     void saveAll_shouldCreateMultiplePcsAndReturnStatusCreated() throws Exception {
         String requestBody = """
@@ -316,7 +316,7 @@ class PcControllerTest {
     }
 
     @DirtiesContext
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @Test
     void deleteById_shouldDeletePcWithSpecifiedId() throws Exception {
         pcRepository.save(testPc);
@@ -329,7 +329,7 @@ class PcControllerTest {
 
 
     @DirtiesContext
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @Test
     void updatePcResponse_shouldUpdatePcAndReturnOk() throws Exception {
         pcRepository.save(testPc);

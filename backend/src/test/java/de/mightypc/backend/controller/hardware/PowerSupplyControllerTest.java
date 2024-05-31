@@ -35,7 +35,7 @@ class PowerSupplyControllerTest extends BaseControllerTest{
     }
 
     @DirtiesContext
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @Test
     void savePowerSupply_shouldReturnCreatedPowerSupply() throws Exception {
         String jsonRequestBody = """
@@ -58,7 +58,7 @@ class PowerSupplyControllerTest extends BaseControllerTest{
     }
 
     @DirtiesContext
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @Test
     void saveAllPowerSupplies_shouldReturnStatusCreated() throws Exception {
         String jsonRequestBody = """

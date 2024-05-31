@@ -37,7 +37,7 @@ class GpuControllerTest extends BaseControllerTest{
 
     @DirtiesContext
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void saveGpu_shouldReturnCreatedGpu() throws Exception {
         String jsonRequestBody = """
                 {
@@ -60,7 +60,7 @@ class GpuControllerTest extends BaseControllerTest{
 
     @DirtiesContext
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void saveAllGpus_shouldReturnStatusCreated() throws Exception {
         String jsonRequestBody = """
                 [{

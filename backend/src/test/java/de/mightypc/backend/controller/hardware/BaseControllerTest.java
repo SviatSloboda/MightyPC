@@ -49,14 +49,14 @@ abstract class BaseControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void deleteById_shouldReturnSuccessStatus() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/hardware/" + pathOfEntity + "/{id}", idOfEntity))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void update_shouldReturnUpdated() throws Exception {
         String entityId = idOfEntity;
         String jsonRequestBody = jsonRequestBodyForUpdate.formatted(entityId);
