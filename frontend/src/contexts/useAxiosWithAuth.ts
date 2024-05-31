@@ -5,7 +5,7 @@ const useAxiosWithAuth = () => {
     const {logout} = useAuth();
 
     const axiosInstance = axios.create({
-        baseURL: '/api',
+        baseURL: 'https://mightypc.onrender.com/api',
     });
 
     axiosInstance.interceptors.request.use(
