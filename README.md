@@ -1,6 +1,7 @@
 # PC Shop - Your Ultimate Online PC Configuration Experience
 
-![PC Shop](https://github.com/SviatSloboda/MightyPC/assets/109550885/345d31f3-cd78-4a9e-bc1b-995891493d7c)
+[![PC Shop](https://github.com/SviatSloboda/MightyPC/assets/109550885/345d31f3-cd78-4a9e-bc1b-995891493d7c)
+](https://github.com/SviatSloboda/MightyPC/assets/109550885/345d31f3-cd78-4a9e-bc1b-995891493d7c)
 
 Welcome to the PC Shop, an innovative online platform designed to enhance your PC shopping experience. Our unique custom PC configurator, powered by AI using the ChatGPT API, ensures that even the most novice users can build their dream PC with ease. Whether you're a seasoned tech enthusiast or a beginner, PC Shop has got you covered.
 
