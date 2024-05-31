@@ -4,9 +4,14 @@ https://github.com/SviatSloboda/MightyPC/assets/109550885/345d31f3-cd78-4a9e-bc1
 
 Welcome to the PC Shop, an innovative online platform designed to enhance your PC shopping experience. Our unique custom PC configurator, powered by AI using the ChatGPT API, ensures that even the most novice users can build their dream PC with ease. Whether you're a seasoned tech enthusiast or a beginner, PC Shop has got you covered.
 
+##  Try out the website's functionality on your own! 
+Please note that I'm using the free version of Render, so the loading time might be quite long. Thank you for your patience!
+
+https://mightypc.onrender.com/
+
 ## Tech Stack
 
-- **Backend:** Java, Spring, Spring Security, Spring Boot
+- **Backend:** Java, Spring, Spring Security using JWT and OAUTH2.0, Spring Boot
 - **Database:** MongoDB
 - **Frontend:** TypeScript, React, React Router, CSS, HTML
 - **API Handling:** Axios
@@ -17,7 +22,6 @@ Welcome to the PC Shop, an innovative online platform designed to enhance your P
 
 ## Test Coverage
 ![image](https://github.com/SviatSloboda/MightyPC/assets/109550885/0c4bab14-7558-4c16-b25a-30bb6d6a0d50)
-
 
 ## Features
 
