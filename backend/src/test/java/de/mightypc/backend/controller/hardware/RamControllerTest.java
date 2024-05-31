@@ -35,7 +35,7 @@ class RamControllerTest extends BaseControllerTest {
     }
 
     @DirtiesContext
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @Test
     void saveRam_shouldReturnCreatedRam() throws Exception {
         String jsonRequestBody = """
@@ -60,7 +60,7 @@ class RamControllerTest extends BaseControllerTest {
     }
 
     @DirtiesContext
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @Test
     void saveAllRams_shouldReturnStatusCreated() throws Exception {
         String jsonRequestBody = """

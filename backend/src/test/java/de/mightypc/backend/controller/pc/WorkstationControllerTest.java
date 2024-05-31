@@ -128,7 +128,7 @@ class WorkstationControllerTest {
     }
 
     @DirtiesContext
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @Test
     void save_shouldCreateWorkstationAndReturnStatusCreated() throws Exception {
         String requestBody = """
@@ -161,7 +161,7 @@ class WorkstationControllerTest {
     }
 
     @DirtiesContext
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @Test
     void saveAll_shouldCreateMultipleWorkstationsAndReturnStatusCreated() throws Exception {
         String requestBody = """
@@ -317,7 +317,7 @@ class WorkstationControllerTest {
     }
 
     @DirtiesContext
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @Test
     void deleteById_shouldDeleteWorkstationWithSpecifiedId() throws Exception {
         workstationRepository.save(testWorkstation);
@@ -330,7 +330,7 @@ class WorkstationControllerTest {
 
 
     @DirtiesContext
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @Test
     void updateWorkstationResponse_shouldUpdateWorkstationAndReturnOk() throws Exception {
         workstationRepository.save(testWorkstation);

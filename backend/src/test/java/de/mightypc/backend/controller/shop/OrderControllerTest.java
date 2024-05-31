@@ -28,7 +28,6 @@ import static org.hamcrest.Matchers.hasSize;
 @SpringBootTest
 @AutoConfigureMockMvc
 @Import(SecurityConfig.class)
-@WithMockUser
 class OrderControllerTest {
     private final Item item1 = new Item(
             "itemId1",
@@ -87,6 +86,7 @@ class OrderControllerTest {
     }
 
     @DirtiesContext
+    @WithMockUser
     @Test
     void placeOrder_shouldReturnStatusCreated() throws Exception {
         String jsonRequestBody = """
@@ -106,6 +106,7 @@ class OrderControllerTest {
     }
 
     @DirtiesContext
+    @WithMockUser(roles = "ADMIN")
     @Test
     void removeOrder_shouldDeleteOrder() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/order/{userId}/{orderId}", "user1", "orderId1"))
@@ -113,6 +114,7 @@ class OrderControllerTest {
     }
 
     @DirtiesContext
+    @WithMockUser
     @Test
     void getOrderById_shouldReturnOrderDetails() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/order/{userId}/{orderId}", "user1", "orderId1"))
@@ -122,6 +124,7 @@ class OrderControllerTest {
     }
 
     @DirtiesContext
+    @WithMockUser
     @Test
     void getAllOrders_shouldReturnOrders() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/order/{userId}", "user1"))
@@ -132,6 +135,7 @@ class OrderControllerTest {
     }
 
     @DirtiesContext
+    @WithMockUser(roles = "ADMIN")
     @Test
     void updateStatus_shouldUpdateOrderStatus() throws Exception {
         String jsonRequestBody = """
@@ -146,6 +150,7 @@ class OrderControllerTest {
     }
 
     @DirtiesContext
+    @WithMockUser(roles = "ADMIN")
     @Test
     void deleteAll_shouldRemoveAllOrders() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/order/{userId}/all", "user1"))

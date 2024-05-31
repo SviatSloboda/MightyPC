@@ -34,7 +34,7 @@ class MotherboardControllerTest extends BaseControllerTest {
     }
 
     @DirtiesContext
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @Test
     void saveMotherboard_shouldReturnCreatedMotherboard() throws Exception {
         String jsonRequestBody = """
@@ -59,7 +59,7 @@ class MotherboardControllerTest extends BaseControllerTest {
     }
 
     @DirtiesContext
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @Test
     void saveAllMotherboards_shouldReturnStatusCreated() throws Exception {
         String jsonRequestBody = """
