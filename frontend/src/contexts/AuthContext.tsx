@@ -26,6 +26,27 @@ interface AuthProviderProps {
     children: ReactNode;
 }
 
+interface DecodedToken {
+    exp: number;
+    iat: number;
+}
+
+const decodeJWT = (token: string): DecodedToken => {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+};
+
+const setLogoutTimer = (expirationTime: number, logout: () => Promise<void>) => {
+    setTimeout(() => {
+        logout();
+    }, expirationTime);
+};
+
 export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -37,8 +58,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     const login = async (email: string, password: string) => {
         setIsLoading(true);
         try {
-            const response = await axios.post('/api/user/login', {email, password}, {withCredentials: true});
+            const response = await axios.post('/user/login', {email, password});
             if (response.status === 200) {
+                const token = response.headers['authorization'].split(' ')[1];
+                localStorage.setItem('authToken', token);
+                const decodedToken: DecodedToken = decodeJWT(token);
+                const expirationTime = decodedToken.exp * 1000 - new Date().getTime();
+                setLogoutTimer(expirationTime, logout);
                 setUser(response.data);
             } else {
                 throw new Error('Login failed');
@@ -57,7 +83,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
 
     const logout = async () => {
         try {
-            await axios.post('/api/user/logout', {}, {withCredentials: true});
+            await axios.post('/api/user/logout');
+            localStorage.removeItem('authToken');
             setUser(null);
         } catch (error) {
             console.error('Logout failed', error);
@@ -81,20 +108,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const response = await axios.get('/api/user/current', {withCredentials: true});
-                if (response.status === 200) {
-                    setUser(response.data);
+                const token = localStorage.getItem('authToken');
+                if (token) {
+                    const decodedToken: DecodedToken = decodeJWT(token);
+                    if (decodedToken.exp * 1000 < new Date().getTime()) {
+                        logout();
+                    } else {
+                        const response = await axios.get('/api/user/current', {
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        });
+                        if (response.status === 200) {
+                            setUser(response.data);
+                            const expirationTime = decodedToken.exp * 1000 - new Date().getTime();
+                            setLogoutTimer(expirationTime, logout);
+                        }
+                    }
                 }
             } catch (error) {
                 console.error('Failed to fetch user', error);
             }
         };
 
-        const hasAuthCookies = document.cookie.includes('authToken');
-        const urlParams = new URLSearchParams(window.location.search);
-        if (hasAuthCookies || urlParams.get('oauth2Login') === 'true') {
-            fetchUser();
-        }
+        fetchUser();
     }, []);
 
     return (

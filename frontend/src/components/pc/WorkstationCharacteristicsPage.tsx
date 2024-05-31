@@ -1,5 +1,4 @@
 import {useEffect, useState} from "react";
-import axios from "axios";
 import {useNavigate, useParams} from "react-router-dom";
 import {useAuth} from "../../contexts/AuthContext.tsx";
 import useLoginModal from "../login/useLoginModal.ts";
@@ -8,6 +7,7 @@ import Photo from "../hardware/utils/Photo.tsx";
 import Rating from "../hardware/utils/Rating.tsx";
 import workstationPhoto from "../../assets/pc/Workstations.png";
 import {Workstation} from "../../model/pc/Workstation.tsx";
+import useAxiosWithAuth from "../../contexts/useAxiosWithAuth.ts";
 
 export default function WorkstationCharacteristics() {
     const [workstation, setWorkstation] = useState<Workstation | null>(null);
@@ -42,11 +42,13 @@ export default function WorkstationCharacteristics() {
 
     const {isLoginModalOpen, showLoginModal, hideLoginModal, handleLogin} = useLoginModal();
 
+    const axiosInstance = useAxiosWithAuth();
+
     useEffect(() => {
         const fetchWorkstationData = async () => {
             if (id) {
                 try {
-                    const response = await axios.get(`/api/workstation/${id}`);
+                    const response = await axiosInstance.get(`/workstation/${id}`);
                     setWorkstation(response.data);
                     setPhotos(response.data.photos || []);
 
@@ -84,7 +86,7 @@ export default function WorkstationCharacteristics() {
         formData.append("file", file);
 
         try {
-            const response = await axios.post(`/api/workstation/upload/image/${id}`, formData, {
+            const response = await axiosInstance.post(`/workstation/upload/image/${id}`, formData, {
                 headers: {'Content-Type': 'multipart/form-data'}
             });
             setPhotos(prevPhotos => [response.data, ...prevPhotos]);
@@ -94,7 +96,7 @@ export default function WorkstationCharacteristics() {
     };
 
     const handleDelete = () => {
-        axios.delete(`/api/workstation/${id}`)
+        axiosInstance.delete(`/workstation/${id}`)
             .then(() => {
                 navigate('../workstation');
             })
@@ -116,7 +118,7 @@ export default function WorkstationCharacteristics() {
                 pcCaseId: updatedPcCaseId
             }, cpuNumber: updatedCpuNumber, gpuNumber: updatedGpuNumber, photos: workstation?.photos
         };
-        axios.put(`/api/workstation`, payload)
+        axiosInstance.put(`/workstation`, payload)
             .then(response => {
                 setWorkstation(response.data);
                 setIsUpdateModalOpen(false);
@@ -139,7 +141,7 @@ export default function WorkstationCharacteristics() {
             pathToCharacteristicsPage: "/workstation"
         };
 
-        axios.post<void>(`/api/basket/${user?.id}`, payload)
+        axiosInstance.post<void>(`/basket/${user?.id}`, payload)
             .then(() => {
                 navigate("../basket/");
             })

@@ -1,15 +1,16 @@
 import {useCallback, useEffect, useState} from 'react';
-import axios from 'axios';
 import {useAuth} from '../../contexts/AuthContext';
 import {Order} from '../../model/shop/Order';
 import OrderInfoModal from './OrderInfoModal';
 import empty_box from "../../assets/shop/empty_box.png";
+import useAxiosWithAuth from "../../contexts/useAxiosWithAuth.ts";
 
 export default function OrderPage() {
     const [orders, setOrders] = useState<Order[]>([]);
     const [showModal, setShowModal] = useState<boolean>(false);
     const [selectedOrderId, setSelectedOrderId] = useState<string>('');
     const {user} = useAuth();
+    const axiosInstance = useAxiosWithAuth();
 
     useEffect(() => {
         if (user?.id) {
@@ -19,7 +20,7 @@ export default function OrderPage() {
 
     const fetchOrders = useCallback(async (userId: string) => {
         try {
-            const response = await axios.get<Order[]>(`/api/order/${userId}`);
+            const response = await axiosInstance.get<Order[]>(`/order/${userId}`);
             setOrders(response.data);
         } catch (error) {
             console.error('Failed to fetch orders', error);

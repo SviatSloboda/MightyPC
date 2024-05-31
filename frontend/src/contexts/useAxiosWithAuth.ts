@@ -1,22 +1,33 @@
 import axios from 'axios';
-import {useAuth} from "./AuthContext.tsx";
+import {useAuth} from './AuthContext';
 
 const useAxiosWithAuth = () => {
     const {logout} = useAuth();
 
     const axiosInstance = axios.create({
         baseURL: '/api',
-        withCredentials: true,
     });
+
+    axiosInstance.interceptors.request.use(
+        config => {
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                config.headers['Authorization'] = `Bearer ${token}`;
+            }
+            return config;
+        },
+        error => {
+            return Promise.reject(error);
+        }
+    );
 
     axiosInstance.interceptors.response.use(
         response => response,
-        error => {
+        async error => {
             if (error.response && error.response.status === 401) {
-                logout();
+                await logout();
             }
-            const rejectionError = error instanceof Error ? error : new Error('An unknown error occurred');
-            return Promise.reject(rejectionError);
+            return Promise.reject(error);
         }
     );
 

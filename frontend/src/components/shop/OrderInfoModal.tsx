@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import axios from 'axios';
-import {Order} from "../../model/shop/Order.tsx";
 import {useNavigate} from "react-router-dom";
+import {Order} from "../../model/shop/Order.tsx";
+import useAxiosWithAuth from "../../contexts/useAxiosWithAuth.ts";
 
 interface OrderInfoModalProps {
     showModal: boolean;
@@ -13,10 +13,11 @@ interface OrderInfoModalProps {
 const OrderInfoModal: React.FC<OrderInfoModalProps> = ({showModal, setShowModal, orderId, userId}) => {
     const [orderDetails, setOrderDetails] = useState<Order | null>(null);
     const navigate = useNavigate();
+    const axiosInstance = useAxiosWithAuth();
 
     const fetchOrderDetails = async () => {
         try {
-            const response = await axios.get<Order>(`/api/order/${userId}/${orderId}`);
+            const response = await axiosInstance.get<Order>(`/order/${userId}/${orderId}`);
             setOrderDetails(response.data);
         } catch (error) {
             console.error("Error fetching order details:", error);
@@ -54,16 +55,12 @@ const OrderInfoModal: React.FC<OrderInfoModalProps> = ({showModal, setShowModal,
                                 onClick={() => navigate(item.pathToCharacteristicsPage)}>
                                 Detailed Information
                             </button>
-
                         </div>
                     ))}
                     <div className="order-info-modal__total">
                         <h4>Total Price: {orderDetails?.completePrice} €</h4>
                     </div>
-
-                    <button onClick={handleClose}
-                            className="order-info-modal__button--close">Close
-                    </button>
+                    <button onClick={handleClose} className="order-info-modal__button--close">Close</button>
                 </div>
             </div>
         </div>

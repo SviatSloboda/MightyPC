@@ -1,5 +1,4 @@
 import {ChangeEvent, useCallback, useEffect, useState} from 'react';
-import axios from 'axios';
 import {useAuth} from "../../contexts/AuthContext";
 import {HardwareSpec} from "../../model/hardware/HardwareSpec";
 import {SpecsIds} from "../../model/pc/SpecsIds";
@@ -35,6 +34,7 @@ import CreatePCModal from "./CreatePcModal.tsx";
 import PreferencesModal from "./PrefencesModal.tsx";
 import {ConfiguratorItem} from "../../model/configurator/ConfiguratorItem.tsx";
 import {ConfiguratorItems} from "../../model/configurator/ConfiguratorItems.tsx";
+import useAxiosWithAuth from "../../contexts/useAxiosWithAuth.ts";
 
 interface SelectOption {
     id: string;
@@ -71,6 +71,8 @@ export default function ConfiguratorPage() {
 
     const navigate = useNavigate();
 
+    const axiosInstance = useAxiosWithAuth();
+
     const [selectedItems, setSelectedItems] = useState<{ [key in keyof SpecsIds]: ConfiguratorItem | null }>({
         cpuId: null,
         gpuId: null,
@@ -91,7 +93,7 @@ export default function ConfiguratorPage() {
 
     const fetchComponents = async () => {
         try {
-            const response = await axios.get<ConfiguratorItems>('/api/configurator/items');
+            const response = await axiosInstance.get<ConfiguratorItems>('/configurator/items');
             const fetchedComponents = response.data.itemsForConfigurator.map(componentCategory => componentCategory.map(item => ({
                 id: item.id,
                 displayValue: `${item.name} ($${item.price})`,
@@ -141,7 +143,7 @@ export default function ConfiguratorPage() {
         setIsLoading(true);
 
         try {
-            const response = await axios.post<SpecsIds>('/api/configurator/gpt', [type, price]);
+            const response = await axiosInstance.post<SpecsIds>('/configurator/gpt', [type, price]);
             const specsIds = response.data;
 
             const updatedSelectedItems = {...selectedItems};
@@ -206,7 +208,7 @@ export default function ConfiguratorPage() {
 
         if (user) {
             try {
-                await axios.post(`/api/user-pcs/${user.id}`, payload).then(() => {
+                await axiosInstance.post(`/user-pcs/${user.id}`, payload).then(() => {
                     navigate('../user-pcs');
                 });
             } catch (error) {
@@ -218,11 +220,11 @@ export default function ConfiguratorPage() {
     const fetchMotherboards = async () => {
         if (createSpecs.cpuId && !isGeneratedByGPT) {
             try {
-                const cpuSocketResponse = await axios.get<string>(`/api/hardware/cpu/socket/${createSpecs.cpuId}`);
+                const cpuSocketResponse = await axiosInstance.get<string>(`/hardware/cpu/socket/${createSpecs.cpuId}`);
                 const cpuSocket = cpuSocketResponse.data;
-                const response = await axios.get<{
+                const response = await axiosInstance.get<{
                     [key: string]: string
-                }>(`/api/configurator/motherboard/socket/${cpuSocket}`);
+                }>(`/configurator/motherboard/socket/${cpuSocket}`);
                 const motherboardOptions: SelectOption[] = Object.entries(response.data).map(([id, name]) => ({
                     id, displayValue: name, name, price: '', image: '', pathNameForItemDetailsPage: ''
                 }));
@@ -249,9 +251,9 @@ export default function ConfiguratorPage() {
                     hddId: createSpecs.hddId,
                 };
 
-                const response = await axios.post<{
+                const response = await axiosInstance.post<{
                     [key: string]: string
-                }>(`/api/pc/configuration/calculate-energy-consumption`, payload);
+                }>(`/pc/configuration/calculate-energy-consumption`, payload);
 
                 const powerSupplyOptions: SelectOption[] = Object.entries(response.data).map(([id, name]) => ({
                     id, displayValue: name, name, price: '', image: '', pathNameForItemDetailsPage: ''
