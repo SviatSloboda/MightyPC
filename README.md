@@ -9,7 +9,7 @@ Welcome to the PC Shop, an innovative online platform designed to enhance your P
 
 Try out the website's functionality on your own! Please note that I'm using the free version of Render, so the loading time might be quite long. Thank you for your patience!
 
-[Visit PC Shop](https://mightypc.onrender.com/)
+[Visit Mighty PC Website](https://mightypc.onrender.com/)
 
 ## Tech Stack
 
