@@ -48,7 +48,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/configurator/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/configurator/**").authenticated()
                         .requestMatchers("/api/user-pcs/**").authenticated()
-                        .requestMatchers(HttpMethod.POST,"/api/user-pcs/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/user-pcs/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/hardware/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/pc/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/configuration/calculate-energy-consumption").authenticated()
