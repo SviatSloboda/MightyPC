@@ -28,6 +28,7 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -82,11 +83,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/workstation/**").hasRole("ADMIN")
                         .requestMatchers("/api/user/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/user/login").permitAll()
-                        .requestMatchers( "/api/basket/**").authenticated()
+                        .requestMatchers("/api/basket/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/order/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/order/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/order/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/order/**").hasRole("ADMIN")
+                        .anyRequest().permitAll() // Allow all other requests
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
