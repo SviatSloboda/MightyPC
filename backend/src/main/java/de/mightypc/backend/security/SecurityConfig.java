@@ -16,8 +16,12 @@ import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -44,7 +48,25 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtTokenProvider tokenProvider, CustomUserDetailsService userDetailsService) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(request -> {
+                    CorsConfiguration config = new CorsConfiguration();
+                    config.setAllowedOrigins(Arrays.asList("http://localhost:5173", "https://mightypc.onrender.com"));
+                    config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                    config.setAllowedHeaders(List.of("*"));
+                    config.setAllowCredentials(true);
+                    return config;
+                }))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/").permitAll()
+                        .requestMatchers("/pc/**").permitAll()
+                        .requestMatchers("/workstation/**").permitAll()
+                        .requestMatchers("/configurator/**").permitAll()
+                        .requestMatchers("/hardware/**").permitAll()
+                        .requestMatchers("/basket/**").permitAll()
+                        .requestMatchers("/order/**").permitAll()
+                        .requestMatchers("/user/**").permitAll()
+                        .requestMatchers("/user-pcs/**").permitAll()
+                        .requestMatchers("/privacy-policy/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/configurator/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/configurator/**").authenticated()
                         .requestMatchers("/api/user-pcs/**").authenticated()
@@ -90,7 +112,7 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:5173")
+                        .allowedOrigins("http://localhost:5173", "https://mightypc.onrender.com")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
