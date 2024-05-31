@@ -1,5 +1,4 @@
 import {useEffect, useState} from "react";
-import axios from "axios";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {useAuth} from "../../contexts/AuthContext.tsx";
 import useLoginModal from "../login/useLoginModal.ts";
@@ -8,6 +7,7 @@ import Photo from "../hardware/utils/Photo.tsx";
 import Rating from "../hardware/utils/Rating.tsx";
 import pcPhoto from "../../assets/pc/Pc.png"
 import {PC} from "../../model/pc/PC.tsx";
+import useAxiosWithAuth from "../../contexts/useAxiosWithAuth.ts";
 
 export default function PcCharacteristics() {
     const [pc, setPc] = useState<PC | null>(null);
@@ -34,6 +34,8 @@ export default function PcCharacteristics() {
     const {state} = location;
     const isUserPc = state?.isUserPc || false;
 
+    const axiosInstance = useAxiosWithAuth();
+
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
 
     const navigate = useNavigate();
@@ -46,12 +48,12 @@ export default function PcCharacteristics() {
         const fetchPcData = async () => {
             if (id) {
                 try {
-                    let url = `/api/pc/${id}`;
+                    let url = `/pc/${id}`;
                     if (isUserPc && user) {
-                        url = `/api/user-pcs/${user.id}/${id}`;
+                        url = `/user-pcs/${user.id}/${id}`;
                     }
 
-                    const response = await axios.get(url);
+                    const response = await axiosInstance.get(url);
                     setPc(response.data);
                     setPhotos(response.data.photos || []);
 
@@ -86,7 +88,7 @@ export default function PcCharacteristics() {
         formData.append("file", file);
 
         try {
-            const response = await axios.post(`/api/pc/upload/image/${id}`, formData, {
+            const response = await axiosInstance.post(`/pc/upload/image/${id}`, formData, {
                 headers: {'Content-Type': 'multipart/form-data'}
             });
             setPhotos(prevPhotos => [response.data, ...prevPhotos]);
@@ -97,14 +99,14 @@ export default function PcCharacteristics() {
 
     const handleDelete = () => {
         if (isUserPc) {
-            axios.delete(`../api/user-pcs/${user?.id}/${pc?.id}`)
+            axiosInstance.delete(`../user-pcs/${user?.id}/${pc?.id}`)
                 .then(() => {
                     navigate('../user-pcs');
                 })
                 .catch(console.error);
 
         } else {
-            axios.delete(`/api/pc/${id}`)
+            axiosInstance.delete(`/pc/${id}`)
                 .then(() => {
                     navigate('../pc');
                 })
@@ -129,14 +131,14 @@ export default function PcCharacteristics() {
         };
 
         if (isUserPc) {
-            axios.put("../api/user-pcs/" + user?.id, payload)
+            axiosInstance.put("../user-pcs/" + user?.id, payload)
                 .then(response => {
                     setPc(response.data);
                     setIsUpdateModalOpen(false);
                 })
                 .catch(console.error);
         } else {
-            axios.put(`/api/pc`, payload)
+            axiosInstance.put(`/pc`, payload)
                 .then(response => {
                     setPc(response.data);
                     setIsUpdateModalOpen(false);
@@ -160,7 +162,7 @@ export default function PcCharacteristics() {
             pathToCharacteristicsPage: "/pc"
         };
 
-        axios.post<void>(`/api/basket/${user?.id}`, payload)
+        axiosInstance.post<void>(`/basket/${user?.id}`, payload)
             .then(() => {
                 navigate("../basket/");
             })
@@ -179,7 +181,7 @@ export default function PcCharacteristics() {
 
 
     const handleAdditionOfPrivateUserPcToAllPcs = () => {
-        axios.put<void>(`../api/user-pcs/${user?.id}/${pc?.id}/promote`)
+        axiosInstance.put<void>(`../user-pcs/${user?.id}/${pc?.id}/promote`)
             .then(() => {
                 navigate("../pc")
             })

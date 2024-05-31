@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import axios from 'axios';
 import ProductBox from './utils/ProductBox.tsx';
 import Modal, {useModal} from './utils/Modal.tsx';
 import {useNavigate} from 'react-router-dom';
@@ -18,6 +17,7 @@ import ssdPhoto from '../../assets/hardware/ssd.png';
 import {IThumbProps, ITrackProps} from 'react-range/lib/types';
 import pcPhoto from "../../assets/pc/Pc.png";
 import workstationPhoto from "../../assets/pc/Workstations.png";
+import useAxiosWithAuth from "../../contexts/useAxiosWithAuth.ts";
 
 type HardwareType = 'cpu' | 'gpu' | 'hdd' | 'motherboard' | 'pc-case' | 'psu' | 'ram' | 'ssd' | 'pc' | 'workstation';
 
@@ -121,8 +121,8 @@ type FilterField = {
 
 const hardwareConfig: Record<HardwareType, HardwareConfig<HardwareItem>> = {
     cpu: {
-        apiPath: '/api/hardware/cpu/filtered',
-        addApiPath: '/api/hardware/cpu',
+        apiPath: '/hardware/cpu/filtered',
+        addApiPath: '/hardware/cpu',
         photo: cpuPhoto,
         additionalFields: {socket: ''} as Partial<CPU>,
         filterFields: [
@@ -132,8 +132,8 @@ const hardwareConfig: Record<HardwareType, HardwareConfig<HardwareItem>> = {
         ]
     },
     gpu: {
-        apiPath: '/api/hardware/gpu/filtered',
-        addApiPath: '/api/hardware/gpu',
+        apiPath: '/hardware/gpu/filtered',
+        addApiPath: '/hardware/gpu',
         photo: gpuPhoto,
         additionalFields: {} as Partial<GPU>,
         filterFields: [
@@ -142,8 +142,8 @@ const hardwareConfig: Record<HardwareType, HardwareConfig<HardwareItem>> = {
         ]
     },
     hdd: {
-        apiPath: '/api/hardware/hdd/filtered',
-        addApiPath: '/api/hardware/hdd',
+        apiPath: '/hardware/hdd/filtered',
+        addApiPath: '/hardware/hdd',
         photo: hddPhoto,
         additionalFields: {capacity: ''} as Partial<HDD>,
         filterFields: [
@@ -153,8 +153,8 @@ const hardwareConfig: Record<HardwareType, HardwareConfig<HardwareItem>> = {
         ]
     },
     motherboard: {
-        apiPath: '/api/hardware/motherboard/filtered',
-        addApiPath: '/api/hardware/motherboard',
+        apiPath: '/hardware/motherboard/filtered',
+        addApiPath: '/hardware/motherboard',
         photo: motherboardPhoto,
         additionalFields: {socket: ''} as Partial<Motherboard>,
         filterFields: [
@@ -164,8 +164,8 @@ const hardwareConfig: Record<HardwareType, HardwareConfig<HardwareItem>> = {
         ]
     },
     'pc-case': {
-        apiPath: '/api/hardware/pc-case/filtered',
-        addApiPath: '/api/hardware/pc-case',
+        apiPath: '/hardware/pc-case/filtered',
+        addApiPath: '/hardware/pc-case',
         photo: pcCasePhoto,
         additionalFields: {dimensions: ''} as Partial<PcCase>,
         filterFields: [
@@ -175,8 +175,8 @@ const hardwareConfig: Record<HardwareType, HardwareConfig<HardwareItem>> = {
         ]
     },
     psu: {
-        apiPath: '/api/hardware/psu/filtered',
-        addApiPath: '/api/hardware/psu',
+        apiPath: '/hardware/psu/filtered',
+        addApiPath: '/hardware/psu',
         photo: psuPhoto,
         additionalFields: {power: 0} as Partial<PSU>,
         filterFields: [
@@ -186,8 +186,8 @@ const hardwareConfig: Record<HardwareType, HardwareConfig<HardwareItem>> = {
         ]
     },
     ram: {
-        apiPath: '/api/hardware/ram/filtered',
-        addApiPath: '/api/hardware/ram',
+        apiPath: '/hardware/ram/filtered',
+        addApiPath: '/hardware/ram',
         photo: ramPhoto,
         additionalFields: {type: '', memorySize: 0} as Partial<RAM>,
         filterFields: [
@@ -198,8 +198,8 @@ const hardwareConfig: Record<HardwareType, HardwareConfig<HardwareItem>> = {
         ]
     },
     ssd: {
-        apiPath: '/api/hardware/ssd/filtered',
-        addApiPath: '/api/hardware/ssd',
+        apiPath: '/hardware/ssd/filtered',
+        addApiPath: '/hardware/ssd',
         photo: ssdPhoto,
         additionalFields: {capacity: 0} as Partial<SSD>,
         filterFields: [
@@ -209,8 +209,8 @@ const hardwareConfig: Record<HardwareType, HardwareConfig<HardwareItem>> = {
         ]
     },
     pc: {
-        apiPath: '/api/pc/filtered',
-        addApiPath: '/api/pc',
+        apiPath: '/pc/filtered',
+        addApiPath: '/pc',
         photo: pcPhoto,
         additionalFields: {
             specsIds: {
@@ -230,8 +230,8 @@ const hardwareConfig: Record<HardwareType, HardwareConfig<HardwareItem>> = {
         ]
     },
     workstation: {
-        apiPath: '/api/workstation/filtered',
-        addApiPath: '/api/workstation',
+        apiPath: '/workstation/filtered',
+        addApiPath: '/workstation',
         photo: workstationPhoto,
         additionalFields: {
             specsIds: {
@@ -274,9 +274,11 @@ function HardwarePage<T extends HardwareItem>({type}: Readonly<HardwarePageProps
     const {user, isSuperUser} = useAuth();
     const {isLoginModalOpen, showLoginModal, hideLoginModal, handleLogin} = useLoginModal();
 
+    const axiosInstance = useAxiosWithAuth();
+
     useEffect(() => {
         const fetchItems = () => {
-            axios.get(`${hardwareConfig[type].apiPath}?page=${currentPage}&size=${itemsPerPage}`, {
+            axiosInstance.get(`${hardwareConfig[type].apiPath}?page=${currentPage}&size=${itemsPerPage}`, {
                 params: {
                     ...filter, sortType
                 }
@@ -293,22 +295,23 @@ function HardwarePage<T extends HardwareItem>({type}: Readonly<HardwarePageProps
         fetchItems();
     }, [currentPage, itemsPerPage, type, sortType, filter]);
 
+
     function paginate(pageNumber: number) {
         setCurrentPage(pageNumber);
     }
 
-    function saveValues() {
+    const saveValues = () => {
         const payload = {
             hardwareSpec, ...additionalFields
         };
-        axios.post(hardwareConfig[type].addApiPath, payload)
+        axiosInstance.post(hardwareConfig[type].addApiPath, payload)
             .then(response => {
                 console.log(`${type} added:`, response.data);
                 setItems(prevItems => [...prevItems, response.data]);
                 toggleModal();
             })
             .catch(error => console.error(`Failed to add ${type}:`, error));
-    }
+    };
 
     const handleAddToBasket = (item: T) => {
         if (!user) {
@@ -340,7 +343,7 @@ function HardwarePage<T extends HardwareItem>({type}: Readonly<HardwarePageProps
             pathToCharacteristicsPage
         };
 
-        axios.post(`/api/basket/${user.id}`, payload)
+        axiosInstance.post(`/basket/${user.id}`, payload, {withCredentials: true})
             .then(() => {
                 navigate("../basket/");
             })

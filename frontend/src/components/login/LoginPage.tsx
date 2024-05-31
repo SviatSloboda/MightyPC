@@ -1,10 +1,11 @@
-import React, {useState} from 'react';
+import React, {FormEvent, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import {toast, ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import RegisterModal from './RegisterModal';
 import {useAuth} from '../../contexts/AuthContext';
+import useAxiosWithAuth from "../../contexts/useAxiosWithAuth.ts";
 
 export default function LoginPage() {
     const {updateUser} = useAuth();
@@ -12,24 +13,32 @@ export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+    const axiosInstance = useAxiosWithAuth();
 
     const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value);
     const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value);
 
-    const handleLogin = async (e: React.FormEvent) => {
+    const handleLogin = async (e: FormEvent) => {
         e.preventDefault();
         try {
-            const response = await axios.post('/api/user/login', {email, password}, {withCredentials: true});
+            const response = await axiosInstance.post('/user/login', {email, password});
             if (response.status === 200) {
+                const token = response.headers['authorization'].split(' ')[1];
+                localStorage.setItem('authToken', token);
                 updateUser(response.data);
                 navigate('/');
             } else {
-                console.error('Login failed with status', response.status);
                 toast.error('Login failed. Please check your credentials.');
             }
         } catch (error: unknown) {
-            if (axios.isAxiosError(error) && error.response && error.response.status === 401) {
-                toast.error('Invalid credentials. Please try again.');
+            if (axios.isAxiosError(error) && error.response) {
+                if (error.response.status === 401) {
+                    toast.error('Invalid credentials. Please check your email and password.');
+                } else if (error.response.status === 400) {
+                    toast.error('Bad request. Please ensure all fields are filled correctly.');
+                } else {
+                    toast.error('Login failed. Please try again later.');
+                }
             } else {
                 toast.error('Login failed. Please try again later.');
                 console.error('Login failed', error);

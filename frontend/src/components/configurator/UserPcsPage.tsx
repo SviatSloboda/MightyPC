@@ -1,5 +1,4 @@
 import {useCallback, useEffect, useState} from 'react';
-import axios from 'axios';
 import {useNavigate} from "react-router-dom";
 import pcPhoto from "../../assets/pc/Pc.png";
 import nothingImage from "../../assets/pc/noPC.png";
@@ -8,6 +7,7 @@ import useLoginModal from "../login/useLoginModal.ts";
 import LoginModal from "../login/LoginModal.tsx";
 import {PC} from "../../model/pc/PC.tsx";
 import UserProductBox from "./UserProductBox.tsx";
+import useAxiosWithAuth from "../../contexts/useAxiosWithAuth.ts";
 
 export default function UserPcsPage() {
     const [pcs, setPcs] = useState<PC[]>([]);
@@ -17,6 +17,8 @@ export default function UserPcsPage() {
     const {user} = useAuth();
     const {isLoginModalOpen, showLoginModal, hideLoginModal, handleLogin} = useLoginModal();
     const navigate = useNavigate();
+
+    const axiosInstance = useAxiosWithAuth();
 
     const fetchPcs = useCallback(async () => {
         if (!user) {
@@ -32,7 +34,7 @@ export default function UserPcsPage() {
         }
         const userId = user?.id;
         if (userId) {
-            const response = await axios.get(`/api/user-pcs/${userId}/page`, {
+            const response = await axiosInstance.get(`/user-pcs/${userId}/page`, {
                 params: {
                     page: currentPage,
                     size: pcsPerPage
@@ -62,7 +64,7 @@ export default function UserPcsPage() {
             price: pc.hardwareSpec.price,
             photos: pc.photos?.length ? pc.photos : [pcPhoto]
         };
-        axios.post(`/api/basket/${user.id}`, payload).then(() => navigate("../basket/"));
+        axiosInstance.post(`/basket/${user.id}`, payload).then(() => navigate("../basket/"));
     };
 
     return (

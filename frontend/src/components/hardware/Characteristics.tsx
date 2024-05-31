@@ -1,5 +1,4 @@
 import {useEffect, useState} from "react";
-import axios from "axios";
 import {useNavigate, useParams} from "react-router-dom";
 import Photo from "./utils/Photo.tsx";
 import Rating from "./utils/Rating.tsx";
@@ -14,6 +13,7 @@ import pcCasePhoto from "../../assets/hardware/pcCase.png";
 import psuPhoto from "../../assets/hardware/psu.png";
 import ramPhoto from "../../assets/hardware/ram.png";
 import ssdPhoto from "../../assets/hardware/ssd.png";
+import useAxiosWithAuth from "../../contexts/useAxiosWithAuth.ts";
 
 type HardwareType = 'cpu' | 'gpu' | 'hdd' | 'motherboard' | 'pc-case' | 'psu' | 'ram' | 'ssd';
 
@@ -96,9 +96,11 @@ function Characteristics<T extends HardwareItem>({type, apiPath, defaultPhoto}: 
     const navigate = useNavigate();
     const {isLoginModalOpen, showLoginModal, hideLoginModal, handleLogin} = useLoginModal();
 
+    const axiosInstance = useAxiosWithAuth();
+
     useEffect(() => {
         if (id) {
-            axios.get(`${apiPath}/${id}`)
+            axiosInstance.get(`${apiPath}/${id}`)
                 .then(response => {
                     setItem(response.data);
                     setPhotos(response.data.photos ?? []);
@@ -117,7 +119,7 @@ function Characteristics<T extends HardwareItem>({type, apiPath, defaultPhoto}: 
         formData.append("file", file);
 
         try {
-            const response = await axios.post(`${apiPath}/upload/image/${id}`, formData, {
+            const response = await axiosInstance.post(`${apiPath}/upload/image/${id}`, formData, {
                 headers: {'Content-Type': 'multipart/form-data'}
             });
             setPhotos(prevPhotos => [response.data, ...prevPhotos]);
@@ -127,7 +129,7 @@ function Characteristics<T extends HardwareItem>({type, apiPath, defaultPhoto}: 
     };
 
     const handleDelete = () => {
-        axios.delete(`${apiPath}/${id}`)
+        axiosInstance.delete(`${apiPath}/${id}`)
             .then(() => {
                 navigate(`/hardware/${type}`);
             })
@@ -135,7 +137,7 @@ function Characteristics<T extends HardwareItem>({type, apiPath, defaultPhoto}: 
     };
 
     const handleUpdate = () => {
-        axios.put(`${apiPath}`, updatedFields)
+        axiosInstance.put(`${apiPath}`, updatedFields)
             .then(response => {
                 setItem(response.data);
                 setIsUpdateModalOpen(false);
@@ -157,7 +159,7 @@ function Characteristics<T extends HardwareItem>({type, apiPath, defaultPhoto}: 
             pathToCharacteristicsPage: `/hardware/${type}`
         };
 
-        axios.post<void>(`/api/basket/${user.id}`, payload)
+        axiosInstance.post<void>(`/basket/${user.id}`, payload)
             .then(() => {
                 navigate("../basket/");
             })
@@ -342,16 +344,16 @@ function Characteristics<T extends HardwareItem>({type, apiPath, defaultPhoto}: 
     </>);
 }
 
-const CpuCharacteristics = () => <Characteristics type="cpu" apiPath="/api/hardware/cpu" defaultPhoto={cpuPhoto}/>;
-const GpuCharacteristics = () => <Characteristics type="gpu" apiPath="/api/hardware/gpu" defaultPhoto={gpuPhoto}/>;
-const HddCharacteristics = () => <Characteristics type="hdd" apiPath="/api/hardware/hdd" defaultPhoto={hddPhoto}/>;
-const MotherboardCharacteristics = () => <Characteristics type="motherboard" apiPath="/api/hardware/motherboard"
+const CpuCharacteristics = () => <Characteristics type="cpu" apiPath="/hardware/cpu" defaultPhoto={cpuPhoto}/>;
+const GpuCharacteristics = () => <Characteristics type="gpu" apiPath="/hardware/gpu" defaultPhoto={gpuPhoto}/>;
+const HddCharacteristics = () => <Characteristics type="hdd" apiPath="/hardware/hdd" defaultPhoto={hddPhoto}/>;
+const MotherboardCharacteristics = () => <Characteristics type="motherboard" apiPath="/hardware/motherboard"
                                                           defaultPhoto={motherboardPhoto}/>;
-const PcCaseCharacteristics = () => <Characteristics type="pc-case" apiPath="/api/hardware/pc-case"
+const PcCaseCharacteristics = () => <Characteristics type="pc-case" apiPath="/hardware/pc-case"
                                                      defaultPhoto={pcCasePhoto}/>;
-const PsuCharacteristics = () => <Characteristics type="psu" apiPath="/api/hardware/psu" defaultPhoto={psuPhoto}/>;
-const RamCharacteristics = () => <Characteristics type="ram" apiPath="/api/hardware/ram" defaultPhoto={ramPhoto}/>;
-const SsdCharacteristics = () => <Characteristics type="ssd" apiPath="/api/hardware/ssd" defaultPhoto={ssdPhoto}/>;
+const PsuCharacteristics = () => <Characteristics type="psu" apiPath="/hardware/psu" defaultPhoto={psuPhoto}/>;
+const RamCharacteristics = () => <Characteristics type="ram" apiPath="/hardware/ram" defaultPhoto={ramPhoto}/>;
+const SsdCharacteristics = () => <Characteristics type="ssd" apiPath="/hardware/ssd" defaultPhoto={ssdPhoto}/>;
 
 export {
     CpuCharacteristics,
